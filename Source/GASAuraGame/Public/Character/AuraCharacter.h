@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Character/AuraCharacterBase.h"
+#include "Camera/CameraComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "AuraCharacter.generated.h"
 
 /**
@@ -14,4 +16,13 @@ class GASAURAGAME_API AAuraCharacter : public AAuraCharacterBase
 {
 	GENERATED_BODY()
 	
+public:
+	AAuraCharacter();
+
+private:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USpringArmComponent> CameraSpringArm;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UCameraComponent> FollowCamera;
 };
