@@ -18,6 +18,11 @@ class GASAURAGAME_API AAuraEnemy : public AAuraCharacterBase, public IEnemyInter
 public:
 	AAuraEnemy();
 
+	/* 敌人接口 */
 	virtual void HighlightActor() override;
 	virtual void UnHighlightActor() override;
+	/* 敌人接口结尾 */
+
+protected:
+	virtual void BeginPlay() override;
 };
