@@ -1,7 +1,7 @@
 // Super Copyright
 
 
-#include "Widgets/AuraUserWidget.h"
+#include "UI/Widgets/AuraUserWidget.h"
 
 void UAuraUserWidget::SetWidgetController(UObject* InWidgetController)
 {
