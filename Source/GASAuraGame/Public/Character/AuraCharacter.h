@@ -28,5 +28,5 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCameraComponent> FollowCamera;
 
-	void InitAbilityActorInfo();
+	virtual void InitAbilityActorInfo() override;
 };

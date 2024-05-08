@@ -14,4 +14,10 @@ class GASAURAGAME_API UAuraAbilitySystemComponentBase : public UAbilitySystemCom
 {
 	GENERATED_BODY()
 	
+public:
+	void AbilityActorInfoSet();
+
+protected:
+	void OnEffectApplied(UAbilitySystemComponent* TargetASC, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle);
+
 };
