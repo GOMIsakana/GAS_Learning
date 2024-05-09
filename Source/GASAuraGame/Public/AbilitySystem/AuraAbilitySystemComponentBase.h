@@ -4,7 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
+#include "Net/UnrealNetwork.h"
 #include "AuraAbilitySystemComponentBase.generated.h"
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FEffectAssetTags, const FGameplayTagContainer& /* 资产的Tag */)
 
 /**
  * 
@@ -16,6 +19,8 @@ class GASAURAGAME_API UAuraAbilitySystemComponentBase : public UAbilitySystemCom
 	
 public:
 	void AbilityActorInfoSet();
+
+	FEffectAssetTags EffectAssetTags;
 
 protected:
 	void OnEffectApplied(UAbilitySystemComponent* TargetASC, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle);

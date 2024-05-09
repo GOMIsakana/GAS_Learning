@@ -13,9 +13,5 @@ void UAuraAbilitySystemComponentBase::OnEffectApplied(UAbilitySystemComponent* T
 	FGameplayTagContainer TagContainer;
 	EffectSpec.GetAllAssetTags(TagContainer);
 
-	for (const FGameplayTag Tag : TagContainer)
-	{
-		FString DebugMsg = FString::Printf(TEXT("Get Tag: %s"), *Tag.GetTagName().ToString());
-		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Cyan, DebugMsg);
-	}
+	EffectAssetTags.Broadcast(TagContainer);
 }
