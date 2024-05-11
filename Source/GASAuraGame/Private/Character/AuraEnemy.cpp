@@ -34,6 +34,7 @@ void AAuraEnemy::BeginPlay()
 	Super::BeginPlay();
 
 	InitAbilityActorInfo();
+	InitializePrimaryAttribute();
 }
 
 void AAuraEnemy::InitAbilityActorInfo()
