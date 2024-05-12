@@ -42,7 +42,7 @@ void AAuraCharacter::PossessedBy(AController* NewController)
 	// 在 服务器上 初始化角色能力信息(AbilityActorInfo)
 	// 如果其他没有PossessBy函数的Actor中设置ASC(AbilitySystemComponent)的OnwerActor,需要手动给改Acotr设置一个有效的Controller作为Onwer，以保证ASC的Mixed网络模式正常运行
 	InitAbilityActorInfo();
-	InitializePrimaryAttribute();
+	InitializeDefaultAttribute();
 }
 
 void AAuraCharacter::OnRep_PlayerState()
@@ -54,10 +54,20 @@ void AAuraCharacter::OnRep_PlayerState()
 	InitAbilityActorInfo();
 }
 
+int32 AAuraCharacter::GetCombatLevel()
+{
+	const AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
+	if (AuraPlayerState)
+	{
+		return AuraPlayerState->GetCombatLevel();
+	}
+	return 0;
+}
+
 void AAuraCharacter::InitAbilityActorInfo()
 {
 	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
-	check(AuraPlayerState);
+	if (!IsValid(AuraPlayerState)) return;
 	AuraPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(AuraPlayerState, this);
 
 	Cast<UAuraAbilitySystemComponentBase>(AuraPlayerState->GetAbilitySystemComponent())->AbilityActorInfoSet();

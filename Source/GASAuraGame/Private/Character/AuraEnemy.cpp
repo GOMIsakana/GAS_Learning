@@ -29,12 +29,17 @@ void AAuraEnemy::UnHighlightActor()
 	Weapon->SetRenderCustomDepth(false);
 }
 
+int32 AAuraEnemy::GetCombatLevel()
+{
+	return Level;
+}
+
 void AAuraEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
 	InitAbilityActorInfo();
-	InitializePrimaryAttribute();
+	InitializeDefaultAttribute();
 }
 
 void AAuraEnemy::InitAbilityActorInfo()
