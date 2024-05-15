@@ -19,6 +19,6 @@ public:
 	static UAuraAssetManager& Get();
 
 protected:
-
+	// 意义是将属性初始化为native属性
 	virtual void StartInitialLoading() override;
 };

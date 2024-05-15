@@ -6,8 +6,8 @@
 #include "AttributeSet.h"
 #include "AbilitySystemComponent.h"
 #include "GameplayEffectExtension.h"
+#include "Delegates/DelegateInstancesImpl.h"
 #include "AuraAttributeSet.generated.h"
-
 
 #define ATTRIBUTE_ACCESSORS(ClassName, PropertyName) \
 	GAMEPLAYATTRIBUTE_PROPERTY_GETTER(ClassName, PropertyName) \
@@ -47,6 +47,14 @@ struct FEffectProperties
 	FGameplayEffectContextHandle EffectContextHandle;
 };
 
+//typedef TBaseStaticDelegateInstance<FGameplayAttribute(), FDefaultDelegateUserPolicy>::FFuncPtr FAttributeFuncPtr;
+// 
+// 把函数的地址作为指针返回出去。template比typedef更通用
+// 
+// 不知什么原因导致继承模板无法使用, 只能直接用函数指针了
+// template<class T>
+// using TStaticFuncPtr = typename TBaseStaticDelegateInstance<T, FDefaultDelegateUserPolicy>::FFuncPtr;
+
 /**
  * 
  */
@@ -62,6 +70,17 @@ public:
 
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue);
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data);
+
+	TMap<FGameplayTag, FGameplayAttribute(*)()> TagsToAttributes;
+
+	/* 在.h文件中定义函数指针
+	TStaticFuncPtr<float(int32, float, int32)> AnyFunctionPtr;
+	static float AnyFunction(int32 integer1, float f1, int32 integer2);
+
+	在.cpp文件中，将函数指针和函数绑定
+	AnyFunctionPtr = AnyFunction;
+	float res = AnyFunctionPtr(values...)
+	*/
 
 	/*
 	* 次要属性
