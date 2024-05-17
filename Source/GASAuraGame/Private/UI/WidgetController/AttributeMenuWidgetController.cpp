@@ -34,6 +34,7 @@ void UAttributeMenuWidgetController::BindCallbacksToDependencies()
 void UAttributeMenuWidgetController::BroadcastAttributeInfo(const FGameplayAttribute& Attribute, const FGameplayTag Tag) const
 {
 	FAuraAttributeInfo Info = AttributeInfo->FindAttributeInfoForTag(Tag);
+	// 获取Attribute在某个AS中的值（具体的属性在AS里面已经写好（AS.GetMaxHealthAttribute这种）并加入到map里面了）
 	Info.AttributeValue = Attribute.GetNumericValue(AttributeSet);
 	AttributeInfoDelegate.Broadcast(Info);
 }

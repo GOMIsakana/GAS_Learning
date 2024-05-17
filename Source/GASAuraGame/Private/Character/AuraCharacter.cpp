@@ -43,6 +43,7 @@ void AAuraCharacter::PossessedBy(AController* NewController)
 	// 如果其他没有PossessBy函数的Actor中设置ASC(AbilitySystemComponent)的OnwerActor,需要手动给改Acotr设置一个有效的Controller作为Onwer，以保证ASC的Mixed网络模式正常运行
 	InitAbilityActorInfo();
 	InitializeDefaultAttribute();
+	AddCharacterAbilities();
 }
 
 void AAuraCharacter::OnRep_PlayerState()

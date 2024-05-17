@@ -43,3 +43,11 @@ void AAuraCharacterBase::InitializeDefaultAttribute() const
 	ApplyEffectToSelf(DefaultInitializeVitalAttributesClass, 1.f);
 }
 
+void AAuraCharacterBase::AddCharacterAbilities()
+{
+	if (!HasAuthority()) return;
+
+	UAuraAbilitySystemComponentBase* ASC = Cast<UAuraAbilitySystemComponentBase>(AbilitySystemComponent);
+	ASC->AddCharacterAbilities(StartupAbilities);
+}
+

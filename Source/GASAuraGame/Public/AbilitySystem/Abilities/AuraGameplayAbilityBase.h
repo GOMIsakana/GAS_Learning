@@ -1,0 +1,17 @@
+// Super Copyright
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Abilities/GameplayAbility.h"
+#include "AuraGameplayAbilityBase.generated.h"
+
+/**
+ * 
+ */
+UCLASS()
+class GASAURAGAME_API UAuraGameplayAbilityBase : public UGameplayAbility
+{
+	GENERATED_BODY()
+	
+};
