@@ -23,6 +23,7 @@ public:
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
+	virtual FVector GetCombatWeaponTipSocketLocation() override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -30,6 +31,9 @@ protected:
 	// UE的新标准, 尽量用TObject
 	UPROPERTY(EditAnywhere, Category = "武器")
 	TObjectPtr<USkeletalMeshComponent> Weapon;
+
+	UPROPERTY(EditAnywhere, Category = "武器")
+	FName WeaponTipSocketName;
 
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
