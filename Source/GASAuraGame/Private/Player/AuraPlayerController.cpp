@@ -82,13 +82,11 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 		return;
 	}
 
-	// 如果鼠标对准敌人，则释放技能
-	if (bTargeting)
-	{
-		if (GetAuraASC()) GetAuraASC()->AbilityInputTagReleased(InputTag);
-	}
-	// 如果对准地板，则使用导航系统从当前位置到目标位置生成一条导航线，并获取其中转折点作为spline的点，然后使用spline进行导航
-	else
+	// 如果鼠标准星对着目标，或按着shift
+	if (GetAuraASC()) GetAuraASC()->AbilityInputTagReleased(InputTag);
+
+	// 如果对准地板且没按下shift，则使用导航系统从当前位置到目标位置生成一条导航线，并获取其中转折点作为spline的点，然后使用spline进行导航
+	if (!bTargeting && !bShiftKeyDown)
 	{
 		APawn* ControlledPawn = GetPawn();
 		if (FollowTime <= ShortPressThresHold && ControlledPawn)
@@ -122,7 +120,7 @@ void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 		return;
 	}
 
-	if (bTargeting)
+	if (bTargeting || bShiftKeyDown)
 	{
 		if (GetAuraASC()) GetAuraASC()->AbilityInputTagHeld(InputTag);
 	}
@@ -180,6 +178,11 @@ void AAuraPlayerController::SetupInputComponent()
 	if (MoveAction)
 	{
 		AuraInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAuraPlayerController::Move);
+	}
+	if (ShiftAction)
+	{
+		AuraInputComponent->BindAction(ShiftAction, ETriggerEvent::Started, this, &AAuraPlayerController::ShiftPressed);
+		AuraInputComponent->BindAction(ShiftAction, ETriggerEvent::Completed, this, &AAuraPlayerController::ShiftReleased);
 	}
 
 	if (InputConfig)

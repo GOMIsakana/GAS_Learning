@@ -7,7 +7,7 @@
 #include "CombatInterface.generated.h"
 
 // This class does not need to be modified.
-UINTERFACE(MinimalAPI)
+UINTERFACE(MinimalAPI, BlueprintType)
 class UCombatInterface : public UInterface
 {
 	GENERATED_BODY()
@@ -24,4 +24,7 @@ class GASAURAGAME_API ICombatInterface
 public:
 	virtual int32 GetCombatLevel();
 	virtual FVector GetCombatWeaponTipSocketLocation();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void SetFacingLocation(const FVector& TargetLocation);
 };

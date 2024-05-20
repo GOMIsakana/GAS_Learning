@@ -4,20 +4,20 @@
 #include "AbilitySystem/Abilities/AuraProjectileSpell.h"
 #include "Interaction/CombatInterface.h"
 
-void UAuraProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+void UAuraProjectileSpell::SpawnProjectile(const FVector& TargetLocation)
 {
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	const bool bIsServer = HasAuthority(&ActivationInfo);
-	
-	if (!bIsServer) return;
+	if (!(GetAvatarActorFromActorInfo() && GetAvatarActorFromActorInfo()->HasAuthority())) return;
 
 	ICombatInterface* CombatInterface = Cast<ICombatInterface>(GetAvatarActorFromActorInfo());
 	if (ProjectileClass && CombatInterface)
 	{
-		FRotator SpawnRotation = GetAvatarActorFromActorInfo()->GetActorRotation();
 		FTransform SpawnTransform;
-		SpawnTransform.SetLocation(CombatInterface->GetCombatWeaponTipSocketLocation());
+		FVector SocketLocation = CombatInterface->GetCombatWeaponTipSocketLocation();
+		FRotator Rotation = (TargetLocation - SocketLocation).Rotation();
+		Rotation.Pitch = 0.f;
+
+		SpawnTransform.SetLocation(SocketLocation);
+		SpawnTransform.SetRotation(Rotation.Quaternion());
 
 		AAuraProjectile* Projectile = GetWorld()->SpawnActorDeferred<AAuraProjectile>(
 			ProjectileClass,
@@ -28,4 +28,13 @@ void UAuraProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 		);
 		Projectile->FinishSpawning(SpawnTransform);
 	}
+}
+
+void UAuraProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+{
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+
+	const bool bIsServer = HasAuthority(&ActivationInfo);
+	
+	if (!bIsServer) return;
 }

@@ -27,6 +27,7 @@ class GASAURAGAME_API AAuraPlayerController : public APlayerController
 public:
 	AAuraPlayerController();
 	virtual void PlayerTick(float DeltaTime) override;
+	FORCEINLINE FHitResult GetCursorHitResult() const { return CursorHit; }
 
 protected:
 	virtual void BeginPlay() override;
@@ -40,6 +41,12 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> MoveAction;
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<UInputAction> ShiftAction;
+
+	FORCEINLINE void ShiftPressed() { bShiftKeyDown = true; }
+	FORCEINLINE void ShiftReleased() { bShiftKeyDown = false; }
+	bool bShiftKeyDown = false;
 
 	void Move(const struct FInputActionValue& InputActionValue);
 
