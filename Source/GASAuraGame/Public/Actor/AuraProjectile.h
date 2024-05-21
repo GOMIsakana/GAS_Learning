@@ -10,6 +10,7 @@
 #include "Sound/SoundBase.h"
 #include "Sound/SoundCue.h"
 #include "Components/AudioComponent.h"
+#include "GameplayEffect.h"
 #include "AuraProjectile.generated.h"
 
 UCLASS()
@@ -22,6 +23,10 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovementComponent;
+
+	UPROPERTY(BlueprintReadWrite, meta = (ExposeOnSpawn = "true"))
+	FGameplayEffectSpecHandle DamageEffectHandle;
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void Destroyed() override;

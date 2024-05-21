@@ -79,8 +79,10 @@ void AAuraEffectActor::OnEndOverlap(AActor* TargetActor)
 	if (InfiniteEffectRemovalPolicy == EEffectRemovalPolicy::ERP_RemoveOnEndOverlap)
 	{
 		UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
-		if (!IsValid(TargetASC)) return;
-		TargetASC->RemoveActiveGameplayEffect(InfiniteEffectHandlesMap[TargetASC], InfiniteEffectRemovalStack);
-		InfiniteEffectHandlesMap.Remove(TargetASC);
+		if (IsValid(TargetASC) && InfiniteEffectHandlesMap.Contains(TargetASC) && InfiniteEffectHandlesMap[TargetASC].IsValid())
+		{
+			TargetASC->RemoveActiveGameplayEffect(InfiniteEffectHandlesMap[TargetASC], InfiniteEffectRemovalStack);
+			InfiniteEffectHandlesMap.Remove(TargetASC);
+		}
 	}
 }

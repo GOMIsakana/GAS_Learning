@@ -5,6 +5,9 @@
 #include "CoreMinimal.h"
 #include "Character/AuraCharacterBase.h"
 #include "Interaction/EnemyInterface.h"
+#include "Components/WidgetComponent.h"
+#include "Net/UnrealNetwork.h"
+#include "UI/WidgetController/OverlayWidgetController.h"
 #include "AuraEnemy.generated.h"
 
 /**
@@ -27,6 +30,11 @@ public:
 	virtual int32 GetCombatLevel() override;
 	/* 战斗接口结尾 */
 
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Attributes")
+	FOnAttributeChangedSignature OnEnemyHealthChanged;
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Attributes")
+	FOnAttributeChangedSignature OnEnemyMaxHealthChanged;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -35,4 +43,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Default")
 	int32 Level = 1;
 private:
+	void BindCallback();
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UWidgetComponent> HealthBar;
 };

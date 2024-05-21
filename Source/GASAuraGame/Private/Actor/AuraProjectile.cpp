@@ -5,6 +5,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraFunctionLibrary.h"
 #include "GASAuraGame/GASAuraGame.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
 
 AAuraProjectile::AAuraProjectile()
 {
@@ -77,6 +79,13 @@ void AAuraProjectile::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedCompo
 
 	if (HasAuthority())
 	{
+		UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwner());
+		UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor);
+		if (SourceASC && TargetASC)
+		{
+			SourceASC->ApplyGameplayEffectSpecToTarget(*DamageEffectHandle.Data.Get(), TargetASC);
+		}
+
 		Destroy();
 	}
 	else
