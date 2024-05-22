@@ -36,7 +36,7 @@ public:
 	TMap<ECharacterClass, FCharacterClassDefaultInfo> CharacterClassInfomation;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Common Class Defaults")
-	TSubclassOf<UGameplayEffect> SendcoryAttributes;
+	TSubclassOf<UGameplayEffect> SecondaryAttributes;
 	UPROPERTY(EditDefaultsOnly, Category = "Common Class Defaults")
 	TSubclassOf<UGameplayEffect> VitalAttributes;
 

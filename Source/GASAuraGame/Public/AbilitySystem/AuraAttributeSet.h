@@ -159,6 +159,14 @@ public:
 	FGameplayAttributeData Mana;
 	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Mana);
 
+	/*
+	* 元属性	元属性是在本地计算的属性，作为一个计算结果影响其他属性
+	*/
+
+	UPROPERTY(BlueprintReadOnly, Category = "Meta Attribute")
+	FGameplayAttributeData InComingDamage;
+	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, InComingDamage);
+
 	/* 关键属性 */
 
 	UFUNCTION()

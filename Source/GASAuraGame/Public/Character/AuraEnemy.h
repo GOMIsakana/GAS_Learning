@@ -8,6 +8,7 @@
 #include "Components/WidgetComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
+#include "Data/CharacterClassInfo.h"
 #include "AuraEnemy.generated.h"
 
 /**
@@ -42,6 +43,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Default")
 	int32 Level = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Default")
+	ECharacterClass CharacterClass;
+
+	virtual void InitializeDefaultAttribute() const override;
 private:
 	void BindCallback();
 	UPROPERTY(EditAnywhere)

@@ -5,6 +5,7 @@
 #include "Debug/DebugDrawComponent.h"
 #include "GASAuraGame/GASAuraGame.h"
 #include "UI/Widgets/AuraUserWidget.h"
+#include "AbilitySystem/AuraAbilitySystemLibrary.h"
 
 AAuraEnemy::AAuraEnemy()
 {
@@ -76,4 +77,9 @@ void AAuraEnemy::BindCallback()
 	);
 	OnEnemyHealthChanged.Broadcast(AuraAttributeSet->GetHealth());
 	OnEnemyMaxHealthChanged.Broadcast(AuraAttributeSet->GetMaxHealth());
+}
+
+void AAuraEnemy::InitializeDefaultAttribute() const
+{
+	UAuraAbilitySystemLibrary::InitializeDefaultAttributes(this, CharacterClass, Level, AbilitySystemComponent);
 }
