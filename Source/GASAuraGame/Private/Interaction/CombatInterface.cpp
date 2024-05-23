@@ -14,3 +14,7 @@ FVector ICombatInterface::GetCombatWeaponTipSocketLocation()
 {
 	return FVector();
 }
+
+void ICombatInterface::Die()
+{
+}

@@ -39,6 +39,8 @@ public:
 	TSubclassOf<UGameplayEffect> SecondaryAttributes;
 	UPROPERTY(EditDefaultsOnly, Category = "Common Class Defaults")
 	TSubclassOf<UGameplayEffect> VitalAttributes;
+	UPROPERTY(EditDefaultsOnly, Category = "Common Class Defaults")
+	TArray<TSubclassOf<UGameplayAbility>> CommonAbilities;
 
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE FCharacterClassDefaultInfo GetClassDefaultInfo(ECharacterClass CharacterClass) const { return CharacterClassInfomation.FindChecked(CharacterClass); }

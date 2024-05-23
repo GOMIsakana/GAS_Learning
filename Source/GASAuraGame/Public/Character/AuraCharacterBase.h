@@ -8,6 +8,7 @@
 #include "AbilitySystem/AuraAttributeSet.h"
 #include "AbilitySystemInterface.h"
 #include "Interaction/CombatInterface.h"
+#include "Net/UnrealNetwork.h"
 #include "AuraCharacterBase.generated.h"
 
 class UAbilitySystemComponent;
@@ -25,6 +26,12 @@ public:
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 	virtual FVector GetCombatWeaponTipSocketLocation() override;
 
+	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
+
+	UFUNCTION(NetMulticast, Reliable)
+	virtual void MulticastHandleDeath();
+
+	virtual void Die() override;
 protected:
 	virtual void BeginPlay() override;
 
@@ -58,4 +65,7 @@ protected:
 private:
 	UPROPERTY(EditAnywhere, Category = "Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TObjectPtr<UAnimMontage> HitReactMontage;
 };
