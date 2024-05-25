@@ -9,6 +9,7 @@
 #include "GameplayTags.h"
 #include "AbilitySystem/AuraAbilitySystemComponentBase.h"
 #include "Components/SplineComponent.h"
+#include "UI/Widgets/DamageTextWidgetComponent.h"
 #include "AuraPlayerController.generated.h"
 
 class UInputMappingContext;
@@ -28,6 +29,9 @@ public:
 	AAuraPlayerController();
 	virtual void PlayerTick(float DeltaTime) override;
 	FORCEINLINE FHitResult GetCursorHitResult() const { return CursorHit; }
+
+	UFUNCTION(Client, Reliable)
+	void ClientShowDamageNumber(float DamageAmount, AActor* Target);
 
 protected:
 	virtual void BeginPlay() override;
@@ -78,4 +82,7 @@ private:
 	TObjectPtr<USplineComponent> Spline;
 
 	void AutoRun();
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UDamageTextWidgetComponent> DamageTextComponentClass;
 };

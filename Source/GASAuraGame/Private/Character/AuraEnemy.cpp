@@ -78,6 +78,7 @@ void AAuraEnemy::InitAbilityActorInfo()
 void AAuraEnemy::Die()
 {
 	SetLifeSpan(LifeSpan);
+	HealthBar->SetVisibility(false);
 	Super::Die();
 }
 
