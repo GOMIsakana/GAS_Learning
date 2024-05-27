@@ -31,7 +31,7 @@ public:
 	FORCEINLINE FHitResult GetCursorHitResult() const { return CursorHit; }
 
 	UFUNCTION(Client, Reliable)
-	void ClientShowDamageNumber(float DamageAmount, AActor* Target);
+	void ClientShowDamageNumber(float DamageAmount, AActor* Target, bool bCriticalHit, bool bDamageValid);
 
 protected:
 	virtual void BeginPlay() override;

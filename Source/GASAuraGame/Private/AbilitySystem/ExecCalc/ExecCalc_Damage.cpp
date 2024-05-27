@@ -10,6 +10,7 @@
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "Data/CharacterClassInfo.h"
 #include "Interaction/CombatInterface.h"
+#include "AuraAbilityTypes.h"
 
 struct AuraDamageStatic
 {
@@ -54,6 +55,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	ICombatInterface* TargetCombatInterface = Cast<ICombatInterface>(TargetAvatarActor);
 
 	const FGameplayEffectSpec& EffectSpec = ExecutionParams.GetOwningSpec();
+	FGameplayEffectContextHandle EffectContextHandle = EffectSpec.GetContext();
 
 	const FGameplayTagContainer* SourceTags = EffectSpec.CapturedSourceTags.GetAggregatedTags();
 	const FGameplayTagContainer* TargetTags = EffectSpec.CapturedTargetTags.GetAggregatedTags();
@@ -61,7 +63,13 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	EvalParams.SourceTags = SourceTags;
 	EvalParams.TargetTags = TargetTags;
 
-	float Damage = EffectSpec.GetSetByCallerMagnitude(FAuraGameplayTags::Get().Damage);	// 获取Caller设置的Damage
+	float Damage = 0;	// 获取Caller设置的Damage
+
+	for (FGameplayTag DamageTypeTag : FAuraGameplayTags::Get().DamageTypes)
+	{
+		const float DamageValue = EffectSpec.GetSetByCallerMagnitude(DamageTypeTag);	// 获取Caller设置的Damage
+		Damage += DamageValue;
+	}
 
 	// 等级差曲线, 等级差越高, 高等级的穿透和防御效率越低
 	UCharacterClassInfo* CharacterClassInfo = UAuraAbilitySystemLibrary::GetCharacterClassInfo(SourceAvatarActor);
@@ -81,9 +89,21 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatic().CritChanceDef, EvalParams, CritChanceValue);
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatic().CritDamageDef, EvalParams, CritDamageValue);
 	CritDamageValue = FMath::Max<float>(0.f, CritDamageValue);
-	if (CritChanceValue > FMath::RandRange(0.f, 100.f))
+	bool bIsCriticalHit = CritChanceValue > FMath::RandRange(0.f, 100.f);
+	if (bIsCriticalHit)
 	{
 		Damage *= CritDamageValue / 100.f;
+	}
+
+	UAuraAbilitySystemLibrary::SetIsCriticalHit(EffectContextHandle, bIsCriticalHit);
+	if (Damage > 0.f)
+	{
+		UAuraAbilitySystemLibrary::SetIsDamageValid(EffectContextHandle, true);
+	}
+	else
+	{
+		UAuraAbilitySystemLibrary::SetIsDamageValid(EffectContextHandle, false);
+		Damage = 0.f;
 	}
 
 	const FGameplayModifierEvaluatedData EvalData(UAuraAttributeSet::GetInComingDamageAttribute(), EGameplayModOp::Additive, Damage);	// 将Damage增加到该角色的IncomingDamage
