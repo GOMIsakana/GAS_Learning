@@ -18,6 +18,11 @@ struct AuraDamageStatic
 	DECLARE_ATTRIBUTE_CAPTUREDEF(DefensePenetration);
 	DECLARE_ATTRIBUTE_CAPTUREDEF(CritChance);
 	DECLARE_ATTRIBUTE_CAPTUREDEF(CritDamage);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(Resist_Fire);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(Resist_Lighting);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(Resist_Arcane);
+
+	TMap<FGameplayTag, FGameplayEffectAttributeCaptureDefinition> TagsToCaptureDefs;
 
 	AuraDamageStatic()
 	{
@@ -25,6 +30,19 @@ struct AuraDamageStatic
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UAuraAttributeSet, DefensePenetration, Source, false);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UAuraAttributeSet, CritChance, Source, false);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UAuraAttributeSet, CritDamage, Source, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UAuraAttributeSet, Resist_Fire, Target, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UAuraAttributeSet, Resist_Lighting, Target, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UAuraAttributeSet, Resist_Arcane, Target, false);
+
+		const FAuraGameplayTags& Tags = FAuraGameplayTags::Get();
+
+		TagsToCaptureDefs.Add(Tags.Attributes_Secondary_Defense, DefenseDef);
+		TagsToCaptureDefs.Add(Tags.Attributes_Secondary_DefensePenetration, DefensePenetrationDef);
+		TagsToCaptureDefs.Add(Tags.Attributes_Secondary_CritChance, CritChanceDef);
+		TagsToCaptureDefs.Add(Tags.Attributes_Secondary_CritDamage, CritDamageDef);
+		TagsToCaptureDefs.Add(Tags.Attributes_Resist_Fire, Resist_FireDef);
+		TagsToCaptureDefs.Add(Tags.Attributes_Resist_Lighting, Resist_LightingDef);
+		TagsToCaptureDefs.Add(Tags.Attributes_Resist_Arcane, Resist_ArcaneDef);
 	}
 };
 
@@ -42,6 +60,10 @@ UExecCalc_Damage::UExecCalc_Damage()
 	RelevantAttributesToCapture.Add(DamageStatic().DefensePenetrationDef);
 	RelevantAttributesToCapture.Add(DamageStatic().CritChanceDef);
 	RelevantAttributesToCapture.Add(DamageStatic().CritDamageDef);
+
+	RelevantAttributesToCapture.Add(DamageStatic().Resist_FireDef);
+	RelevantAttributesToCapture.Add(DamageStatic().Resist_LightingDef);
+	RelevantAttributesToCapture.Add(DamageStatic().Resist_ArcaneDef);
 }
 
 void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
@@ -65,10 +87,20 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 
 	float Damage = 0;	// 获取Caller设置的Damage
 
-	for (FGameplayTag DamageTypeTag : FAuraGameplayTags::Get().DamageTypes)
+	for (const TTuple<FGameplayTag, FGameplayTag>& Pair : FAuraGameplayTags::Get().DamageTypeToResist)
 	{
-		const float DamageValue = EffectSpec.GetSetByCallerMagnitude(DamageTypeTag);	// 获取Caller设置的Damage
-		Damage += DamageValue;
+		const FGameplayTag DamageTypeTag = Pair.Key;
+		const FGameplayTag DamageResistTag = Pair.Value;
+		if (AuraDamageStatic().TagsToCaptureDefs.Contains(DamageResistTag))
+		{
+			float ResistValue = 0.f;
+			const FGameplayEffectAttributeCaptureDefinition CaptureDef = AuraDamageStatic().TagsToCaptureDefs[DamageResistTag];
+			ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(CaptureDef, EvalParams, ResistValue);
+			ResistValue = ResistValue > 100.f ? 100.f : ResistValue;
+			float DamageValue = EffectSpec.GetSetByCallerMagnitude(Pair.Key, false);	// 获取Caller设置的Damage
+			DamageValue *= (100 - ResistValue) / 100.f;
+			Damage += DamageValue;
+		}
 	}
 
 	// 等级差曲线, 等级差越高, 高等级的穿透和防御效率越低

@@ -38,7 +38,16 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 
 	GameplayTags.Damage = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Damage"), TEXT("即将到来的伤害"));
 	GameplayTags.Damage_Fire = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Damage.Fire"), TEXT("即将到来的火焰伤害"));
-	GameplayTags.DamageTypes.Add(GameplayTags.Damage_Fire);
+	GameplayTags.Damage_Lighting = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Damage.Lighting"), TEXT("即将到来的雷电伤害"));
+	GameplayTags.Damage_Arcane = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Damage.Arcane"), TEXT("即将到来的神秘伤害"));
+
+	GameplayTags.Attributes_Resist_Fire = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Damage.FireResist"), TEXT("火焰伤害抗性"));
+	GameplayTags.Attributes_Resist_Lighting = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Damage.LightingResist"), TEXT("雷电伤害抗性"));
+	GameplayTags.Attributes_Resist_Arcane = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Damage.ArcaneResist"), TEXT("神秘伤害抗性"));
+
+	GameplayTags.DamageTypeToResist.Add(GameplayTags.Damage_Fire, GameplayTags.Attributes_Resist_Fire);
+	GameplayTags.DamageTypeToResist.Add(GameplayTags.Damage_Lighting, GameplayTags.Attributes_Resist_Lighting);
+	GameplayTags.DamageTypeToResist.Add(GameplayTags.Damage_Arcane, GameplayTags.Attributes_Resist_Arcane);
 
 	GameplayTags.Effects_HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Effects.HitReact"), TEXT("受击硬直时给予的Tag"));
 }

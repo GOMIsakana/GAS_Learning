@@ -38,6 +38,10 @@ public:
 	FGameplayTag Attributes_Secondary_CritChance;
 	FGameplayTag Attributes_Secondary_CritDamage;
 
+	FGameplayTag Attributes_Resist_Fire;
+	FGameplayTag Attributes_Resist_Lighting;
+	FGameplayTag Attributes_Resist_Arcane;
+
 	FGameplayTag InputTag_LMB;
 	FGameplayTag InputTag_RMB;
 	FGameplayTag InputTag_1;
@@ -47,8 +51,10 @@ public:
 
 	FGameplayTag Damage;
 	FGameplayTag Damage_Fire;
+	FGameplayTag Damage_Lighting;
+	FGameplayTag Damage_Arcane;
 
-	TArray<FGameplayTag> DamageTypes;
+	TMap<FGameplayTag, FGameplayTag> DamageTypeToResist;
 
 	FGameplayTag Effects_HitReact;
 protected:

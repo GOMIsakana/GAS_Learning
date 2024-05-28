@@ -127,6 +127,16 @@ public:
 	FGameplayAttributeData CritDamage;
 	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, CritDamage);
 
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Resist_Fire, Category = "Secondary Attribute")
+	FGameplayAttributeData Resist_Fire;
+	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Resist_Fire);
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Resist_Lighting, Category = "Secondary Attribute")
+	FGameplayAttributeData Resist_Lighting;
+	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Resist_Lighting);
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Resist_Arcane, Category = "Secondary Attribute")
+	FGameplayAttributeData Resist_Arcane;
+	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Resist_Arcane);
+
 	/*
 	* 主要属性
 	*/
@@ -226,6 +236,13 @@ public:
 
 	UFUNCTION()
 	void OnRep_CritDamage(const FGameplayAttributeData& OldCritDamage) const;
+
+	UFUNCTION()
+	void OnRep_Resist_Fire(const FGameplayAttributeData& OldResist_Fire) const;
+	UFUNCTION()
+	void OnRep_Resist_Lighting(const FGameplayAttributeData& OldResist_Lighting) const;
+	UFUNCTION()
+	void OnRep_Resist_Arcane(const FGameplayAttributeData& OldResist_Arcane) const;
 
 private:
 	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const;

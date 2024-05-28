@@ -33,6 +33,9 @@ UAuraAttributeSet::UAuraAttributeSet()
 	TagsToAttributes.Add(GameplayTags.Attributes_Secondary_CritChance, GetCritChanceAttribute);
 	TagsToAttributes.Add(GameplayTags.Attributes_Secondary_CritDamage, GetCritDamageAttribute);
 
+	TagsToAttributes.Add(GameplayTags.Attributes_Resist_Fire, GetResist_FireAttribute);
+	TagsToAttributes.Add(GameplayTags.Attributes_Resist_Lighting, GetResist_LightingAttribute);
+	TagsToAttributes.Add(GameplayTags.Attributes_Resist_Arcane, GetResist_ArcaneAttribute);
 }
 
 void UAuraAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -59,6 +62,10 @@ void UAuraAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME_CONDITION_NOTIFY(UAuraAttributeSet, ManaRegeneration, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UAuraAttributeSet, CritChance, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UAuraAttributeSet, CritDamage, COND_None, REPNOTIFY_Always);
+
+	DOREPLIFETIME_CONDITION_NOTIFY(UAuraAttributeSet, Resist_Fire, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UAuraAttributeSet, Resist_Lighting, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UAuraAttributeSet, Resist_Arcane, COND_None, REPNOTIFY_Always);
 }
 
 void UAuraAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
@@ -158,7 +165,7 @@ void UAuraAttributeSet::ShowFloatingText(const FEffectProperties& Props, float D
 
 	if (Props.SourceCharacter != Props.TargetCharacter)
 	{
-		if (AAuraPlayerController* PC = Cast<AAuraPlayerController>(UGameplayStatics::GetPlayerController(Props.SourceCharacter, 0)))
+		if (AAuraPlayerController* PC = Cast<AAuraPlayerController>(Props.SourceController))
 		{
 			PC->ClientShowDamageNumber(DamageAmount, Props.TargetCharacter, bCriticalHit, bDamageValid);
 		}
@@ -253,4 +260,20 @@ void UAuraAttributeSet::OnRep_CritChance(const FGameplayAttributeData& OldCritCh
 void UAuraAttributeSet::OnRep_CritDamage(const FGameplayAttributeData& OldCritDamage) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UAuraAttributeSet, CritDamage, OldCritDamage);
+	UE_LOG(LogTemp, Warning, TEXT("CritDamage Changed: %.2f -> %.2f"), OldCritDamage.GetCurrentValue(), CritDamage.GetCurrentValue());
+}
+
+void UAuraAttributeSet::OnRep_Resist_Fire(const FGameplayAttributeData& OldResist_Fire) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UAuraAttributeSet, Resist_Fire, OldResist_Fire);
+}
+
+void UAuraAttributeSet::OnRep_Resist_Lighting(const FGameplayAttributeData& OldResist_Lighting) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UAuraAttributeSet, Resist_Lighting, OldResist_Lighting);
+}
+
+void UAuraAttributeSet::OnRep_Resist_Arcane(const FGameplayAttributeData& OldResist_Arcane) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UAuraAttributeSet, Resist_Arcane, OldResist_Arcane);
 }
