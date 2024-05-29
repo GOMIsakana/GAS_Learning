@@ -39,7 +39,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintCallable)
-	void ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGameplayEffect> GameplayEffectClass);
+	UPARAM(DisplayName = "bApplySuccessful") bool ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGameplayEffect> GameplayEffectClass);
 
 	UFUNCTION(BlueprintCallable)
 	void OnOverlap(AActor* TargetActor);
@@ -76,4 +76,7 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Apply Effect")
 	float ActorLevel = 1.f;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Apply Effect")
+	TArray<FName> AffectableTag;
 };

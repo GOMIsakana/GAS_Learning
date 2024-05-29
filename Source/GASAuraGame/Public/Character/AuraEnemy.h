@@ -9,7 +9,10 @@
 #include "Net/UnrealNetwork.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
 #include "Data/CharacterClassInfo.h"
+#include "BehaviorTree/BehaviorTree.h"
 #include "AuraEnemy.generated.h"
+
+class AAuraAIController;
 
 /**
  * 
@@ -21,6 +24,7 @@ class GASAURAGAME_API AAuraEnemy : public AAuraCharacterBase, public IEnemyInter
 	
 public:
 	AAuraEnemy();
+	virtual void PossessedBy(AController* NewController) override;
 
 	/* 敌人接口 */
 	virtual void HighlightActor() override;
@@ -61,6 +65,13 @@ protected:
 	ECharacterClass CharacterClass;
 
 	virtual void InitializeDefaultAttribute() const override;
+
+	UPROPERTY(EditAnywhere, Category = "AI")
+	TObjectPtr<UBehaviorTree> BehaviorTree;
+
+	UPROPERTY()
+	TObjectPtr<AAuraAIController> AuraAIController;
+
 private:
 	void BindCallback();
 	UPROPERTY(EditAnywhere)

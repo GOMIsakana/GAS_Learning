@@ -19,10 +19,21 @@ void AAuraEffectActor::BeginPlay()
 	
 }
 
-void AAuraEffectActor::ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGameplayEffect> GameplayEffectClass)
+UPARAM(DisplayName = "bApplySuccessful") bool AAuraEffectActor::ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGameplayEffect> GameplayEffectClass)
 {
+	bool bCanApplyEffect = false;
+	for (FName Tag : AffectableTag)
+	{
+		if (TargetActor->ActorHasTag(Tag))
+		{
+			bCanApplyEffect = true;
+			break;
+		}
+	}
+
+	if (!bCanApplyEffect) return false;
 	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
-	if (TargetASC == nullptr) return;
+	if (TargetASC == nullptr) return false;
 
 	check(GameplayEffectClass);
 	FGameplayEffectContextHandle EffectContextHandle = TargetASC->MakeEffectContext();
@@ -37,6 +48,7 @@ void AAuraEffectActor::ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGam
 		// InfiniteEffectHandlesMap.Add(ActiveEffectHandle, TargetASC);
 		InfiniteEffectHandlesMap.Add(TargetASC, ActiveEffectHandle);
 	}
+	return true;
 }
 
 void AAuraEffectActor::OnOverlap(AActor* TargetActor)
