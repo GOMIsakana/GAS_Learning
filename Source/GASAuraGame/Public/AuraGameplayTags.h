@@ -54,6 +54,8 @@ public:
 	FGameplayTag Damage_Lighting;
 	FGameplayTag Damage_Arcane;
 
+	FGameplayTag Abilities_Attack;
+
 	TMap<FGameplayTag, FGameplayTag> DamageTypeToResist;
 
 	FGameplayTag Effects_HitReact;

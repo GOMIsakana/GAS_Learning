@@ -27,6 +27,7 @@ public:
 	virtual FVector GetCombatWeaponTipSocketLocation() override;
 
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
+	virtual UAnimMontage* GetAttackMontage_Implementation() override;
 
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void MulticastHandleDeath();
@@ -84,4 +85,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TObjectPtr<UAnimMontage> HitReactMontage;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TObjectPtr<UAnimMontage> AttackMontage;
 };
