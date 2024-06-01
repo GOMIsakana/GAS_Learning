@@ -24,17 +24,25 @@ public:
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
-	virtual FVector GetCombatWeaponTipSocketLocation() override;
 
+	/* ICombatInterface 接口开始 */
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
 	virtual UAnimMontage* GetAttackMontage_Implementation() override;
+	virtual void Die() override;
+	virtual FVector GetCombatWeaponTipSocketLocation_Implementation() override;
+	virtual bool IsDead_Implementation() const override;
+	virtual AActor* GetAvatarActor_Implementation() override;
+	/* ICombatInterface 接口结束 */
+
 
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void MulticastHandleDeath();
 
-	virtual void Die() override;
 protected:
 	virtual void BeginPlay() override;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool bDead = false;
 
 	// UE的新标准, 尽量用TObject
 	UPROPERTY(EditAnywhere, Category = "武器")

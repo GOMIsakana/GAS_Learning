@@ -14,6 +14,10 @@ class GASAURAGAME_API UAuraDamageGameplayAbility : public UAuraGameplayAbilityBa
 {
 	GENERATED_BODY()
 	
+public:
+	UFUNCTION(BlueprintCallable)
+	void CauseDamage(AActor* TargetActor);
+
 protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)

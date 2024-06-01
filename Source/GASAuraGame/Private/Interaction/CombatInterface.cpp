@@ -10,11 +10,6 @@ int32 ICombatInterface::GetCombatLevel()
 	return 0;
 }
 
-FVector ICombatInterface::GetCombatWeaponTipSocketLocation()
-{
-	return FVector();
-}
-
 void ICombatInterface::Die()
 {
 }

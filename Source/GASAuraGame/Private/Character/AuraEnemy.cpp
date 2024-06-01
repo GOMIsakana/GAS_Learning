@@ -58,6 +58,16 @@ void AAuraEnemy::UnHighlightActor()
 	Weapon->SetRenderCustomDepth(false);
 }
 
+void AAuraEnemy::SetCombatTarget_Implementation(AActor* InCombatTarget)
+{
+	CombatTarget = InCombatTarget;
+}
+
+AActor* AAuraEnemy::GetCombatTarget_Implementation() const
+{
+	return CombatTarget;
+}
+
 int32 AAuraEnemy::GetCombatLevel()
 {
 	return Level;
@@ -67,14 +77,14 @@ void AAuraEnemy::OnHitReactTagChanged(const FGameplayTag CallbackTag, int32 NewC
 {
 
 	bHitReacting = NewCount > 0;
+	if (AuraAIController == nullptr || AuraAIController->GetBlackboardComponent() == nullptr) return;
+	AuraAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), bHitReacting);
 	if (bHitReacting)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = 0.f;
-		AuraAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), true);
 		return;
 	}
 	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
-	AuraAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), false);
 }
 
 void AAuraEnemy::BeginPlay()

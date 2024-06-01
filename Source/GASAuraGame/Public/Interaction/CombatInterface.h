@@ -23,7 +23,9 @@ class GASAURAGAME_API ICombatInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	virtual int32 GetCombatLevel();
-	virtual FVector GetCombatWeaponTipSocketLocation();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	FVector GetCombatWeaponTipSocketLocation();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void SetFacingLocation(const FVector& TargetLocation);
@@ -35,4 +37,10 @@ public:
 	UAnimMontage* GetAttackMontage();
 
 	virtual void Die();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool IsDead() const;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	AActor* GetAvatarActor();
 };

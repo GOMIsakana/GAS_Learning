@@ -29,6 +29,11 @@ public:
 	/* 敌人接口 */
 	virtual void HighlightActor() override;
 	virtual void UnHighlightActor() override;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void SetCombatTarget(AActor* InCombatTarget);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	AActor* GetCombatTarget() const;
 	/* 敌人接口结尾 */
 
 	/* 战斗接口 */
@@ -53,6 +58,9 @@ public:
 	float LifeSpan = 5.f;
 
 	virtual void Die() override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
+	TObjectPtr<AActor> CombatTarget;
 
 protected:
 	virtual void BeginPlay() override;
