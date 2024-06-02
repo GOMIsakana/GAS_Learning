@@ -4,7 +4,21 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "GameplayTags.h"
 #include "CombatInterface.generated.h"
+
+USTRUCT(BlueprintType)
+struct FTaggedMontage
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UAnimMontage* Montage = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FGameplayTag MontageTag;
+};
+
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType)
@@ -25,7 +39,7 @@ public:
 	virtual int32 GetCombatLevel();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	FVector GetCombatWeaponTipSocketLocation();
+	FVector GetCombatSocketLocation(const FGameplayTag& MontageTag);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void SetFacingLocation(const FVector& TargetLocation);
@@ -34,7 +48,7 @@ public:
 	UAnimMontage* GetHitReactMontage();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	UAnimMontage* GetAttackMontage();
+	TArray<FTaggedMontage> GetAttackMontages();
 
 	virtual void Die();
 

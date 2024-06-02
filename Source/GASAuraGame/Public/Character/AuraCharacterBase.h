@@ -27,9 +27,9 @@ public:
 
 	/* ICombatInterface 接口开始 */
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
-	virtual UAnimMontage* GetAttackMontage_Implementation() override;
+	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation() override;
 	virtual void Die() override;
-	virtual FVector GetCombatWeaponTipSocketLocation_Implementation() override;
+	virtual FVector GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag) override;
 	virtual bool IsDead_Implementation() const override;
 	virtual AActor* GetAvatarActor_Implementation() override;
 	/* ICombatInterface 接口结束 */
@@ -37,6 +37,9 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void MulticastHandleDeath();
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	TArray<FTaggedMontage> AttackMontages;
 
 protected:
 	virtual void BeginPlay() override;
@@ -50,6 +53,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "武器")
 	FName WeaponTipSocketName;
+	UPROPERTY(EditAnywhere, Category = "武器")
+	FName LeftHandSocketName;
+	UPROPERTY(EditAnywhere, Category = "武器")
+	FName RightHandSocketName;
 
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
@@ -93,7 +100,4 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TObjectPtr<UAnimMontage> HitReactMontage;
-
-	UPROPERTY(EditAnywhere, Category = "Combat")
-	TObjectPtr<UAnimMontage> AttackMontage;
 };

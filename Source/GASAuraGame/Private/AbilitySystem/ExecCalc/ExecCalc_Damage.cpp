@@ -14,6 +14,7 @@
 
 struct AuraDamageStatic
 {
+	DECLARE_ATTRIBUTE_CAPTUREDEF(PhysicalDamage);
 	DECLARE_ATTRIBUTE_CAPTUREDEF(Defense);
 	DECLARE_ATTRIBUTE_CAPTUREDEF(DefensePenetration);
 	DECLARE_ATTRIBUTE_CAPTUREDEF(CritChance);
@@ -26,6 +27,7 @@ struct AuraDamageStatic
 
 	AuraDamageStatic()
 	{
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UAuraAttributeSet, PhysicalDamage, Source, false);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UAuraAttributeSet, Defense, Target, false);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UAuraAttributeSet, DefensePenetration, Source, false);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UAuraAttributeSet, CritChance, Source, false);
@@ -36,6 +38,7 @@ struct AuraDamageStatic
 
 		const FAuraGameplayTags& Tags = FAuraGameplayTags::Get();
 
+		TagsToCaptureDefs.Add(Tags.Attributes_Secondary_PhysicalDamage, PhysicalDamageDef);
 		TagsToCaptureDefs.Add(Tags.Attributes_Secondary_Defense, DefenseDef);
 		TagsToCaptureDefs.Add(Tags.Attributes_Secondary_DefensePenetration, DefensePenetrationDef);
 		TagsToCaptureDefs.Add(Tags.Attributes_Secondary_CritChance, CritChanceDef);
@@ -56,6 +59,8 @@ static const AuraDamageStatic& DamageStatic()
 
 UExecCalc_Damage::UExecCalc_Damage()
 {
+	RelevantAttributesToCapture.Add(DamageStatic().PhysicalDamageDef);
+
 	RelevantAttributesToCapture.Add(DamageStatic().DefenseDef);
 	RelevantAttributesToCapture.Add(DamageStatic().DefensePenetrationDef);
 	RelevantAttributesToCapture.Add(DamageStatic().CritChanceDef);
@@ -86,6 +91,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	EvalParams.TargetTags = TargetTags;
 
 	float Damage = 0;	// 获取Caller设置的Damage
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatic().PhysicalDamageDef, EvalParams, Damage);
 
 	for (const TTuple<FGameplayTag, FGameplayTag>& Pair : FAuraGameplayTags::Get().DamageTypeToResist)
 	{
@@ -98,7 +104,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 			ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(CaptureDef, EvalParams, ResistValue);
 			ResistValue = ResistValue > 100.f ? 100.f : ResistValue;
 			float DamageValue = EffectSpec.GetSetByCallerMagnitude(Pair.Key, false);	// 获取Caller设置的Damage
-			DamageValue *= (100 - ResistValue) / 100.f;
+			DamageValue *= (100.f - ResistValue) / 100.f;
 			Damage += DamageValue;
 		}
 	}
