@@ -15,7 +15,7 @@ AAuraCharacter::AAuraCharacter()
 	
 	CameraSpringArm = CreateDefaultSubobject<USpringArmComponent>(FName("SpringArm"));
 	CameraSpringArm->SetupAttachment(RootComponent);
-	CameraSpringArm->TargetArmLength = 1000.f;
+	CameraSpringArm->TargetArmLength = 900.f;
 	CameraSpringArm->bUsePawnControlRotation = false;
 	CameraSpringArm->bInheritPitch = false;
 	CameraSpringArm->bInheritRoll = false;

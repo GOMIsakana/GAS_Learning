@@ -48,7 +48,7 @@ protected:
 	bool bDead = false;
 
 	// UE的新标准, 尽量用TObject
-	UPROPERTY(EditAnywhere, Category = "武器")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "武器")
 	TObjectPtr<USkeletalMeshComponent> Weapon;
 
 	UPROPERTY(EditAnywhere, Category = "武器")
