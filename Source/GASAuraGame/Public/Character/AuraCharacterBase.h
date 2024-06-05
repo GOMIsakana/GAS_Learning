@@ -9,6 +9,7 @@
 #include "AbilitySystemInterface.h"
 #include "Interaction/CombatInterface.h"
 #include "Net/UnrealNetwork.h"
+#include "NiagaraSystem.h"
 #include "AuraCharacterBase.generated.h"
 
 class UAbilitySystemComponent;
@@ -32,6 +33,7 @@ public:
 	virtual FVector GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag) override;
 	virtual bool IsDead_Implementation() const override;
 	virtual AActor* GetAvatarActor_Implementation() override;
+	virtual UNiagaraSystem* GetBloodEffect_Implementation() override;
 	/* ICombatInterface 接口结束 */
 
 
@@ -93,6 +95,9 @@ protected:
 	TObjectPtr<UMaterialInstance> DissolveMaterialInstance;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UMaterialInstance> WeaponDissolveMaterialInstance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UNiagaraSystem* BloodEffect;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Abilities")

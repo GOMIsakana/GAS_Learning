@@ -57,6 +57,11 @@ AActor* AAuraCharacterBase::GetAvatarActor_Implementation()
 	return this;
 }
 
+UNiagaraSystem* AAuraCharacterBase::GetBloodEffect_Implementation()
+{
+	return BloodEffect;
+}
+
 UAnimMontage* AAuraCharacterBase::GetHitReactMontage_Implementation()
 {
 	return HitReactMontage;

@@ -65,11 +65,14 @@ void AAuraProjectile::Destroyed()
 
 void AAuraProjectile::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (DamageEffectHandle.Data.IsValid() && DamageEffectHandle.Data.Get()->GetContext().GetEffectCauser() == OtherActor)
+	if (DamageEffectHandle.Data.IsValid())
 	{
-		return;
+		if (DamageEffectHandle.Data.Get()->GetContext().GetEffectCauser() == OtherActor || UAuraAbilitySystemLibrary::ActorIsFriend(DamageEffectHandle.Data.Get()->GetContext().GetEffectCauser(), OtherActor))
+		{
+			return;
+		}
 	}
-	if (DamageEffectHandle.Data.IsValid() && UAuraAbilitySystemLibrary::ActorIsFriend(DamageEffectHandle.Data.Get()->GetContext().GetEffectCauser(), OtherActor))
+	else
 	{
 		return;
 	}
