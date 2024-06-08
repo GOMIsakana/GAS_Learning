@@ -7,6 +7,8 @@
 #include "Actor/AuraProjectile.h"
 #include "AuraProjectileSpell.generated.h"
 
+struct FGameplayTag;
+
 /**
  * 
  */
@@ -17,7 +19,7 @@ class GASAURAGAME_API UAuraProjectileSpell : public UAuraDamageGameplayAbility
 	
 public:
 	UFUNCTION(BlueprintCallable, Category = "ProjectileSpell")
-	void SpawnProjectile(const FVector& TargetLocation);
+	void SpawnProjectile(const FVector& TargetLocation, const FGameplayTag& SocketTag);
 
 protected:
 

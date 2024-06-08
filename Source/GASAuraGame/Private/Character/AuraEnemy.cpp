@@ -130,6 +130,7 @@ void AAuraEnemy::Die()
 void AAuraEnemy::BindCallback()
 {
 	UAuraAttributeSet* AuraAttributeSet = Cast<UAuraAttributeSet>(AttributeSet);
+	if (AuraAttributeSet == nullptr) return;
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AuraAttributeSet->GetHealthAttribute()).AddLambda(
 		[this](const FOnAttributeChangeData& Data)
 		{
