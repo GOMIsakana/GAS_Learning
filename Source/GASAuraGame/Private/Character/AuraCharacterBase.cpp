@@ -79,6 +79,11 @@ FTaggedMontage AAuraCharacterBase::GetTaggedMontageByTag_Implementation(const FG
 	return FTaggedMontage();
 }
 
+int32 AAuraCharacterBase::GetMinionsCount_Implementation()
+{
+	return MinionsCount;
+}
+
 UAnimMontage* AAuraCharacterBase::GetHitReactMontage_Implementation()
 {
 	return HitReactMontage;

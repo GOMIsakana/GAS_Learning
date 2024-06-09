@@ -35,6 +35,7 @@ public:
 	virtual AActor* GetAvatarActor_Implementation() override;
 	virtual UNiagaraSystem* GetBloodEffect_Implementation() override;
 	virtual FTaggedMontage GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag) override;
+	virtual int32 GetMinionsCount_Implementation() override;
 	/* ICombatInterface 接口结束 */
 
 
@@ -104,6 +105,11 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<USoundBase> DeathSound;
+
+	/* 召唤相关 */
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 MinionsCount = 0;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Abilities")

@@ -37,6 +37,7 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.InputTag_4 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.4"), TEXT("左边键盘的数字4的输入Tag"));
 
 	GameplayTags.Abilities_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Attack"), TEXT("攻击技能"));
+	GameplayTags.Abilities_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Summon"), TEXT("召唤技能"));
 
 	GameplayTags.CombatSocket_Weapon = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatSocket.Weapon"), TEXT("使用武器攻击的插槽"));
 	GameplayTags.CombatSocket_LeftHand = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatSocket.LeftHand"), TEXT("使用左手攻击的插槽"));
