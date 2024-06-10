@@ -84,6 +84,11 @@ int32 AAuraCharacterBase::GetMinionsCount_Implementation()
 	return MinionsCount;
 }
 
+void AAuraCharacterBase::SetMinionsCount_Implementation(int32 InMinionsCount)
+{
+	MinionsCount = InMinionsCount;
+}
+
 UAnimMontage* AAuraCharacterBase::GetHitReactMontage_Implementation()
 {
 	return HitReactMontage;
