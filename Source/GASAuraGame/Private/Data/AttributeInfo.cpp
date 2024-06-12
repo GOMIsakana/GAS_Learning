@@ -2,6 +2,7 @@
 
 
 #include "Data/AttributeInfo.h"
+#include "GASAuraGame/AuraLogChannels.h"
 
 FAuraAttributeInfo UAttributeInfo::FindAttributeInfoForTag(const FGameplayTag& AttributeTag, bool bLogNotFound) const
 {
@@ -15,7 +16,7 @@ FAuraAttributeInfo UAttributeInfo::FindAttributeInfoForTag(const FGameplayTag& A
 
 	if (bLogNotFound)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("无法在 AttributeInfo [%s] 中找到 AttributeTag [%s]"), *GetNameSafe(this), *AttributeTag.ToString())
+		UE_LOG(LogAura, Error, TEXT("无法在 AttributeInfo [%s] 中找到 AttributeTag [%s]"), *GetNameSafe(this), *AttributeTag.ToString())
 	}
 
 	return FAuraAttributeInfo();
