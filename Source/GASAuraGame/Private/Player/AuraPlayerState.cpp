@@ -21,14 +21,32 @@ UAbilitySystemComponent* AAuraPlayerState::GetAbilitySystemComponent() const
 	return AbilitySystemComponent;
 }
 
+void AAuraPlayerState::SetXP(float NewXP)
+{
+	XP = NewXP;
+	OnXPChangeDelegate.Broadcast(XP);
+}
+
+void AAuraPlayerState::SetCombatLevel(int32 NewLevel)
+{
+	Level = NewLevel;
+	OnLevelChangeDelegate.Broadcast(Level);
+}
+
 void AAuraPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AAuraPlayerState, Level);
+	DOREPLIFETIME(AAuraPlayerState, XP);
 }
 
 void AAuraPlayerState::OnRep_Level(int32 OldLevel)
 {
+	OnLevelChangeDelegate.Broadcast(Level);
+}
 
+void AAuraPlayerState::OnRep_XP(float OldXP)
+{
+	OnXPChangeDelegate.Broadcast(XP);
 }

@@ -18,6 +18,9 @@ void UOverlayWidgetController::BroadcastInitialValues()
 
 void UOverlayWidgetController::BindCallbacksToDependencies()
 {
+	AAuraPlayerState* AuraPlayerState = CastChecked<AAuraPlayerState>(PlayerState);
+	AuraPlayerState->OnXPChangeDelegate.AddUObject(this, &UOverlayWidgetController::OnXPChanged);
+
 	const UAuraAttributeSet* AuraAttributeSet = CastChecked<UAuraAttributeSet>(AttributeSet);
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AuraAttributeSet->GetHealthAttribute()).AddLambda(
@@ -87,4 +90,22 @@ void UOverlayWidgetController::OnInitializeStartupAbilities(UAuraAbilitySystemCo
 		}
 	);
 	AuraASC->ForEachAbility(BroadcastDelegate);
+}
+
+void UOverlayWidgetController::OnXPChanged(float NewXp)
+{
+	const AAuraPlayerState* AuraPlayerState = CastChecked<AAuraPlayerState>(PlayerState);
+	const ULevelUpInfo* LevelUpInfo = AuraPlayerState->LevelUpInfo;
+	if (LevelUpInfo)
+	{
+		FLevelUpData CurrentLevelData = LevelUpInfo->FindLevelDataForExp(NewXp);
+		FLevelUpData NextLevelData = LevelUpInfo->FindLevelDataForExp(NewXp, true);
+		bool bIsMaxLevel = CurrentLevelData.TargetLevel == NextLevelData.TargetLevel;
+		float XPBarPercentage = 1.f;
+		if (!bIsMaxLevel)
+		{
+			XPBarPercentage = (NewXp - CurrentLevelData.ExperienceRequirement) / (NextLevelData.ExperienceRequirement - CurrentLevelData.ExperienceRequirement);
+		}
+		OnXPPercentChangedDelegate.Broadcast(XPBarPercentage);
+	}
 }
