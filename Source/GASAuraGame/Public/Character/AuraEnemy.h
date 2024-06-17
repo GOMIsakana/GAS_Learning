@@ -37,7 +37,8 @@ public:
 	/* 敌人接口结尾 */
 
 	/* 战斗接口 */
-	virtual int32 GetCombatLevel() override;
+	virtual int32 GetCombatLevel_Implementation() override;
+	virtual ECharacterClass GetCharacterClass_Implementation() override;
 	/* 战斗接口结尾 */
 
 	UPROPERTY(BlueprintAssignable, Category = "GAS|Attributes")

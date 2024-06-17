@@ -28,6 +28,15 @@ void UAuraAbilitySystemComponentBase::AddCharacterAbilities(const TArray<TSubcla
 	AbilityGivenDelegate.Broadcast(this);
 }
 
+void UAuraAbilitySystemComponentBase::AddCharacterPassiveAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartUpPassiveAbilities)
+{
+	for (const TSubclassOf<UGameplayAbility> AbilityClass : StartUpPassiveAbilities)
+	{
+		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
+		GiveAbilityAndActivateOnce(AbilitySpec);
+	}
+}
+
 void UAuraAbilitySystemComponentBase::AbilityInputTagHeld(const FGameplayTag& InputTag)
 {
 	if (!InputTag.IsValid()) return;

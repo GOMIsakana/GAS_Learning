@@ -20,6 +20,12 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 {
 	AAuraPlayerState* AuraPlayerState = CastChecked<AAuraPlayerState>(PlayerState);
 	AuraPlayerState->OnXPChangeDelegate.AddUObject(this, &UOverlayWidgetController::OnXPChanged);
+	AuraPlayerState->OnLevelChangeDelegate.AddLambda(
+		[this](int32 NewLevel)
+		{
+			OnPlayerLevelChangedDelegate.Broadcast(NewLevel);
+		}
+	);
 
 	const UAuraAttributeSet* AuraAttributeSet = CastChecked<UAuraAttributeSet>(AttributeSet);
 
@@ -105,6 +111,7 @@ void UOverlayWidgetController::OnXPChanged(float NewXp)
 		if (!bIsMaxLevel)
 		{
 			XPBarPercentage = (NewXp - CurrentLevelData.ExperienceRequirement) / (NextLevelData.ExperienceRequirement - CurrentLevelData.ExperienceRequirement);
+			XPBarPercentage = FMath::Fmod(XPBarPercentage, 1.f);
 		}
 		OnXPPercentChangedDelegate.Broadcast(XPBarPercentage);
 	}

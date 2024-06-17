@@ -78,8 +78,16 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 
 	AActor* SourceAvatarActor = SourceASC == nullptr ? nullptr : SourceASC->GetAvatarActor();
 	AActor* TargetAvatarActor = TargetASC == nullptr ? nullptr : TargetASC->GetAvatarActor();
-	ICombatInterface* SourceCombatInterface = Cast<ICombatInterface>(SourceAvatarActor);
-	ICombatInterface* TargetCombatInterface = Cast<ICombatInterface>(TargetAvatarActor);
+	int32 SourceCombatLevel = 0;
+	int32 TargetCombatLevel = 0;
+	if (SourceAvatarActor->Implements<UCombatInterface>())
+	{
+		SourceCombatLevel = ICombatInterface::Execute_GetCombatLevel(SourceAvatarActor);
+	}
+	if (TargetAvatarActor->Implements<UCombatInterface>())
+	{
+		TargetCombatLevel = ICombatInterface::Execute_GetCombatLevel(TargetAvatarActor);
+	}
 
 	const FGameplayEffectSpec& EffectSpec = ExecutionParams.GetOwningSpec();
 	FGameplayEffectContextHandle EffectContextHandle = EffectSpec.GetContext();
@@ -113,8 +121,8 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	UCharacterClassInfo* CharacterClassInfo = UAuraAbilitySystemLibrary::GetCharacterClassInfo(SourceAvatarActor);
 	FRealCurve* DefensePenetrationCurve = CharacterClassInfo->DamageCalculationCoefficients->FindCurve(FName("DefensePenetration"), FString());
 	FRealCurve* DefenseCurve = CharacterClassInfo->DamageCalculationCoefficients->FindCurve(FName("EffectiveDefense"), FString());
-	const float DefensePenetrationCoefficients = DefensePenetrationCurve->Eval(FMath::Max<float>(1.f, SourceCombatInterface->GetCombatLevel() - TargetCombatInterface->GetCombatLevel()));
-	const float DefenseCoefficients = DefenseCurve->Eval(FMath::Max<float>(1.f, TargetCombatInterface->GetCombatLevel() - SourceCombatInterface->GetCombatLevel()));
+	const float DefensePenetrationCoefficients = DefensePenetrationCurve->Eval(FMath::Max<float>(1.f, SourceCombatLevel - TargetCombatLevel));
+	const float DefenseCoefficients = DefenseCurve->Eval(FMath::Max<float>(1.f, TargetCombatLevel - SourceCombatLevel));
 
 	float TargetDefense = 0.f, SourceDefensePenetration = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatic().DefenseDef, EvalParams, TargetDefense);

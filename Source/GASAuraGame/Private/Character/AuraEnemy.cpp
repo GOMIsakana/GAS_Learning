@@ -68,9 +68,14 @@ AActor* AAuraEnemy::GetCombatTarget_Implementation() const
 	return CombatTarget;
 }
 
-int32 AAuraEnemy::GetCombatLevel()
+int32 AAuraEnemy::GetCombatLevel_Implementation()
 {
 	return Level;
+}
+
+ECharacterClass AAuraEnemy::GetCharacterClass_Implementation()
+{
+	return CharacterClass;
 }
 
 void AAuraEnemy::OnHitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)

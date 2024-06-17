@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "GameplayTags.h"
 #include "NiagaraSystem.h"
+#include "Data/CharacterClassInfo.h"
 #include "CombatInterface.generated.h"
 
 USTRUCT(BlueprintType)
@@ -43,7 +44,8 @@ class GASAURAGAME_API ICombatInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual int32 GetCombatLevel();
+	UFUNCTION(BlueprintNativeEvent)
+	int32 GetCombatLevel();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	FVector GetCombatSocketLocation(const FGameplayTag& MontageTag);
@@ -76,4 +78,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void SetMinionsCount(int32 InMinionsCount);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	ECharacterClass GetCharacterClass();
 };

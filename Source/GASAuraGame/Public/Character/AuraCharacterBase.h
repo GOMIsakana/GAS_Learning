@@ -26,7 +26,7 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 
-	/* ICombatInterface 接口开始 */
+	/* 战斗 接口开始 */
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
 	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation() override;
 	virtual void Die() override;
@@ -37,7 +37,8 @@ public:
 	virtual FTaggedMontage GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag) override;
 	virtual int32 GetMinionsCount_Implementation() override;
 	virtual void SetMinionsCount_Implementation(int32 InMinionsCount) override;
-	/* ICombatInterface 接口结束 */
+	virtual ECharacterClass GetCharacterClass_Implementation() override;
+	/* 战斗 接口结束 */
 
 
 	UFUNCTION(NetMulticast, Reliable)
@@ -115,6 +116,9 @@ protected:
 private:
 	UPROPERTY(EditAnywhere, Category = "Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
+
+	UPROPERTY(EditAnywhere, Category = "Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> StartupPassiveAbilities;
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TObjectPtr<UAnimMontage> HitReactMontage;

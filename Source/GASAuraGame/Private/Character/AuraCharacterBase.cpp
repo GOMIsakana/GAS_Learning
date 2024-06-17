@@ -89,6 +89,11 @@ void AAuraCharacterBase::SetMinionsCount_Implementation(int32 InMinionsCount)
 	MinionsCount = InMinionsCount;
 }
 
+ECharacterClass AAuraCharacterBase::GetCharacterClass_Implementation()
+{
+	return ECharacterClass::Elementalist;
+}
+
 UAnimMontage* AAuraCharacterBase::GetHitReactMontage_Implementation()
 {
 	return HitReactMontage;
@@ -159,6 +164,7 @@ void AAuraCharacterBase::AddCharacterAbilities()
 
 	UAuraAbilitySystemComponentBase* ASC = Cast<UAuraAbilitySystemComponentBase>(AbilitySystemComponent);
 	ASC->AddCharacterAbilities(StartupAbilities);
+	ASC->AddCharacterPassiveAbilities(StartupPassiveAbilities);
 }
 
 void AAuraCharacterBase::Dissolve()
