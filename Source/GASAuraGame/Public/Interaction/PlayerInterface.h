@@ -31,9 +31,13 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent)
 	int32 GetAttributePointsReward(int32 Level) const;
+	UFUNCTION(BlueprintNativeEvent)
+	int32 GetAttributePoints() const;
 
 	UFUNCTION(BlueprintNativeEvent)
 	int32 GetSpellPointsReward(int32 Level) const;
+	UFUNCTION(BlueprintNativeEvent)
+	int32 GetSpellPoints() const;
 
 	UFUNCTION(BlueprintNativeEvent)
 	void AddToCombatLevel(int32 InCombatLevel);

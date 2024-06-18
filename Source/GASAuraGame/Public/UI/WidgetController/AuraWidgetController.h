@@ -8,6 +8,8 @@
 #include "AttributeSet.h"
 #include "AuraWidgetController.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FIntPlayerStateChangeSignature, int32, Point);
+
 USTRUCT(BlueprintType)
 struct FWidgetControllerParams
 {

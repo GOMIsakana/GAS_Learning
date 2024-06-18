@@ -10,21 +10,18 @@ FLevelUpData ULevelUpInfo::FindLevelDataForExp(float Exp, bool bReturnNextLevel)
 	bool bLevelContinuous = true;
 	for (FLevelUpData CurrentLevelData : LevelUpDatas)
 	{
-		bLevelContinuous = LastLevelData.TargetLevel + 1 == CurrentLevelData.TargetLevel;
 		// 当大于当前升级的需求时, 寻找下一个等级
 		if (Exp >= CurrentLevelData.ExperienceRequirement)
 		{
 			LastLevelData = CurrentLevelData;
 		}
-		// 当小于当前升级的需求，且等级不连续：
+		// 当小于当前升级的需求：
 		//   尝试寻找上一个等级到这个等级之间长度为(CurrentLevel - LastLevel)的等差数列, 且首项为LastLevel, 末项为CurrentLevel
 		//   返回寻找到的等级
-		// 如果等级连续:
-		//   返回上一个等级
 		else
 		{
 			// 这部分其实和循环一次一样的, 考虑到自己的猪脑不知道怎么复用就歇了
-			FLevelUpData FoundLevelData = FLevelUpData();
+			FLevelUpData FoundLevelData = LastLevelData;
 			float ArithmeticDifference = (CurrentLevelData.ExperienceRequirement - LastLevelData.ExperienceRequirement) / (CurrentLevelData.TargetLevel - LastLevelData.TargetLevel);
 			float LastLevelExpRequirement = LastLevelData.ExperienceRequirement + ArithmeticDifference;
 			// 循环，直到找到下一个比当前等级小的等级
@@ -49,15 +46,6 @@ FLevelUpData ULevelUpInfo::FindLevelDataForExp(float Exp, bool bReturnNextLevel)
 
 				LastLevelExpRequirement += ArithmeticDifference;
 			}
-			/*
-			if (bLevelContinuous)
-			{
-				return bReturnNextLevel ? CurrentLevelData : LastLevelData;
-			}
-			else
-			{
-			}
-			*/
 		}
 	}
 	return LastLevelData;

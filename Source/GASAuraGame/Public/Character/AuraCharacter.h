@@ -26,7 +26,9 @@ public:
 	virtual void AddToXP_Implementation(float InXP) override;
 	virtual float GetXP_Implementation() override;
 	virtual int32 GetAttributePointsReward_Implementation(int32 Level) const override;
+	virtual int32 GetAttributePoints_Implementation() const override;
 	virtual int32 GetSpellPointsReward_Implementation(int32 Level) const override;
+	virtual int32 GetSpellPoints_Implementation() const override;
 	virtual int32 FindLevelForXP_Implementation(float InXP) const override;
 	virtual void AddToCombatLevel_Implementation(int32 InCombatLevel) override;
 	virtual void AddToAttributePointsReward_Implementation(int32 InAttributePoints) override;

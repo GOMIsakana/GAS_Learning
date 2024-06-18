@@ -85,7 +85,18 @@ int32 AAuraCharacter::GetAttributePointsReward_Implementation(int32 Level) const
 	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
 	if (AuraPlayerState)
 	{
-		return AuraPlayerState->LevelUpInfo->FindLevelDataForExp(Level).RewardAttributePoint;
+		FLevelUpData tempval = AuraPlayerState->LevelUpInfo->FindLevelDataForExp(Level);
+		return tempval.RewardAttributePoint;
+	}
+	return 0;
+}
+
+int32 AAuraCharacter::GetAttributePoints_Implementation() const
+{
+	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
+	if (AuraPlayerState)
+	{
+		return AuraPlayerState->GetAttributePoint();
 	}
 	return 0;
 }
@@ -96,6 +107,16 @@ int32 AAuraCharacter::GetSpellPointsReward_Implementation(int32 Level) const
 	if (AuraPlayerState)
 	{
 		return AuraPlayerState->LevelUpInfo->FindLevelDataForExp(Level).RewardSpellPoint;
+	}
+	return 0;
+}
+
+int32 AAuraCharacter::GetSpellPoints_Implementation() const
+{
+	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
+	if (AuraPlayerState)
+	{
+		return AuraPlayerState->GetSpellPoint();
 	}
 	return 0;
 }
@@ -121,10 +142,20 @@ void AAuraCharacter::AddToCombatLevel_Implementation(int32 InCombatLevel)
 
 void AAuraCharacter::AddToAttributePointsReward_Implementation(int32 InAttributePoints)
 {
+	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
+	if (AuraPlayerState)
+	{
+		AuraPlayerState->SetAttributePoint(AuraPlayerState->GetAttributePoint() + InAttributePoints);
+	}
 }
 
 void AAuraCharacter::AddToSpellPointsReward_Implementation(int32 InSpellPoints)
 {
+	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
+	if (AuraPlayerState)
+	{
+		AuraPlayerState->SetSpellPoint(AuraPlayerState->GetSpellPoint() + InSpellPoints);
+	}
 }
 
 void AAuraCharacter::LevelUp_Implementation()

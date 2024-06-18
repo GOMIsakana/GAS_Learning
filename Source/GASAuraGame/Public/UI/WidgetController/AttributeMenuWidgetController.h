@@ -25,6 +25,14 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "GAS|Attributes")
 	FAttributeInfoSignature AttributeInfoDelegate;
 
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Points")
+	FIntPlayerStateChangeSignature AttributePointDelegate;
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Points")
+	FIntPlayerStateChangeSignature SpellPointDelegate;
+
+	UFUNCTION(BlueprintCallable)
+	void UpgradeAttribute(const FGameplayTag& AttributeTag);
+
 protected:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UAttributeInfo> AttributeInfo;

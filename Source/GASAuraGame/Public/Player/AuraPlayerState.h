@@ -31,13 +31,20 @@ public:
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 
 	FORCEINLINE int32 GetCombatLevel() const { return Level; }
+	void SetCombatLevel(int32 NewLevel);
 
 	FORCEINLINE float GetXP() const { return XP; }
 	void SetXP(float NewXP);
-	void SetCombatLevel(int32 NewLevel);
 
-	FOnFloatPlayerStateChangeSignature OnXPChangeDelegate;
+	FORCEINLINE int32 GetAttributePoint() const { return AttributePoint; }
+	void SetAttributePoint(int32 NewAttributePoint);
+	FORCEINLINE int32 GetSpellPoint() const { return SpellPoint; }
+	void SetSpellPoint(int32 NewSpellPoint);
+
 	FOnIntPlayerStateChangeSignature OnLevelChangeDelegate;
+	FOnFloatPlayerStateChangeSignature OnXPChangeDelegate;
+	FOnIntPlayerStateChangeSignature OnAttributePointChangeDelegate;
+	FOnIntPlayerStateChangeSignature OnSpellPointChangeDelegate;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level Data")
 	TObjectPtr<ULevelUpInfo> LevelUpInfo;
@@ -56,11 +63,23 @@ private:
 	int32 Level = 1;
 
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_XP)
-	float XP;
+	float XP = 0.f;
+
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_AttributePoint)
+	int32 AttributePoint = 0;
+
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_SpellPoint)
+	int32 SpellPoint = 0;
 
 	UFUNCTION()
 	void OnRep_Level(int32 OldLevel);
 
 	UFUNCTION()
 	void OnRep_XP(float OldXP);
+
+	UFUNCTION()
+	void OnRep_AttributePoint(int32 OldAttributePoint);
+
+	UFUNCTION()
+	void OnRep_SpellPoint(int32 OldSpellPoint);
 };
