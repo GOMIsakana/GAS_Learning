@@ -9,34 +9,28 @@
 
 void UAttributeMenuWidgetController::BroadcastInitialValues()
 {
-	AAuraPlayerState* AuraPlayerState = Cast<AAuraPlayerState>(PlayerState);
-	UAuraAttributeSet* AuraAttributeSet = Cast<UAuraAttributeSet>(AttributeSet);
-
-	for (auto& Pair : AuraAttributeSet->TagsToAttributes)
+	for (auto& Pair : GetAuraAttributeSet()->TagsToAttributes)
 	{
 		BroadcastAttributeInfo(Pair.Value(), Pair.Key);
 	}
-	if (AuraPlayerState)
+	if (GetAuraPlayerState())
 	{
-		AttributePointDelegate.Broadcast(AuraPlayerState->GetAttributePoint());
-		SpellPointDelegate.Broadcast(AuraPlayerState->GetSpellPoint());
+		AttributePointDelegate.Broadcast(GetAuraPlayerState()->GetAttributePoint());
+		SpellPointDelegate.Broadcast(GetAuraPlayerState()->GetSpellPoint());
 	}
 }
 
 void UAttributeMenuWidgetController::BindCallbacksToDependencies()
 {
-	AAuraPlayerState* AuraPlayerState = Cast<AAuraPlayerState>(PlayerState);
-	UAuraAttributeSet* AuraAttributeSet = Cast<UAuraAttributeSet>(AttributeSet);
-
-	if (AuraPlayerState)
+	if (GetAuraPlayerState())
 	{
-		AuraPlayerState->OnAttributePointChangeDelegate.AddLambda(
+		GetAuraPlayerState()->OnAttributePointChangeDelegate.AddLambda(
 			[this](int32 Points)
 			{
 				AttributePointDelegate.Broadcast(Points);
 			}
 		);
-		AuraPlayerState->OnSpellPointChangeDelegate.AddLambda(
+		GetAuraPlayerState()->OnSpellPointChangeDelegate.AddLambda(
 			[this](int32 Points)
 			{
 				SpellPointDelegate.Broadcast(Points);
@@ -44,9 +38,9 @@ void UAttributeMenuWidgetController::BindCallbacksToDependencies()
 		);
 	}
 
-	for (auto& Pair : AuraAttributeSet->TagsToAttributes)
+	for (auto& Pair : GetAuraAttributeSet()->TagsToAttributes)
 	{
-		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Pair.Value()).AddLambda(
+		GetAuraAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(Pair.Value()).AddLambda(
 			[this, Pair](const FOnAttributeChangeData& Data)
 			{
 				BroadcastAttributeInfo(Pair.Value(), Pair.Key);
@@ -57,9 +51,9 @@ void UAttributeMenuWidgetController::BindCallbacksToDependencies()
 
 void UAttributeMenuWidgetController::UpgradeAttribute(const FGameplayTag& AttributeTag)
 {
-	if (UAuraAbilitySystemComponentBase* AuraASC = Cast<UAuraAbilitySystemComponentBase>(AbilitySystemComponent))
+	if (GetAuraAbilitySystemComponent())
 	{
-		AuraASC->UpgradeAttribute(AttributeTag);
+		GetAuraAbilitySystemComponent()->UpgradeAttribute(AttributeTag);
 	}
 }
 
