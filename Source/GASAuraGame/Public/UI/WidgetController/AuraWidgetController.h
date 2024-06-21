@@ -53,11 +53,16 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void BroadcastInitialValues();
 	virtual void BindCallbacksToDependencies();
+	UFUNCTION()
 	void BroadcastAbilityInfo();
 
+	UFUNCTION(BlueprintPure)
 	AAuraPlayerController* GetAuraPlayerController();
+	UFUNCTION(BlueprintPure)
 	AAuraPlayerState* GetAuraPlayerState();
+	UFUNCTION(BlueprintPure)
 	UAuraAbilitySystemComponentBase* GetAuraAbilitySystemComponent();
+	UFUNCTION(BlueprintPure)
 	UAuraAttributeSet* GetAuraAttributeSet();
 
 protected:

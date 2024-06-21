@@ -22,7 +22,10 @@ void UAuraWidgetController::BindCallbacksToDependencies()
 
 void UAuraWidgetController::BroadcastAbilityInfo()
 {
-	if (!GetAuraAbilitySystemComponent()->bStartupAbilitiesGiven) return;
+	if (!GetAuraAbilitySystemComponent()->bStartupAbilitiesGiven)
+	{
+		return;
+	}
 
 	FForEachAbility BroadcastDelegate;
 	BroadcastDelegate.BindLambda(
@@ -30,6 +33,7 @@ void UAuraWidgetController::BroadcastAbilityInfo()
 		{
 			FAuraAbilityInfo Info = AbilityInfo->FindAbilityInfoByTag(GetAuraAbilitySystemComponent()->GetAbilityTagFromSpec(AbilitySpec));
 			Info.InputTag = GetAuraAbilitySystemComponent()->GetInputTagFromSpec(AbilitySpec);
+			Info.StatusTag = GetAuraAbilitySystemComponent()->GetStatusTagFromSpec(AbilitySpec);
 			AbilityInfoDelegate.Broadcast(Info);
 		}
 	);

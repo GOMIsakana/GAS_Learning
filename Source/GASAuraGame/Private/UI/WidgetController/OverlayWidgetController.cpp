@@ -57,7 +57,7 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 		}
 		else
 		{
-			GetAuraAbilitySystemComponent()->AbilityGivenDelegate.AddUObject(this, &UOverlayWidgetController::BroadcastAbilityInfo);
+			GetAuraAbilitySystemComponent()->AbilityGivenDelegate.AddDynamic(this, &UOverlayWidgetController::BroadcastAbilityInfo);
 		}
 
 		GetAuraAbilitySystemComponent()->EffectAssetTags.AddLambda(
