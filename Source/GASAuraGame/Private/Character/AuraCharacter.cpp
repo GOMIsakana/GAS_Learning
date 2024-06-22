@@ -59,6 +59,13 @@ void AAuraCharacter::OnRep_PlayerState()
 
 	// 在 客户端上 初始化角色能力信息(AbilityActorInfo)
 	InitAbilityActorInfo();
+
+	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
+	UAuraAbilitySystemComponentBase* AuraASC = Cast<UAuraAbilitySystemComponentBase>(GetAbilitySystemComponent());
+	if (AuraPlayerState && AuraASC)
+	{
+		AuraASC->UpdateAbilityStatuses(AuraPlayerState->GetCombatLevel());
+	}
 }
 
 void AAuraCharacter::AddToXP_Implementation(float InXP)
@@ -137,6 +144,10 @@ void AAuraCharacter::AddToCombatLevel_Implementation(int32 InCombatLevel)
 	if (AuraPlayerState)
 	{
 		AuraPlayerState->SetCombatLevel(AuraPlayerState->GetCombatLevel() + InCombatLevel);
+		if (UAuraAbilitySystemComponentBase* AuraASC = Cast<UAuraAbilitySystemComponentBase>(GetAbilitySystemComponent()))
+		{
+			AuraASC->UpdateAbilityStatuses(AuraPlayerState->GetCombatLevel());
+		}
 	}
 }
 

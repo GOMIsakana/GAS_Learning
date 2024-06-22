@@ -127,7 +127,7 @@ FGameplayTag UAuraAbilitySystemComponentBase::GetStatusTagFromSpec(const FGamepl
 	return FGameplayTag();
 }
 
-FGameplayAbilitySpec* UAuraAbilitySystemComponentBase::GetSpecFromAbilityTag(const FGameplayTag& AbilityTag)
+FGameplayAbilitySpec* UAuraAbilitySystemComponentBase::GetAbilitySpecFromAbilityTag(const FGameplayTag& AbilityTag)
 {
 	FScopedAbilityListLock ActiveScopeLock(*this);
 	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
@@ -157,15 +157,19 @@ void UAuraAbilitySystemComponentBase::UpgradeAttribute(const FGameplayTag& Attri
 void UAuraAbilitySystemComponentBase::UpdateAbilityStatuses(int32 Level)
 {
 	UAbilityInfo* AbilityInfo = UAuraAbilitySystemLibrary::GetAbilityInfo(this);
-	for (const FAuraAbilityInfo& Info : AbilityInfo->AbilityInfomation)
+	for (FAuraAbilityInfo& Info : AbilityInfo->AbilityInfomation)
 	{
+		// 自身等级大于等级需求代表已解锁过, 不进行处理
 		if (!Info.AbilityTag.IsValid() || Level > Info.LevelRequirement) continue;
-		if (GetSpecFromAbilityTag(Info.AbilityTag) == nullptr)
+		// 从ActibleAbility中检查出未拥有Info中的符合条件的技能时, 赋予该技能
+		if (GetAbilitySpecFromAbilityTag(Info.AbilityTag) == nullptr && Level == Info.LevelRequirement)
 		{
 			FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(Info.Ability, 1.f);
 			AbilitySpec.DynamicAbilityTags.AddTag(FAuraGameplayTags::Get().Abilities_Status_Eligible);
+			Info.StatusTag = FAuraGameplayTags::Get().Abilities_Status_Eligible;
 			GiveAbility(AbilitySpec);
 			MarkAbilitySpecDirty(AbilitySpec);
+			ClientUpdateStatusTag(Info.AbilityTag, FAuraGameplayTags::Get().Abilities_Status_Eligible);
 		}
 	}
 }
@@ -182,6 +186,11 @@ void UAuraAbilitySystemComponentBase::ServerUpgradeAttribute_Implementation(cons
 	{
 		IPlayerInterface::Execute_AddToAttributePointsReward(GetAvatarActor(), -1);
 	}
+}
+
+void UAuraAbilitySystemComponentBase::ClientUpdateStatusTag_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag)
+{
+	AbilityStatusChanged.Broadcast(AbilityTag, StatusTag);
 }
 
 void UAuraAbilitySystemComponentBase::OnRep_ActivateAbilities()
