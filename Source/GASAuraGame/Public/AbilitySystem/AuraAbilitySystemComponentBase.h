@@ -10,7 +10,7 @@
 DECLARE_MULTICAST_DELEGATE_OneParam(FEffectAssetTags, const FGameplayTagContainer& /* 资产的Tag */);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAbilityGiven);
 DECLARE_DELEGATE_OneParam(FForEachAbility, const FGameplayAbilitySpec&);
-DECLARE_MULTICAST_DELEGATE_TwoParams(FAbilityStatusChanged, const FGameplayTag& /* 技能Tag */, const FGameplayTag& /* 状态Tag */)
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FAbilityStatusChanged, const FGameplayTag& /* 技能Tag */, const FGameplayTag& /* 状态Tag */, int32 /* 技能等级 */)
 
 /**
  * 
@@ -49,12 +49,18 @@ public:
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void ServerUpgradeAttribute(const FGameplayTag& AttributeTag);
 
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void ServerLevelupAbility(const FGameplayTag& AbilityTag);
+
 	void UpdateAbilityStatuses(int32 Level);
+
+	UFUNCTION(BlueprintCallable)
+	bool GetDescriptionByAbilityTag(const FGameplayTag& AbilityTag, FString& OutDescription, FString& OutDescriptionNextLevel);
 protected:
 	UFUNCTION(Client, Reliable)
 	void ClientOnEffectApplied(UAbilitySystemComponent* TargetASC, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle);
 	UFUNCTION(Client, Reliable)
-	void ClientUpdateStatusTag(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag);
+	void ClientUpdateAbilityStatus(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag, int32 AbilityLevel);
 
 	virtual void OnRep_ActivateAbilities() override;
 };

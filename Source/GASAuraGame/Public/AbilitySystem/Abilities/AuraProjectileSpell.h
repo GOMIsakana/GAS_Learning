@@ -20,6 +20,11 @@ class GASAURAGAME_API UAuraProjectileSpell : public UAuraDamageGameplayAbility
 public:
 	UFUNCTION(BlueprintCallable, Category = "ProjectileSpell")
 	void SpawnProjectile(const FVector& TargetLocation, const FGameplayTag& SocketTag);
+	virtual FString GetDescription(int32 Level) override;
+	virtual FString GetDescriptionNextLevel(int32 Level) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 NumProjectile = 1;
 
 protected:
 

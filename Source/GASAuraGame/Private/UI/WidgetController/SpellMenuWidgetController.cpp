@@ -2,7 +2,6 @@
 
 
 #include "UI/WidgetController/SpellMenuWidgetController.h"
-#include "AuraGameplayTags.h"
 
 void USpellMenuWidgetController::BroadcastInitialValues()
 {
@@ -13,17 +12,40 @@ void USpellMenuWidgetController::BroadcastInitialValues()
 void USpellMenuWidgetController::BindCallbacksToDependencies()
 {
 	GetAuraAbilitySystemComponent()->AbilityStatusChanged.AddLambda(
-		[this](const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag)
+		[this](const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag, int32 AbilityLevel)
 		{
-			FAuraAbilityInfo Info = AbilityInfo->FindAbilityInfoByTag(AbilityTag);
-			Info.StatusTag = StatusTag;
-			AbilityInfoDelegate.Broadcast(Info);
+			if (SelectedAbility.AbilityTag.MatchesTagExact(AbilityTag))
+			{
+				SelectedAbility.StatusTag = StatusTag;
+				bool bEnableLevelupButton = false;
+				bool bEnableEquipButton = false;
+				ShouldEnableButtons(StatusTag, CurrentSpellPoint, bEnableLevelupButton, bEnableEquipButton);
+				FString Description;
+				FString DescriptionNextLevel;
+				GetAuraAbilitySystemComponent()->GetDescriptionByAbilityTag(SelectedAbility.AbilityTag, Description, DescriptionNextLevel);
+				SpellGlobeSelectedDelegate.Broadcast(bEnableLevelupButton, bEnableEquipButton, Description, DescriptionNextLevel);
+			}
+			if (AbilityInfo)
+			{
+				FAuraAbilityInfo Info = AbilityInfo->FindAbilityInfoByTag(AbilityTag);
+				Info.StatusTag = StatusTag;
+				AbilityInfoDelegate.Broadcast(Info);
+			}
 		}
 	);
 	GetAuraPlayerState()->OnSpellPointChangeDelegate.AddLambda(
 		[this](int32 NewSpellPoint)
 		{
 			SpellPointDelegate.Broadcast(NewSpellPoint);
+			CurrentSpellPoint = NewSpellPoint;
+
+			bool bEnableLevelupButton = false;
+			bool bEnableEquipButton = false;
+			ShouldEnableButtons(SelectedAbility.StatusTag, CurrentSpellPoint, bEnableLevelupButton, bEnableEquipButton);
+			FString Description;
+			FString DescriptionNextLevel;
+			GetAuraAbilitySystemComponent()->GetDescriptionByAbilityTag(SelectedAbility.AbilityTag, Description, DescriptionNextLevel);
+			SpellGlobeSelectedDelegate.Broadcast(bEnableLevelupButton, bEnableEquipButton, Description, DescriptionNextLevel);
 		}
 	);
 }
@@ -46,10 +68,23 @@ void USpellMenuWidgetController::SpellGlobeSelected(const FGameplayTag& AbilityT
 	{
 		AbilityStatus = GetAuraAbilitySystemComponent()->GetStatusTagFromSpec(*AbilitySpec);
 	}
+	SelectedAbility.AbilityTag = AbilityTag;
+	SelectedAbility.StatusTag = AbilityStatus;
 	bool bEnableLevelupButton = false;
 	bool bEnableEquipButton = false;
 	ShouldEnableButtons(AbilityStatus, GetAuraPlayerState()->GetSpellPoint(), bEnableLevelupButton, bEnableEquipButton);
-	SpellGlobeSelectedDelegate.Broadcast(bEnableLevelupButton, bEnableEquipButton);
+	FString Description;
+	FString DescriptionNextLevel;
+	GetAuraAbilitySystemComponent()->GetDescriptionByAbilityTag(SelectedAbility.AbilityTag, Description, DescriptionNextLevel);
+	SpellGlobeSelectedDelegate.Broadcast(bEnableLevelupButton, bEnableEquipButton, Description, DescriptionNextLevel);
+}
+
+void USpellMenuWidgetController::LevelupButtonClicked()
+{
+	if (GetAuraAbilitySystemComponent() && !SelectedAbility.AbilityTag.MatchesTagExact(FAuraGameplayTags::Get().Abilities_None))
+	{
+		GetAuraAbilitySystemComponent()->ServerLevelupAbility(SelectedAbility.AbilityTag);
+	}
 }
 
 void USpellMenuWidgetController::ShouldEnableButtons(const FGameplayTag& AbilityStatus, int32 SpellPoint, bool& bShouldEnableLevelupButton, bool& bShouldEnableEquipButton)

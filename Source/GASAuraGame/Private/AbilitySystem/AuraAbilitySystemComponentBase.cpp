@@ -154,13 +154,38 @@ void UAuraAbilitySystemComponentBase::UpgradeAttribute(const FGameplayTag& Attri
 	}
 }
 
+void UAuraAbilitySystemComponentBase::ServerLevelupAbility_Implementation(const FGameplayTag& AbilityTag)
+{
+	if (FGameplayAbilitySpec* AbilitySpec = GetAbilitySpecFromAbilityTag(AbilityTag))
+	{
+		if (GetAvatarActor()->Implements<UPlayerInterface>())
+		{
+			IPlayerInterface::Execute_AddToSpellPointsReward(GetAvatarActor(), -1);
+		}
+		
+		FAuraGameplayTags GameplayTags = FAuraGameplayTags::Get();
+		FGameplayTag AbilityStatus = GetStatusTagFromSpec(*AbilitySpec);
+		if (AbilityStatus.MatchesTagExact(GameplayTags.Abilities_Status_Eligible))
+		{
+			AbilitySpec->DynamicAbilityTags.RemoveTag(GameplayTags.Abilities_Status_Eligible);
+			AbilitySpec->DynamicAbilityTags.AddTag(GameplayTags.Abilities_Status_Unlocked);
+			AbilityStatus = GameplayTags.Abilities_Status_Unlocked;
+		}
+		else if (AbilityStatus.MatchesTagExact(GameplayTags.Abilities_Status_Unlocked) || AbilityStatus.MatchesTagExact(GameplayTags.Abilities_Status_Equipped))
+		{
+			AbilitySpec->Level += 1;
+		}
+		ClientUpdateAbilityStatus(AbilityTag, AbilityStatus, AbilitySpec->Level);
+		MarkAbilitySpecDirty(*AbilitySpec);
+	}
+}
+
 void UAuraAbilitySystemComponentBase::UpdateAbilityStatuses(int32 Level)
 {
 	UAbilityInfo* AbilityInfo = UAuraAbilitySystemLibrary::GetAbilityInfo(this);
 	for (FAuraAbilityInfo& Info : AbilityInfo->AbilityInfomation)
 	{
-		// 自身等级大于等级需求代表已解锁过, 不进行处理
-		if (!Info.AbilityTag.IsValid() || Level > Info.LevelRequirement) continue;
+		if (!Info.AbilityTag.IsValid()) continue;
 		// 从ActibleAbility中检查出未拥有Info中的符合条件的技能时, 赋予该技能
 		if (GetAbilitySpecFromAbilityTag(Info.AbilityTag) == nullptr && Level == Info.LevelRequirement)
 		{
@@ -169,9 +194,26 @@ void UAuraAbilitySystemComponentBase::UpdateAbilityStatuses(int32 Level)
 			Info.StatusTag = FAuraGameplayTags::Get().Abilities_Status_Eligible;
 			GiveAbility(AbilitySpec);
 			MarkAbilitySpecDirty(AbilitySpec);
-			ClientUpdateStatusTag(Info.AbilityTag, FAuraGameplayTags::Get().Abilities_Status_Eligible);
+			ClientUpdateAbilityStatus(Info.AbilityTag, FAuraGameplayTags::Get().Abilities_Status_Eligible, 1);
 		}
 	}
+}
+
+bool UAuraAbilitySystemComponentBase::GetDescriptionByAbilityTag(const FGameplayTag& AbilityTag, FString& OutDescription, FString& OutDescriptionNextLevel)
+{
+	if (const FGameplayAbilitySpec* AbilitySpec = GetAbilitySpecFromAbilityTag(AbilityTag))
+	{
+		if (UAuraGameplayAbilityBase* Ability = Cast<UAuraGameplayAbilityBase>(AbilitySpec->Ability))
+		{
+			OutDescription = Ability->GetDescription(AbilitySpec->Level);
+			OutDescriptionNextLevel = Ability->GetDescriptionNextLevel(AbilitySpec->Level + 1);
+			return true;
+		}
+	}
+	UAbilityInfo* AbilityInfo = UAuraAbilitySystemLibrary::GetAbilityInfo(GetAvatarActor());
+	OutDescription = UAuraGameplayAbilityBase::GetDescriptionLocked(AbilityInfo->FindAbilityInfoByTag(AbilityTag).LevelRequirement);
+	OutDescriptionNextLevel = FString();
+	return false;
 }
 
 void UAuraAbilitySystemComponentBase::ServerUpgradeAttribute_Implementation(const FGameplayTag& AttributeTag)
@@ -188,9 +230,9 @@ void UAuraAbilitySystemComponentBase::ServerUpgradeAttribute_Implementation(cons
 	}
 }
 
-void UAuraAbilitySystemComponentBase::ClientUpdateStatusTag_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag)
+void UAuraAbilitySystemComponentBase::ClientUpdateAbilityStatus_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag, int32 AbilityLevel)
 {
-	AbilityStatusChanged.Broadcast(AbilityTag, StatusTag);
+	AbilityStatusChanged.Broadcast(AbilityTag, StatusTag, AbilityLevel);
 }
 
 void UAuraAbilitySystemComponentBase::OnRep_ActivateAbilities()
