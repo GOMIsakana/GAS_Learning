@@ -8,7 +8,8 @@
 #include "SpellMenuWidgetController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSpellPointSignature, int32, SpellPoint);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FSpellGlobeSelectedSignature, bool, bEnableLevelupButton, bool, bEnableEquipButton, FString, Description, FString, DescriptionNextLevel);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FiveParams(FSpellGlobeSelectedSignature, bool, bEnableLevelupButton, bool, bEnableEquipButton, FString, Description, FString, DescriptionNextLevel, bool, bDeselect);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FWaitForEquipSelectionSignature, const FGameplayTag&, AbilityType);
 
 struct FSelectedAbility
 {
@@ -35,11 +36,28 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "GAS|Messages")
 	FSpellGlobeSelectedSignature SpellGlobeSelectedDelegate;
 
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Messages")
+	FWaitForEquipSelectionSignature WaitForEquippedDelegate;
+
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Messages")
+	FWaitForEquipSelectionSignature StopWaitForEquippedDelegate;
+
 	UFUNCTION(BlueprintCallable)
 	void SpellGlobeSelected(const FGameplayTag& AbilityTag);
 
 	UFUNCTION(BlueprintCallable)
+	void SpellGlobeDeselected();
+
+	UFUNCTION(BlueprintCallable)
+	void EquippedButtonPressed();
+
+	UFUNCTION(BlueprintCallable)
 	void LevelupButtonClicked();
+
+	UFUNCTION(BlueprintCallable)
+	void SpellRowGlobePressed(const FGameplayTag& SlotTag, const FGameplayTag& AbilityType);
+
+	void OnAbilityEquipped(const FGameplayTag& AbilityTag, const FGameplayTag& Status, const FGameplayTag& Slot, const FGameplayTag& PreviousSlot);
 
 private:
 	UFUNCTION()
@@ -47,4 +65,10 @@ private:
 
 	FSelectedAbility SelectedAbility = { FAuraGameplayTags::Get().Abilities_None, FAuraGameplayTags::Get().Abilities_Status_Locked };
 	int32 CurrentSpellPoint = 0;
+
+	FString DefaultDescription = TEXT("<SubTitle>选择一个技能以查看描述</>");
+
+	bool bWaitingForEquippedSelection = false;
+
+	FGameplayTag SelectedSlot;
 };

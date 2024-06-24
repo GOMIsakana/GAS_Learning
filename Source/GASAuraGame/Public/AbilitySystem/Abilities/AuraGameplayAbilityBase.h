@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
+#include "AuraGameplayTags.h"
+#include "AbilitySystem/AuraAttributeSet.h"
 #include "AuraGameplayAbilityBase.generated.h"
 
 /**
@@ -21,4 +23,9 @@ public:
 	virtual FString GetDescription(int32 Level);
 	virtual FString GetDescriptionNextLevel(int32 Level);
 	static FString GetDescriptionLocked(int32 Level);
+
+	UFUNCTION(BlueprintCallable)
+	float GetCooldown(float InLevel = 1.f);
+	UFUNCTION(BlueprintCallable)
+	float GetSpellCost(FGameplayAttribute CostAttribute, float InLevel = 1.f) const;
 };

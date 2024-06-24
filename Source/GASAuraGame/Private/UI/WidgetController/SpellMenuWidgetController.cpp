@@ -23,7 +23,7 @@ void USpellMenuWidgetController::BindCallbacksToDependencies()
 				FString Description;
 				FString DescriptionNextLevel;
 				GetAuraAbilitySystemComponent()->GetDescriptionByAbilityTag(SelectedAbility.AbilityTag, Description, DescriptionNextLevel);
-				SpellGlobeSelectedDelegate.Broadcast(bEnableLevelupButton, bEnableEquipButton, Description, DescriptionNextLevel);
+				SpellGlobeSelectedDelegate.Broadcast(bEnableLevelupButton, bEnableEquipButton, Description, DescriptionNextLevel, false);
 			}
 			if (AbilityInfo)
 			{
@@ -45,13 +45,21 @@ void USpellMenuWidgetController::BindCallbacksToDependencies()
 			FString Description;
 			FString DescriptionNextLevel;
 			GetAuraAbilitySystemComponent()->GetDescriptionByAbilityTag(SelectedAbility.AbilityTag, Description, DescriptionNextLevel);
-			SpellGlobeSelectedDelegate.Broadcast(bEnableLevelupButton, bEnableEquipButton, Description, DescriptionNextLevel);
+			SpellGlobeSelectedDelegate.Broadcast(bEnableLevelupButton, bEnableEquipButton, Description, DescriptionNextLevel, false);
 		}
 	);
+	GetAuraAbilitySystemComponent()->AbilityEquippedDelegate.AddUObject(this, &USpellMenuWidgetController::OnAbilityEquipped);
 }
 
 void USpellMenuWidgetController::SpellGlobeSelected(const FGameplayTag& AbilityTag)
 {
+	if (bWaitingForEquippedSelection)
+	{
+		const FGameplayTag& SelectedAbilityType = AbilityInfo->FindAbilityInfoByTag(SelectedAbility.AbilityTag).AbilityType;
+		StopWaitForEquippedDelegate.Broadcast(SelectedAbilityType);
+		bWaitingForEquippedSelection = false;
+	}
+
 	const FAuraGameplayTags GameplayTags = FAuraGameplayTags::Get();
 	const int32 SpellPoint = GetAuraPlayerState()->GetSpellPoint();
 	FGameplayTag AbilityStatus;
@@ -76,7 +84,33 @@ void USpellMenuWidgetController::SpellGlobeSelected(const FGameplayTag& AbilityT
 	FString Description;
 	FString DescriptionNextLevel;
 	GetAuraAbilitySystemComponent()->GetDescriptionByAbilityTag(SelectedAbility.AbilityTag, Description, DescriptionNextLevel);
-	SpellGlobeSelectedDelegate.Broadcast(bEnableLevelupButton, bEnableEquipButton, Description, DescriptionNextLevel);
+	SpellGlobeSelectedDelegate.Broadcast(bEnableLevelupButton, bEnableEquipButton, Description, DescriptionNextLevel, false);
+}
+
+void USpellMenuWidgetController::SpellGlobeDeselected()
+{
+	if (bWaitingForEquippedSelection)
+	{
+		const FGameplayTag& SelectedAbilityType = AbilityInfo->FindAbilityInfoByTag(SelectedAbility.AbilityTag).AbilityType;
+		StopWaitForEquippedDelegate.Broadcast(SelectedAbilityType);
+		bWaitingForEquippedSelection = false;
+	}
+
+	SelectedAbility = { FAuraGameplayTags::Get().Abilities_None, FAuraGameplayTags::Get().Abilities_Status_Locked };
+	SpellGlobeSelectedDelegate.Broadcast(false, false, DefaultDescription, DefaultDescription, true);
+}
+
+void USpellMenuWidgetController::EquippedButtonPressed()
+{
+	const FGameplayTag& AbilityType = AbilityInfo->FindAbilityInfoByTag(SelectedAbility.AbilityTag).AbilityType;
+	WaitForEquippedDelegate.Broadcast(AbilityType);
+	bWaitingForEquippedSelection = true;
+
+	// const FGameplayTag& SelectedStatus = GetAuraAbilitySystemComponent()->GetStatusTagFromAbilityTag(SelectedAbility.AbilityTag);
+	if (SelectedAbility.StatusTag.MatchesTagExact(FAuraGameplayTags::Get().Abilities_Status_Equipped))
+	{
+		SelectedSlot = GetAuraAbilitySystemComponent()->GetInputTagFromAbilityTag(SelectedAbility.AbilityTag);
+	}
 }
 
 void USpellMenuWidgetController::LevelupButtonClicked()
@@ -85,6 +119,16 @@ void USpellMenuWidgetController::LevelupButtonClicked()
 	{
 		GetAuraAbilitySystemComponent()->ServerLevelupAbility(SelectedAbility.AbilityTag);
 	}
+}
+
+void USpellMenuWidgetController::SpellRowGlobePressed(const FGameplayTag& SlotTag, const FGameplayTag& AbilityType)
+{
+	if (!bWaitingForEquippedSelection) return;
+
+	const FGameplayTag& SelectedAbilityType = AbilityInfo->FindAbilityInfoByTag(SelectedAbility.AbilityTag).AbilityType;
+	if (!AbilityType.MatchesTagExact(SelectedAbilityType)) return;
+
+	GetAuraAbilitySystemComponent()->ServerEquipAbility(SelectedAbility.AbilityTag, SlotTag);
 }
 
 void USpellMenuWidgetController::ShouldEnableButtons(const FGameplayTag& AbilityStatus, int32 SpellPoint, bool& bShouldEnableLevelupButton, bool& bShouldEnableEquipButton)
@@ -111,4 +155,26 @@ void USpellMenuWidgetController::ShouldEnableButtons(const FGameplayTag& Ability
 		bShouldEnableEquipButton = false;
 		return;
 	}
+}
+
+void USpellMenuWidgetController::OnAbilityEquipped(const FGameplayTag& AbilityTag, const FGameplayTag& Status, const FGameplayTag& Slot, const FGameplayTag& PreviousSlot)
+{
+	bWaitingForEquippedSelection = false;
+
+	FAuraAbilityInfo LastSlotInfo;
+	LastSlotInfo.StatusTag = FAuraGameplayTags::Get().Abilities_Status_Unlocked;
+	LastSlotInfo.InputTag = PreviousSlot;
+	LastSlotInfo.AbilityTag = FAuraGameplayTags::Get().Abilities_None;
+	AbilityInfoDelegate.Broadcast(LastSlotInfo);
+
+	FAuraAbilityInfo Info = AbilityInfo->FindAbilityInfoByTag(AbilityTag);
+	Info.StatusTag = Status;
+	Info.InputTag = Slot;
+	AbilityInfoDelegate.Broadcast(Info);
+
+	StopWaitForEquippedDelegate.Broadcast(AbilityInfo->FindAbilityInfoByTag(AbilityTag).AbilityType);
+
+	// 清空之前选中的技能
+	SpellGlobeDeselected();
+	SelectedAbility = { FAuraGameplayTags::Get().Abilities_None, FAuraGameplayTags::Get().Abilities_Status_Locked };
 }

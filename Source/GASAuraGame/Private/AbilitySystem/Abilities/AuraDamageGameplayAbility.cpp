@@ -15,3 +15,13 @@ void UAuraDamageGameplayAbility::CauseDamage(AActor* TargetActor)
 	}
 	GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToTarget(*DamageSpecHandle.Data.Get(), UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor));
 }
+
+float UAuraDamageGameplayAbility::GetDamage(FGameplayTag DamageType, float InLevel) const
+{
+	float Damage = 0.f;
+	if (DamageTypeMap.Contains(DamageType))
+	{
+		Damage = DamageTypeMap[DamageType].GetValueAtLevel(InLevel);
+	}
+	return Damage;
+}

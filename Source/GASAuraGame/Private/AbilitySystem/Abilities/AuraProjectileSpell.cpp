@@ -56,58 +56,12 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& TargetLocation, const 
 
 FString UAuraProjectileSpell::GetDescription(int32 Level)
 {
-	FAuraGameplayTags GameplayTags = FAuraGameplayTags::Get();
-	const float Damage = DamageTypeMap[FAuraGameplayTags::Get().Damage_Fire].GetValueAtLevel(Level);
-	// 冷却时间
-	FGameplayEffectSpec CooldownEffectSpec;
-	float CooldownTime = 0.f;
-	GetCooldownGameplayEffect()->DurationMagnitude.AttemptCalculateMagnitude(CooldownEffectSpec, CooldownTime);
-
-	// 法力消耗 // 目前随着等级提升显示不正确，需要修正！
-
-	float ManaCost = 0.f;
-	for (FGameplayModifierInfo ModifierInfo : GetCostGameplayEffect()->Modifiers)
-	{
-		if (ModifierInfo.Attribute == UAuraAttributeSet::GetManaAttribute())
-		{
-			FGameplayEffectSpec EffectSpec;
-			float CalculatedMagnitude = 0.f;
-			ModifierInfo.ModifierMagnitude.AttemptCalculateMagnitude(EffectSpec, CalculatedMagnitude);
-			ManaCost -= CalculatedMagnitude;
-		}
-	}
-	return FString::Printf(TEXT("<Title>火焰箭</> <Level>Lv. %d</>\n \
-		<Default>朝目标发射一枚火焰箭, 命中时造成</> <Damage>%.1f</> <Default>点</><FireDamage>火属性伤害</>\n \
-		<Default>冷却时间:</> <Cooldown>%.2f</> 秒\n \
-		<Default>法力消耗:</> <ManaCost>%.2f</> \n \
-		"), Level, Damage, CooldownTime, ManaCost);
+	return FString();
 }
 
 FString UAuraProjectileSpell::GetDescriptionNextLevel(int32 Level)
 {
-	FAuraGameplayTags GameplayTags = FAuraGameplayTags::Get();
-	const float Damage = DamageTypeMap[FAuraGameplayTags::Get().Damage_Fire].GetValueAtLevel(Level);
-	// 冷却时间
-	FGameplayEffectSpec CooldownEffectSpec;
-	float CooldownTime = 0.f;
-	GetCooldownGameplayEffect()->DurationMagnitude.AttemptCalculateMagnitude(CooldownEffectSpec, CooldownTime);
-	// 法力消耗
-	float ManaCost = 0.f;
-	for (FGameplayModifierInfo ModifierInfo : GetCostGameplayEffect()->Modifiers)
-	{
-		if (ModifierInfo.Attribute == UAuraAttributeSet::GetManaAttribute())
-		{
-			FGameplayEffectSpec EffectSpec;
-			float CalculatedMagnitude = 0.f;
-			ModifierInfo.ModifierMagnitude.AttemptCalculateMagnitude(EffectSpec, CalculatedMagnitude);
-			ManaCost -= CalculatedMagnitude;
-		}
-	}
-	return FString::Printf(TEXT("<Title>火焰箭</> <Level>Lv. %d</>\n \
-		<Default>朝目标发射一枚火焰箭, 命中时造成</> <Damage>%.1f</> <Default>点</><FireDamage>火属性伤害</>\n \
-		<Default>冷却时间:</> <Cooldown>%.2f</> 秒\n \
-		<Default>法力消耗:</> <ManaCost>%.2f</> \n \
-		"), Level, Damage, CooldownTime, ManaCost);
+	return FString();
 }
 
 void UAuraProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
