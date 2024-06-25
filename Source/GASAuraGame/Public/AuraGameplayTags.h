@@ -63,6 +63,15 @@ public:
 	FGameplayTag Abilities_Summon;
 	FGameplayTag Abilities_HitReact;
 
+	FGameplayTag Debuff_Type_Burn;
+	FGameplayTag Debuff_Type_Stun;
+	FGameplayTag Debuff_Type_Arcane;
+
+	FGameplayTag Debuff_Data_Chance;
+	FGameplayTag Debuff_Data_Damage;
+	FGameplayTag Debuff_Data_Duration;
+	FGameplayTag Debuff_Data_Frequency;
+
 	FGameplayTag Abilities_Status_Locked;
 	FGameplayTag Abilities_Status_Eligible;
 	FGameplayTag Abilities_Status_Unlocked;
@@ -89,6 +98,7 @@ public:
 	FGameplayTag Montage_Attack_4;
 
 	TMap<FGameplayTag, FGameplayTag> DamageTypeToResist;
+	TMap<FGameplayTag, FGameplayTag> DamageTypeToDebuff;
 
 protected:
 

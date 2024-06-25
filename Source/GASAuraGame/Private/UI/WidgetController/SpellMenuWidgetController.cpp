@@ -177,4 +177,5 @@ void USpellMenuWidgetController::OnAbilityEquipped(const FGameplayTag& AbilityTa
 	// 清空之前选中的技能
 	SpellGlobeDeselected();
 	SelectedAbility = { FAuraGameplayTags::Get().Abilities_None, FAuraGameplayTags::Get().Abilities_Status_Locked };
+	SpellGlobeReassignDelegate.Broadcast(AbilityTag);
 }

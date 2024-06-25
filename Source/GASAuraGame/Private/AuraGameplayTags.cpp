@@ -65,6 +65,18 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.CombatSocket_RightHand = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatSocket.RightHand"), TEXT("使用右手攻击的插槽"));
 	GameplayTags.CombatSocket_Tail = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatSocket.Tail"), TEXT("使用尾巴攻击的插槽"));
 
+	GameplayTags.Debuff_Type_Burn = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Debuff.Type.Burn"), TEXT("燃烧debuff"));
+	GameplayTags.Debuff_Type_Stun = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Debuff.Type.Stun"), TEXT("眩晕debuff"));
+	GameplayTags.Debuff_Type_Arcane = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Debuff.Type.Arcane"), TEXT("神秘类型的debuff"));
+	GameplayTags.DamageTypeToDebuff.Add(GameplayTags.Damage_Fire, GameplayTags.Debuff_Type_Burn);
+	GameplayTags.DamageTypeToDebuff.Add(GameplayTags.Damage_Lighting, GameplayTags.Debuff_Type_Stun);
+	GameplayTags.DamageTypeToDebuff.Add(GameplayTags.Damage_Arcane, GameplayTags.Debuff_Type_Arcane);
+
+	GameplayTags.Debuff_Data_Chance = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Debuff.Data.Chance"), TEXT("触发debuff的概率"));
+	GameplayTags.Debuff_Data_Damage = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Debuff.Data.Damage"), TEXT("触发debuff时每跳造成的伤害"));
+	GameplayTags.Debuff_Data_Duration = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Debuff.Data.Duration"), TEXT("debuff持续时间"));
+	GameplayTags.Debuff_Data_Frequency = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Debuff.Data.Frequency"), TEXT("debuff跳字间隔"));
+
 	GameplayTags.Damage = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Damage"), TEXT("即将到来的伤害"));
 	GameplayTags.Damage_Fire = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Damage.Fire"), TEXT("即将到来的火焰伤害"));
 	GameplayTags.Damage_Lighting = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Damage.Lighting"), TEXT("即将到来的雷电伤害"));
@@ -73,7 +85,6 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Attributes_Resist_Fire = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Damage.FireResist"), TEXT("火焰伤害抗性"));
 	GameplayTags.Attributes_Resist_Lighting = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Damage.LightingResist"), TEXT("雷电伤害抗性"));
 	GameplayTags.Attributes_Resist_Arcane = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Damage.ArcaneResist"), TEXT("神秘伤害抗性"));
-
 	GameplayTags.DamageTypeToResist.Add(GameplayTags.Damage_Fire, GameplayTags.Attributes_Resist_Fire);
 	GameplayTags.DamageTypeToResist.Add(GameplayTags.Damage_Lighting, GameplayTags.Attributes_Resist_Lighting);
 	GameplayTags.DamageTypeToResist.Add(GameplayTags.Damage_Arcane, GameplayTags.Attributes_Resist_Arcane);
