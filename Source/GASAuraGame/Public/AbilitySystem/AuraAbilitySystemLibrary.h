@@ -61,4 +61,7 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|CharacterClassDefault")
 	static float GetXPRewardForClassAndLevel(const UObject* WorldContextObject, ECharacterClass Class, int32 CombatLevel);
+
+	UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary|GameplayEffects")
+	static FGameplayEffectContextHandle ApplyDamageEffect(FDamageEffectParams Params);
 };

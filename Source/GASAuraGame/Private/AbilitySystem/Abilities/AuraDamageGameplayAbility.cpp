@@ -22,3 +22,21 @@ float UAuraDamageGameplayAbility::GetDamage(FGameplayTag InDamageType, float InL
 	}
 	return Damage;
 }
+
+FDamageEffectParams UAuraDamageGameplayAbility::MakeDamageEffectParamasFromClassDefaults(AActor* TargetActor) const
+{
+	FDamageEffectParams Params;
+	Params.WorldContext = GetAvatarActorFromActorInfo();
+	Params.DamageEffectClass;
+	Params.SourceASC = GetAbilitySystemComponentFromActorInfo();
+	Params.TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+	Params.BaseDamage = ScalableDamage.GetValueAtLevel(GetAbilityLevel());
+	Params.AbilityLevel = GetAbilityLevel();
+	Params.DamageType = DamageType;
+	Params.DebuffChance = DebuffChance;
+	Params.DebuffDamage = DebuffDamage;
+	Params.DebuffDuration = DebuffDuration;
+	Params.DebuffFrequency = DebuffFrequency;
+
+	return Params;
+}

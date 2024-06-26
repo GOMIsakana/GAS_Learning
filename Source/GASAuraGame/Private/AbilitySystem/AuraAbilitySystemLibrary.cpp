@@ -9,6 +9,7 @@
 #include "Game/AuraGameModeBase.h"
 #include "AuraAbilityTypes.h"
 #include "Interaction/CombatInterface.h"
+#include "AbilitySystemBlueprintLibrary.h"
 
 bool UAuraAbilitySystemLibrary::MakeWidgetControllerParamas(const UObject* WorldContextObject, FWidgetControllerParams& OutWCParams, AAuraHUD*& OutAuraHUD)
 {
@@ -178,6 +179,25 @@ float UAuraAbilitySystemLibrary::GetXPRewardForClassAndLevel(const UObject* Worl
 		return ClassDefaultInfo.XPRewardCurve.GetValueAtLevel(CombatLevel);
 	}
 	return 0.f;
+}
+
+FGameplayEffectContextHandle UAuraAbilitySystemLibrary::ApplyDamageEffect(FDamageEffectParams Params)
+{
+	const FAuraGameplayTags GameplayTags = FAuraGameplayTags::Get();
+
+	FGameplayEffectContextHandle DamageContextHandle = Params.SourceASC->MakeEffectContext();
+	DamageContextHandle.AddSourceObject(Params.SourceASC->GetAvatarActor());
+	FGameplayEffectSpecHandle DamageSpecHandle = Params.SourceASC->MakeOutgoingSpec(Params.DamageEffectClass, Params.AbilityLevel, DamageContextHandle);
+
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(DamageSpecHandle, Params.DamageType, Params.BaseDamage);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(DamageSpecHandle, GameplayTags.Debuff_Data_Chance, Params.DebuffChance);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(DamageSpecHandle, GameplayTags.Debuff_Data_Damage, Params.DebuffDamage);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(DamageSpecHandle, GameplayTags.Debuff_Data_Duration, Params.DebuffDuration);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(DamageSpecHandle, GameplayTags.Debuff_Data_Frequency, Params.DebuffFrequency);
+
+	Params.SourceASC->ApplyGameplayEffectSpecToTarget(*DamageSpecHandle.Data.Get(), Params.TargetASC);
+
+	return DamageContextHandle;
 }
 
 void UAuraAbilitySystemLibrary::GetLifePlayerWithinRadius(const UObject* WorldContextObject, TArray<AActor*>& OutputOverlappingActor, TArray<AActor*> ActorsToIgnore, float Radius, const FVector& SphereOrigin)
