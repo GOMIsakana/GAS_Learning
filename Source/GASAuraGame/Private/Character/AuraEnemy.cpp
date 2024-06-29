@@ -121,15 +121,16 @@ void AAuraEnemy::InitAbilityActorInfo()
 	{
 		InitializeDefaultAttribute();
 	}
+	OnASCRegistered.Broadcast(AbilitySystemComponent);
 }
 
-void AAuraEnemy::Die()
+void AAuraEnemy::Die(const FVector& DeathImpluse)
 {
 	SetLifeSpan(LifeSpan);
 	if (AuraAIController) AuraAIController->GetBlackboardComponent()->SetValueAsBool(FName("Dead"), true);
 
 	HealthBar->SetVisibility(false);
-	Super::Die();
+	Super::Die(DeathImpluse);
 }
 
 void AAuraEnemy::BindCallback()

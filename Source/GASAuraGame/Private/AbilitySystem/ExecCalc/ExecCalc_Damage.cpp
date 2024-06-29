@@ -23,7 +23,6 @@ struct AuraDamageStatic
 	DECLARE_ATTRIBUTE_CAPTUREDEF(Resist_Lighting);
 	DECLARE_ATTRIBUTE_CAPTUREDEF(Resist_Arcane);
 
-	TMap<FGameplayTag, FGameplayEffectAttributeCaptureDefinition> TagsToCaptureDefs;
 
 	AuraDamageStatic()
 	{
@@ -36,16 +35,6 @@ struct AuraDamageStatic
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UAuraAttributeSet, Resist_Lighting, Target, false);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UAuraAttributeSet, Resist_Arcane, Target, false);
 
-		const FAuraGameplayTags& Tags = FAuraGameplayTags::Get();
-
-		TagsToCaptureDefs.Add(Tags.Attributes_Secondary_PhysicalDamage, PhysicalDamageDef);
-		TagsToCaptureDefs.Add(Tags.Attributes_Secondary_Defense, DefenseDef);
-		TagsToCaptureDefs.Add(Tags.Attributes_Secondary_DefensePenetration, DefensePenetrationDef);
-		TagsToCaptureDefs.Add(Tags.Attributes_Secondary_CritChance, CritChanceDef);
-		TagsToCaptureDefs.Add(Tags.Attributes_Secondary_CritDamage, CritDamageDef);
-		TagsToCaptureDefs.Add(Tags.Attributes_Resist_Fire, Resist_FireDef);
-		TagsToCaptureDefs.Add(Tags.Attributes_Resist_Lighting, Resist_LightingDef);
-		TagsToCaptureDefs.Add(Tags.Attributes_Resist_Arcane, Resist_ArcaneDef);
 	}
 };
 
@@ -73,6 +62,18 @@ UExecCalc_Damage::UExecCalc_Damage()
 
 void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
 {
+	TMap<FGameplayTag, FGameplayEffectAttributeCaptureDefinition> TagsToCaptureDefs;
+	const FAuraGameplayTags& Tags = FAuraGameplayTags::Get();
+
+	TagsToCaptureDefs.Add(Tags.Attributes_Secondary_PhysicalDamage, DamageStatic().PhysicalDamageDef);
+	TagsToCaptureDefs.Add(Tags.Attributes_Secondary_Defense, DamageStatic().DefenseDef);
+	TagsToCaptureDefs.Add(Tags.Attributes_Secondary_DefensePenetration, DamageStatic().DefensePenetrationDef);
+	TagsToCaptureDefs.Add(Tags.Attributes_Secondary_CritChance, DamageStatic().CritChanceDef);
+	TagsToCaptureDefs.Add(Tags.Attributes_Secondary_CritDamage, DamageStatic().CritDamageDef);
+	TagsToCaptureDefs.Add(Tags.Attributes_Resist_Fire, DamageStatic().Resist_FireDef);
+	TagsToCaptureDefs.Add(Tags.Attributes_Resist_Lighting, DamageStatic().Resist_LightingDef);
+	TagsToCaptureDefs.Add(Tags.Attributes_Resist_Arcane, DamageStatic().Resist_ArcaneDef);
+
 	const UAbilitySystemComponent* SourceASC = ExecutionParams.GetSourceAbilitySystemComponent();
 	const UAbilitySystemComponent* TargetASC = ExecutionParams.GetTargetAbilitySystemComponent();
 
@@ -101,14 +102,20 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	float Damage = 0;	// 获取Caller设置的Damage
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatic().PhysicalDamageDef, EvalParams, Damage);
 
-	for (const TTuple<FGameplayTag, FGameplayTag>& Pair : FAuraGameplayTags::Get().DamageTypeToResist)
+	const FAuraGameplayTags GameplayTags = FAuraGameplayTags::Get();
+
+	// Debuff相关
+	HandleDebuff(ExecutionParams, EffectSpec, EvalParams, TagsToCaptureDefs);
+
+	// 抗性计算
+	for (const TTuple<FGameplayTag, FGameplayTag>& Pair : GameplayTags.DamageTypeToResist)
 	{
 		const FGameplayTag DamageTypeTag = Pair.Key;
 		const FGameplayTag DamageResistTag = Pair.Value;
-		if (AuraDamageStatic().TagsToCaptureDefs.Contains(DamageResistTag))
+		if (TagsToCaptureDefs.Contains(DamageResistTag))
 		{
 			float ResistValue = 0.f;
-			const FGameplayEffectAttributeCaptureDefinition CaptureDef = AuraDamageStatic().TagsToCaptureDefs[DamageResistTag];
+			const FGameplayEffectAttributeCaptureDefinition CaptureDef = TagsToCaptureDefs[DamageResistTag];
 			ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(CaptureDef, EvalParams, ResistValue);
 			ResistValue = ResistValue > 100.f ? 100.f : ResistValue;
 			float DamageValue = EffectSpec.GetSetByCallerMagnitude(Pair.Key, false);	// 获取Caller设置的Damage
@@ -154,4 +161,44 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 
 	const FGameplayModifierEvaluatedData EvalData(UAuraAttributeSet::GetInComingDamageAttribute(), EGameplayModOp::Additive, Damage);	// 将Damage增加到该角色的IncomingDamage
 	OutExecutionOutput.AddOutputModifier(EvalData);	// 应用EvalData
+}
+
+void UExecCalc_Damage::HandleDebuff(const FGameplayEffectCustomExecutionParameters& ExecutionParams, const FGameplayEffectSpec& EffectSpec, FAggregatorEvaluateParameters EvalParams, const TMap<FGameplayTag, FGameplayEffectAttributeCaptureDefinition>& TagsToCaptureDefs) const
+{
+	const FAuraGameplayTags GameplayTags = FAuraGameplayTags::Get();
+	for (const TTuple<FGameplayTag, FGameplayTag>& Pair : GameplayTags.DamageTypeToDebuff)
+	{
+		const FGameplayTag& DamageType = Pair.Key;
+		const FGameplayTag& DebuffType = Pair.Value;
+		const float DamageAmount = EffectSpec.GetSetByCallerMagnitude(DamageType, false, -1.f);
+		if (DamageAmount > -.5f) // 伤害值大于-0.5时才生效
+		{
+			// 根据几率决定debuff是否生效
+			const float DebuffChance = EffectSpec.GetSetByCallerMagnitude(GameplayTags.Debuff_Data_Chance, false, -1.f);
+			const FGameplayTag& ResistanceTag = GameplayTags.DamageTypeToResist[DamageType];
+			bool bApplyDebuff = DebuffChance > FMath::RandRange(0.f, 100.f);
+			float DamageResistance = -1.f;
+			ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(TagsToCaptureDefs[ResistanceTag], EvalParams, DamageResistance);
+
+			FGameplayEffectContextHandle ContextHandle = EffectSpec.GetContext();
+			if (bApplyDebuff)
+			{
+
+				UAuraAbilitySystemLibrary::SetIsSuccessfulDebuff(ContextHandle, true);
+				UAuraAbilitySystemLibrary::SetDamageType(ContextHandle, DamageType);
+
+				const float DebuffDamage = EffectSpec.GetSetByCallerMagnitude(GameplayTags.Debuff_Data_Damage, false, -1.f);
+				const float DebuffDuration = EffectSpec.GetSetByCallerMagnitude(GameplayTags.Debuff_Data_Duration, false, -1.f);
+				const float DebuffFrequency = EffectSpec.GetSetByCallerMagnitude(GameplayTags.Debuff_Data_Frequency, false, -1.f);
+
+				UAuraAbilitySystemLibrary::SetDebuffDamage(ContextHandle, DebuffDamage);
+				UAuraAbilitySystemLibrary::SetDebuffDuration(ContextHandle, DebuffDuration);
+				UAuraAbilitySystemLibrary::SetDebuffFrequency(ContextHandle, DebuffFrequency);
+			}
+			else
+			{
+				UAuraAbilitySystemLibrary::SetIsSuccessfulDebuff(ContextHandle, false);
+			}
+		}
+	}
 }

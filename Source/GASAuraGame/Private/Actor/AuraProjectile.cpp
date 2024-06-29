@@ -72,13 +72,27 @@ void AAuraProjectile::OnHit()
 void AAuraProjectile::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	AActor* SourceActor = DamageEffectParams.SourceASC->GetAvatarActor();
-	if (!(SourceActor && SourceActor == OtherActor || UAuraAbilitySystemLibrary::ActorIsFriend(SourceActor, OtherActor))) return;
+	if (SourceActor == nullptr) return;
+	if (SourceActor == OtherActor || UAuraAbilitySystemLibrary::ActorIsFriend(SourceActor, OtherActor)) return;
 	if (!bHit) OnHit();
 
 	if (HasAuthority())
 	{
 		if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
 		{
+			const FVector DeathImpulse = GetActorForwardVector() * DamageEffectParams.DeathImpulseMagnitude;
+			DamageEffectParams.DeathImpulse = DeathImpulse;
+
+			const bool bKnockback = DamageEffectParams.KnockbackChance >= FMath::RandRange(0.f, 100.f);
+			if (bKnockback)
+			{
+				FRotator TargetRotation = OtherActor->GetActorRotation();
+				TargetRotation.Pitch = 45.f;
+
+				const FVector KnockbackImpulse = TargetRotation.Vector() * DamageEffectParams.KnockbackMagnitude;
+				DamageEffectParams.KnockbackImpulse = KnockbackImpulse;
+			}
+
 			DamageEffectParams.TargetASC = TargetASC;
 			UAuraAbilitySystemLibrary::ApplyDamageEffect(DamageEffectParams);
 		}

@@ -255,4 +255,7 @@ private:
 	void SendXPEvent(FEffectProperties& Props);
 	bool bTopOffHealth = false;
 	bool bTopOffMana = false;
+	void HandleDamage(FEffectProperties Props);
+	void HandleXP(FEffectProperties Props);
+	void HandleDebuff(FEffectProperties Props);
 };

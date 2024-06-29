@@ -10,6 +10,7 @@
 #include "Interaction/CombatInterface.h"
 #include "Net/UnrealNetwork.h"
 #include "NiagaraSystem.h"
+#include "AbilitySystem/Debuff/DebuffNiagaraComponent.h"
 #include "AuraCharacterBase.generated.h"
 
 class UAbilitySystemComponent;
@@ -29,7 +30,7 @@ public:
 	/* 战斗 接口开始 */
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
 	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation() override;
-	virtual void Die() override;
+	virtual void Die(const FVector& DeathImpluse) override;
 	virtual FVector GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag) override;
 	virtual bool IsDead_Implementation() const override;
 	virtual AActor* GetAvatarActor_Implementation() override;
@@ -38,11 +39,16 @@ public:
 	virtual int32 GetMinionsCount_Implementation() override;
 	virtual void SetMinionsCount_Implementation(int32 InMinionsCount) override;
 	virtual ECharacterClass GetCharacterClass_Implementation() override;
+	virtual FOnASCRegistered GetOnASCRegisteredDelegate() override;
+	virtual FOnDeath GetOnDeathDelegate() override;
+
+	FOnASCRegistered OnASCRegistered;
+	FOnDeath OnDeath;
 	/* 战斗 接口结束 */
 
 
 	UFUNCTION(NetMulticast, Reliable)
-	virtual void MulticastHandleDeath();
+	virtual void MulticastHandleDeath(const FVector& DeathImpulse);
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TArray<FTaggedMontage> AttackMontages;
@@ -112,6 +118,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 MinionsCount = 0;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UDebuffNiagaraComponent> BurnDebuffComponent;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Abilities")

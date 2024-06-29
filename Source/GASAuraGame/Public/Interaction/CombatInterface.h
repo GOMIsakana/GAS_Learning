@@ -9,6 +9,9 @@
 #include "Data/CharacterClassInfo.h"
 #include "CombatInterface.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnASCRegistered, UAbilitySystemComponent*);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnDeath, AActor*);
+
 USTRUCT(BlueprintType)
 struct FTaggedMontage
 {
@@ -59,7 +62,7 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	TArray<FTaggedMontage> GetAttackMontages();
 
-	virtual void Die();
+	virtual void Die(const FVector& DeathImpulse);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool IsDead() const;
@@ -81,4 +84,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	ECharacterClass GetCharacterClass();
+
+	virtual FOnASCRegistered GetOnASCRegisteredDelegate() = 0;
+
+	virtual FOnDeath GetOnDeathDelegate() = 0;
 };
