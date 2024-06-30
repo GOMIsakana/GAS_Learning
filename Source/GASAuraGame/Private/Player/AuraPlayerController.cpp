@@ -10,6 +10,7 @@
 #include "NavigationSystem.h"
 #include "NavigationPath.h"
 #include "Components/WidgetComponent.h"
+#include "NiagaraFunctionLibrary.h"
 
 AAuraPlayerController::AAuraPlayerController()
 {
@@ -78,6 +79,7 @@ void AAuraPlayerController::CursorTrace()
 
 void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
+	if (GetAuraASC()) GetAuraASC()->AbilityInputTagPressed(InputTag);
 	// 当按下右键时，检测右键是否正在对准目标，并禁用自动移动(在下方根据长按还是点按重新分配自动移动)
 	if (InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_RMB))
 	{
@@ -101,6 +103,10 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 	// 如果对准地板且没按下shift，则使用导航系统从当前位置到目标位置生成一条导航线，并获取其中转折点作为spline的点，然后使用spline进行导航
 	if (!bTargeting && !bShiftKeyDown)
 	{
+		if (ClickNiagaraSystem)
+		{
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ClickNiagaraSystem, CachedDestination);
+		}
 		APawn* ControlledPawn = GetPawn();
 		if (FollowTime <= ShortPressThresHold && ControlledPawn)
 		{

@@ -328,6 +328,40 @@ FGameplayEffectContextHandle UAuraAbilitySystemLibrary::ApplyDamageEffect(FDamag
 	return DamageContextHandle;
 }
 
+TArray<FRotator> UAuraAbilitySystemLibrary::EvenlySpacedRotator(const FVector& Forward, const FVector& Axis, float Spread, int32 OutputAmount)
+{
+	TArray<FRotator> RetRotator;
+	FVector LeftRotator = Forward;
+	if (OutputAmount > 1)
+	{
+		LeftRotator = Forward.RotateAngleAxis(-Spread / 2.f, Axis);
+	}
+	float DeltaSpread = OutputAmount == 1 ? Spread : Spread / (OutputAmount - 1);
+	for (int32 i = 0; i < OutputAmount; i++)
+	{
+		FVector Direction = LeftRotator.RotateAngleAxis(DeltaSpread * i, FVector::UpVector);
+		RetRotator.Add(Direction.Rotation());
+	}
+	return RetRotator;
+}
+
+TArray<FVector> UAuraAbilitySystemLibrary::EvenlyRotatedVector(const FVector& Forward, const FVector& Axis, float Spread, int32 OutputAmount)
+{
+	TArray<FVector> RetVector;
+	FVector LeftRotator = Forward;
+	if (OutputAmount > 1)
+	{
+		LeftRotator = Forward.RotateAngleAxis(-Spread / 2.f, Axis);
+	}
+	float DeltaSpread = OutputAmount == 1 ? Spread : Spread / (OutputAmount - 1);
+	for (int32 i = 0; i < OutputAmount; i++)
+	{
+		FVector Direction = LeftRotator.RotateAngleAxis(DeltaSpread * i, FVector::UpVector);
+		RetVector.Add(Direction);
+	}
+	return RetVector;
+}
+
 void UAuraAbilitySystemLibrary::GetLifePlayerWithinRadius(const UObject* WorldContextObject, TArray<AActor*>& OutputOverlappingActor, TArray<AActor*> ActorsToIgnore, float Radius, const FVector& SphereOrigin)
 {
 	FCollisionQueryParams SphereParams;

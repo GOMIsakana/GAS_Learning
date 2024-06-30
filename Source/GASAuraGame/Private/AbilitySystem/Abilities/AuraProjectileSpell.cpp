@@ -10,7 +10,7 @@
 #include "GASAuraGame/Public/AuraGameplayTags.h"
 #include "AbilitySystem/AuraAttributeSet.h"
 
-void UAuraProjectileSpell::SpawnProjectile(const FVector& TargetLocation, const FGameplayTag& SocketTag)
+void UAuraProjectileSpell::SpawnProjectile(const FVector& TargetLocation, const FGameplayTag& SocketTag, bool bOverridePitch, float PitchOverride)
 {
 	if (!(GetAvatarActorFromActorInfo() && GetAvatarActorFromActorInfo()->HasAuthority())) return;
 
@@ -21,7 +21,10 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& TargetLocation, const 
 			FTransform SpawnTransform;
 			FVector SocketLocation = ICombatInterface::Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo(), SocketTag);
 			FRotator Rotation = (TargetLocation - SocketLocation).Rotation();
-			// Rotation.Pitch = 0.f;
+			if (bOverridePitch)
+			{
+				Rotation.Pitch = PitchOverride;
+			}
 
 			SpawnTransform.SetLocation(SocketLocation);
 			SpawnTransform.SetRotation(Rotation.Quaternion());

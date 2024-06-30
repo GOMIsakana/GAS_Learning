@@ -10,6 +10,7 @@
 #include "AbilitySystem/AuraAbilitySystemComponentBase.h"
 #include "Components/SplineComponent.h"
 #include "UI/Widgets/DamageTextWidgetComponent.h"
+#include "NiagaraSystem.h"
 #include "AuraPlayerController.generated.h"
 
 class UInputMappingContext;
@@ -85,4 +86,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UDamageTextWidgetComponent> DamageTextComponentClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UNiagaraSystem> ClickNiagaraSystem;
 };
