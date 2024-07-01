@@ -218,6 +218,7 @@ void UAuraAbilitySystemComponentBase::ServerLevelupAbility_Implementation(const 
 void UAuraAbilitySystemComponentBase::UpdateAbilityStatuses(int32 Level)
 {
 	UAbilityInfo* AbilityInfo = UAuraAbilitySystemLibrary::GetAbilityInfo(this);
+	if (!AbilityInfo) return;
 	for (FAuraAbilityInfo& Info : AbilityInfo->AbilityInfomation)
 	{
 		if (!Info.AbilityTag.IsValid()) continue;

@@ -59,6 +59,10 @@ void AAuraPlayerController::AutoRun()
 
 void AAuraPlayerController::CursorTrace()
 {
+	if (GetAuraASC() && GetAuraASC()->HasMatchingGameplayTag(FAuraGameplayTags::Get().Player_Block_CursorTrace))
+	{
+		return;
+	}
 	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
 	if (!CursorHit.bBlockingHit)
 	{
@@ -79,6 +83,10 @@ void AAuraPlayerController::CursorTrace()
 
 void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
+	if (GetAuraASC() && GetAuraASC()->HasMatchingGameplayTag(FAuraGameplayTags::Get().Player_Block_InputPressed))
+	{
+		return;
+	}
 	if (GetAuraASC()) GetAuraASC()->AbilityInputTagPressed(InputTag);
 	// 当按下右键时，检测右键是否正在对准目标，并禁用自动移动(在下方根据长按还是点按重新分配自动移动)
 	if (InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_RMB))
@@ -90,6 +98,10 @@ void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 
 void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 {
+	if (GetAuraASC() && GetAuraASC()->HasMatchingGameplayTag(FAuraGameplayTags::Get().Player_Block_InputReleased))
+	{
+		return;
+	}
 	// 如果不是右键的输入, 则尝试释放松开按键时的技能
 	if (!InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_RMB))
 	{
@@ -103,7 +115,7 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 	// 如果对准地板且没按下shift，则使用导航系统从当前位置到目标位置生成一条导航线，并获取其中转折点作为spline的点，然后使用spline进行导航
 	if (!bTargeting && !bShiftKeyDown)
 	{
-		if (ClickNiagaraSystem)
+		if (ClickNiagaraSystem && GetAuraASC() && !GetAuraASC()->HasMatchingGameplayTag(FAuraGameplayTags::Get().Player_Block_InputPressed))
 		{
 			UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ClickNiagaraSystem, CachedDestination);
 		}
@@ -136,6 +148,10 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 
 void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
+	if (GetAuraASC() && GetAuraASC()->HasMatchingGameplayTag(FAuraGameplayTags::Get().Player_Block_InputHeld))
+	{
+		return;
+	}
 	if (!InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_RMB))
 	{
 		if (GetAuraASC()) GetAuraASC()->AbilityInputTagHeld(InputTag);
@@ -217,6 +233,10 @@ void AAuraPlayerController::SetupInputComponent()
 
 void AAuraPlayerController::Move(const FInputActionValue& InputActionValue)
 {
+	if (GetAuraASC() && GetAuraASC()->HasMatchingGameplayTag(FAuraGameplayTags::Get().Player_Block_InputPressed))
+	{
+		return;
+	}
 	const FVector2D InputAxisVector = InputActionValue.Get<FVector2D>();
 	const FRotator Rotation = GetControlRotation();
 	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
