@@ -380,3 +380,27 @@ void UAuraAbilitySystemLibrary::GetLifePlayerWithinRadius(const UObject* WorldCo
 		}
 	}
 }
+
+void UAuraAbilitySystemLibrary::GetClosestTargets(int32 MaxTarget, TArray<AActor*> Actors, TArray<AActor*>& OutClosestActors, const FVector& Origin)
+{
+	struct FSortActorNearbyOrigin
+	{
+		FSortActorNearbyOrigin(const FVector& InOrigin) : Origin(InOrigin) {};
+
+		FVector Origin;
+
+		FORCEINLINE bool operator()(const AActor& A, const AActor& B) const
+		{
+			float OriginToA = (A.GetActorLocation() - Origin).Size();
+			float OriginToB = (B.GetActorLocation() - Origin).Size();
+			return OriginToA < OriginToB;
+		}
+	};
+	OutClosestActors.Reset();
+	Actors.Sort(FSortActorNearbyOrigin(Origin));
+	int32 InArrayLength = Actors.Num();
+	for (int32 i = 0; i < MaxTarget && i < InArrayLength; i++)
+	{
+		OutClosestActors.AddUnique(Actors[i]);
+	}
+}

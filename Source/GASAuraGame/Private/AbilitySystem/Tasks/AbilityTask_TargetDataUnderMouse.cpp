@@ -4,6 +4,7 @@
 #include "AbilitySystem/Tasks/AbilityTask_TargetDataUnderMouse.h"
 #include "Player/AuraPlayerController.h"
 #include "AbilitySystemComponent.h"
+#include "GASAuraGame/GASAuraGame.h"
 
 UAbilityTask_TargetDataUnderMouse* UAbilityTask_TargetDataUnderMouse::CreateTargetDataUnderMouse(UGameplayAbility* OwningAbility)
 {
@@ -55,7 +56,7 @@ void UAbilityTask_TargetDataUnderMouse::SendMouseCursorData()
 	if (APlayerController* Controller = Ability->GetCurrentActorInfo()->PlayerController.Get())
 	{
 		FHitResult HitResult;
-		Controller->GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
+		Controller->GetHitResultUnderCursor(ECC_Target, false, HitResult);
 		Data->HitResult = HitResult;
 	}
 	DataHandle.Add(Data);
