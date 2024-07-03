@@ -9,6 +9,7 @@
 #include "AbilitySystem/AuraAbilitySystemComponentBase.h"
 #include "NiagaraComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 AAuraCharacter::AAuraCharacter()
 {
@@ -184,6 +185,37 @@ int32 AAuraCharacter::GetCombatLevel_Implementation()
 	return 0;
 }
 
+void AAuraCharacter::OnStunTagChanged(FGameplayTag ReceivedTag, int32 NewCount)
+{
+	bIsStunned = NewCount > 0;
+	if (bIsStunned)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 0.f;
+		return;
+	}
+	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+}
+
+void AAuraCharacter::OnRep_IsStunned()
+{
+	if (UAuraAbilitySystemComponentBase* AuraASC = Cast<UAuraAbilitySystemComponentBase>(GetAbilitySystemComponent()))
+	{
+		const FAuraGameplayTags& GameplayTags = FAuraGameplayTags::Get();
+		FGameplayTagContainer BlockTags;
+		BlockTags.AddTag(GameplayTags.Player_Block_InputHeld);
+		BlockTags.AddTag(GameplayTags.Player_Block_InputPressed);
+		BlockTags.AddTag(GameplayTags.Player_Block_InputReleased);
+		if (bIsStunned)
+		{
+			AuraASC->AddLooseGameplayTags(BlockTags);
+		}
+		else
+		{
+			AuraASC->RemoveLooseGameplayTags(BlockTags);
+		}
+	}
+}
+
 void AAuraCharacter::InitAbilityActorInfo()
 {
 	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
@@ -195,6 +227,8 @@ void AAuraCharacter::InitAbilityActorInfo()
 	AbilitySystemComponent = AuraPlayerState->GetAbilitySystemComponent();
 	AttributeSet = AuraPlayerState->GetAttributeSet();
 	OnASCRegistered.Broadcast(AbilitySystemComponent);
+
+	AbilitySystemComponent->RegisterGameplayTagEvent(FAuraGameplayTags::Get().Debuff_Type_Stun).AddUObject(this, &AAuraCharacter::OnStunTagChanged);
 
 	if (AAuraPlayerController* AuraPlayerController = Cast<AAuraPlayerController>(GetController()))
 	{

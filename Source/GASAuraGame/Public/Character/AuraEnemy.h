@@ -53,9 +53,6 @@ public:
 	bool bHitReacting = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
-	float BaseWalkSpeed = 250.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
 	float LifeSpan = 5.f;
 
 	virtual void Die(const FVector& DeathImpluse) override;
@@ -64,6 +61,8 @@ public:
 	TObjectPtr<AActor> CombatTarget;
 
 protected:
+	virtual void OnStunTagChanged(FGameplayTag ReceivedTag, int32 NewCount) override;
+
 	virtual void BeginPlay() override;
 
 	virtual void InitAbilityActorInfo() override;

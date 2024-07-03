@@ -27,6 +27,8 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	/* 战斗 接口开始 */
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
 	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation() override;
@@ -40,19 +42,21 @@ public:
 	virtual int32 GetMinionsCount_Implementation() override;
 	virtual void SetMinionsCount_Implementation(int32 InMinionsCount) override;
 	virtual ECharacterClass GetCharacterClass_Implementation() override;
-	virtual FOnASCRegistered GetOnASCRegisteredDelegate() override;
-	virtual FOnDeath GetOnDeathDelegate() override;
+	virtual FOnASCRegistered& GetOnASCRegisteredDelegate() override;
+	virtual FOnDeath& GetOnDeathDelegate() override;
 
 	FOnASCRegistered OnASCRegistered;
 	FOnDeath OnDeath;
 	/* 战斗 接口结束 */
-
 
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void MulticastHandleDeath(const FVector& DeathImpulse);
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TArray<FTaggedMontage> AttackMontages;
+
+	UPROPERTY(ReplicatedUsing = OnRep_IsStunned, BlueprintReadOnly, Category = "Combat")
+	bool bIsStunned = false;
 
 protected:
 	virtual void BeginPlay() override;
@@ -93,6 +97,15 @@ protected:
 	virtual void InitializeDefaultAttribute() const;
 
 	void AddCharacterAbilities();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
+	float BaseWalkSpeed = 600.f;
+
+	virtual void OnStunTagChanged(FGameplayTag ReceivedTag, int32 NewCount);
+
+	UFUNCTION()
+	virtual void OnRep_IsStunned();
+
 
 	/* 溶解特效 */
 

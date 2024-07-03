@@ -42,8 +42,13 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UNiagaraComponent> LevelUpNiagaraComponent;
+protected:
+
+	virtual void OnStunTagChanged(FGameplayTag ReceivedTag, int32 NewCount) override;
+	virtual void OnRep_IsStunned() override;
 
 private:
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USpringArmComponent> CameraSpringArm;
 

@@ -42,7 +42,7 @@ void UDebuffNiagaraComponent::BeginPlay()
 
 	if (OwnerCombatInterface)
 	{
-		OwnerCombatInterface->GetOnDeathDelegate().AddUObject(this, &UDebuffNiagaraComponent::OnOwnerDeath);
+		OwnerCombatInterface->GetOnDeathDelegate().AddDynamic(this, &UDebuffNiagaraComponent::OnOwnerDeath);
 	}
 }
 

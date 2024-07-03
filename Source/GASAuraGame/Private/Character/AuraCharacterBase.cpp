@@ -34,6 +34,13 @@ UAbilitySystemComponent* AAuraCharacterBase::GetAbilitySystemComponent() const
 	return AbilitySystemComponent;
 }
 
+void AAuraCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AAuraCharacterBase, bIsStunned);
+}
+
 FVector AAuraCharacterBase::GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag)
 {
 	const FAuraGameplayTags& GameplayTags = FAuraGameplayTags::Get();
@@ -103,12 +110,12 @@ ECharacterClass AAuraCharacterBase::GetCharacterClass_Implementation()
 	return ECharacterClass::Elementalist;
 }
 
-FOnASCRegistered AAuraCharacterBase::GetOnASCRegisteredDelegate()
+FOnASCRegistered& AAuraCharacterBase::GetOnASCRegisteredDelegate()
 {
 	return OnASCRegistered;
 }
 
-FOnDeath AAuraCharacterBase::GetOnDeathDelegate()
+FOnDeath& AAuraCharacterBase::GetOnDeathDelegate()
 {
 	return OnDeath;
 }
@@ -155,10 +162,17 @@ void AAuraCharacterBase::MulticastHandleDeath_Implementation(const FVector& Deat
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	OnDeath.Broadcast(this);
-	// 因为委托没用，出此下策
-	BurnDebuffComponent->Deactivate();
 
 	Dissolve();
+}
+
+void AAuraCharacterBase::OnStunTagChanged(FGameplayTag ReceivedTag, int32 StackCount)
+{
+
+}
+
+void AAuraCharacterBase::OnRep_IsStunned()
+{
 }
 
 void AAuraCharacterBase::BeginPlay()
