@@ -25,6 +25,8 @@ void UDebuffNiagaraComponent::Deactivate()
 void UDebuffNiagaraComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+
 	ICombatInterface* OwnerCombatInterface = Cast<ICombatInterface>(GetOwner());
 	if (UAbilitySystemComponent* OwnerASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwner()))
 	{

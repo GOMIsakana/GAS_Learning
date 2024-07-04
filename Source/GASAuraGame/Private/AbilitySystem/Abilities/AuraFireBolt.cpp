@@ -13,7 +13,7 @@
 
 void UAuraFireBolt::SpawnProjectileWithSpread(const FVector& TargetLocation, const FGameplayTag& SocketTag, bool bOverridePitch, float PitchOverride, AActor* HomingTarget)
 {
-	if (!(GetAvatarActorFromActorInfo() && GetAvatarActorFromActorInfo()->HasAuthority())) return;
+	if (!GetAvatarActorFromActorInfo()->HasAuthority()) return;
 	if (!ProjectileClass) return;
 
 	FVector SocketLocation = GetAvatarActorFromActorInfo()->GetActorLocation();
@@ -64,6 +64,7 @@ void UAuraFireBolt::SpawnProjectileWithSpread(const FVector& TargetLocation, con
 		Projectile->ProjectileMovementComponent->HomingAccelerationMagnitude = FMath::RandRange(HomingAccelerationMin, HomingAccelerationMax);
 
 		Projectile->FinishSpawning(SpawnTransform);
+		OnProjectileSpawnFinishedSignature.Broadcast();
 	}
 }
 

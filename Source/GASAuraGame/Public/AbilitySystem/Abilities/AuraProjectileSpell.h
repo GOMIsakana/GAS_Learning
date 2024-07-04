@@ -5,7 +5,10 @@
 #include "CoreMinimal.h"
 #include "AbilitySystem/Abilities/AuraDamageGameplayAbility.h"
 #include "Actor/AuraProjectile.h"
+#include "Net/UnrealNetwork.h"
 #include "AuraProjectileSpell.generated.h"
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnProjectileSpawnFinishedSignature);
 
 struct FGameplayTag;
 
@@ -25,6 +28,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 NumProjectile = 1;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnProjectileSpawnFinishedSignature OnProjectileSpawnFinishedSignature;
 
 protected:
 

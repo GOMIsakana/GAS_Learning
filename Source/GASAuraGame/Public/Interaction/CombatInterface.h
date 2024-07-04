@@ -91,6 +91,12 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void SetInShockLoop(bool bLooping);
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool IsBeingShock();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetIsBeingShock(bool bInIsBeingShock);
+
 	virtual FOnASCRegistered& GetOnASCRegisteredDelegate() = 0;
 
 	virtual FOnDeath& GetOnDeathDelegate() = 0;

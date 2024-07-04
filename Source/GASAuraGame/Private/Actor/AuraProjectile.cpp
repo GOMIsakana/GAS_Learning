@@ -36,6 +36,7 @@ void AAuraProjectile::BeginPlay()
 	Capsule->OnComponentBeginOverlap.AddDynamic(this, &AAuraProjectile::OnCapsuleBeginOverlap);
 
 	SetLifeSpan(LifeSpan);
+	SetReplicateMovement(true);
 	if (HasAuthority() && LoopSound)
 	{
 		LoopSoundComponent = UGameplayStatics::SpawnSoundAttached(LoopSound, GetRootComponent(), FName(), GetActorLocation(), EAttachLocation::KeepWorldPosition);

@@ -208,10 +208,12 @@ void AAuraCharacter::OnRep_IsStunned()
 		if (bIsStunned)
 		{
 			AuraASC->AddLooseGameplayTags(BlockTags);
+			StunDebuffComponent->Activate();
 		}
 		else
 		{
 			AuraASC->RemoveLooseGameplayTags(BlockTags);
+			StunDebuffComponent->Deactivate();
 		}
 	}
 }

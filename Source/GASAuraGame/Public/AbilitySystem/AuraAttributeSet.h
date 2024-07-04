@@ -258,4 +258,5 @@ private:
 	void HandleDamage(FEffectProperties Props);
 	void HandleXP(FEffectProperties Props);
 	void HandleDebuff(FEffectProperties Props);
+	void HandleLevelRecovery();
 };

@@ -116,15 +116,9 @@ void UAuraAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute,
 {
 	Super::PostAttributeChange(Attribute, OldValue, NewValue);
 
-	if (Attribute == GetMaxHealthAttribute() && bTopOffHealth)
+	if (Attribute == GetMaxHealthAttribute() || Attribute == GetMaxManaAttribute())
 	{
-		SetHealth(GetMaxHealth());
-		bTopOffHealth = false;
-	}
-	if (Attribute == GetMaxManaAttribute() && bTopOffMana)
-	{
-		SetMana(GetMaxMana());
-		bTopOffMana = false;
+		HandleLevelRecovery();
 	}
 }
 
@@ -213,7 +207,10 @@ void UAuraAttributeSet::HandleDamage(FEffectProperties Props)
 		{
 			FGameplayTagContainer Tags;
 			Tags.AddTag(FAuraGameplayTags::Get().Abilities_HitReact);
-			Props.TargetASC->TryActivateAbilitiesByTag(Tags);
+			if (Props.TargetCharacter->Implements<UCombatInterface>() && !ICombatInterface::Execute_IsBeingShock(Props.TargetCharacter))
+			{
+				Props.TargetASC->TryActivateAbilitiesByTag(Tags);
+			}
 
 			if (UAuraAbilitySystemLibrary::IsSuccessfulDebuff(Props.EffectContextHandle))
 			{
@@ -262,6 +259,7 @@ void UAuraAttributeSet::HandleXP(FEffectProperties Props)
 
 			IPlayerInterface::Execute_AddToCombatLevel(Props.SourceCharacter, NumOfLevelUp);
 			IPlayerInterface::Execute_LevelUp(Props.SourceCharacter);
+			HandleLevelRecovery();
 		}
 
 		IPlayerInterface::Execute_AddToXP(Props.SourceCharacter, LocalIncomingXP);
@@ -294,11 +292,14 @@ void UAuraAttributeSet::HandleDebuff(FEffectProperties Props)
 
 	if (DebuffTag.MatchesTagExact(GameplayTags.Debuff_Type_Stun))
 	{
-		FGameplayTagContainer BlockTags;
+		/* FGameplayTagContainer BlockTags;
 		BlockTags.AddTag(GameplayTags.Player_Block_InputHeld);
 		BlockTags.AddTag(GameplayTags.Player_Block_InputPressed);
 		BlockTags.AddTag(GameplayTags.Player_Block_InputReleased);
-		Props.TargetASC->AddLooseGameplayTags(BlockTags);
+		Props.TargetASC->AddLooseGameplayTags(BlockTags);*/
+		DebuffEffect->InheritableOwnedTagsContainer.AddTag(GameplayTags.Player_Block_InputHeld);
+		DebuffEffect->InheritableOwnedTagsContainer.AddTag(GameplayTags.Player_Block_InputPressed);
+		DebuffEffect->InheritableOwnedTagsContainer.AddTag(GameplayTags.Player_Block_InputReleased);
 	}
 
 	DebuffEffect->StackingType = EGameplayEffectStackingType::AggregateByTarget;
@@ -319,6 +320,20 @@ void UAuraAttributeSet::HandleDebuff(FEffectProperties Props)
 		AuraContext->SetDamageType(DebuffDamageType);
 		AuraContext->SetDebuffDamage(DebuffDamage);
 		Props.SourceASC->ApplyGameplayEffectSpecToTarget(*MutableSpec, Props.TargetASC);
+	}
+}
+
+void UAuraAttributeSet::HandleLevelRecovery()
+{
+	if (bTopOffHealth)
+	{
+		SetHealth(GetMaxHealth());
+		bTopOffHealth = false;
+	}
+	if (bTopOffMana)
+	{
+		SetMana(GetMaxMana());
+		bTopOffMana = false;
 	}
 }
 

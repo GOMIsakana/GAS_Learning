@@ -7,6 +7,7 @@
 #include "AuraGameplayTags.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 AAuraCharacterBase::AAuraCharacterBase()
 {
@@ -15,6 +16,10 @@ AAuraCharacterBase::AAuraCharacterBase()
 	BurnDebuffComponent = CreateDefaultSubobject<UDebuffNiagaraComponent>(TEXT("燃烧Debuff粒子效果"));
 	BurnDebuffComponent->SetupAttachment(GetRootComponent());
 	BurnDebuffComponent->DebuffTag = FAuraGameplayTags::Get().Debuff_Type_Burn;
+
+	StunDebuffComponent = CreateDefaultSubobject<UDebuffNiagaraComponent>(TEXT("眩晕Debuff粒子效果"));
+	StunDebuffComponent->SetupAttachment(GetRootComponent());
+	StunDebuffComponent->DebuffTag = FAuraGameplayTags::Get().Debuff_Type_Stun;
 
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("武器"));
 	Weapon->SetupAttachment(GetMesh(), FName("WeaponHandSocket"));
@@ -39,6 +44,7 @@ void AAuraCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AAuraCharacterBase, bIsStunned);
+	DOREPLIFETIME(AAuraCharacterBase, bIsBeingShock);
 }
 
 FVector AAuraCharacterBase::GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag)
@@ -120,6 +126,16 @@ FOnDeath& AAuraCharacterBase::GetOnDeathDelegate()
 	return OnDeath;
 }
 
+bool AAuraCharacterBase::IsBeingShock_Implementation()
+{
+	return bIsBeingShock;
+}
+
+void AAuraCharacterBase::SetIsBeingShock_Implementation(bool bInIsBeingShock)
+{
+	bIsBeingShock = bInIsBeingShock;
+}
+
 UAnimMontage* AAuraCharacterBase::GetHitReactMontage_Implementation()
 {
 	return HitReactMontage;
@@ -166,9 +182,11 @@ void AAuraCharacterBase::MulticastHandleDeath_Implementation(const FVector& Deat
 	Dissolve();
 }
 
-void AAuraCharacterBase::OnStunTagChanged(FGameplayTag ReceivedTag, int32 StackCount)
+void AAuraCharacterBase::OnStunTagChanged(FGameplayTag ReceivedTag, int32 NewCount)
 {
-
+	bIsStunned = NewCount > 0;
+	bool bShouldStopMove = bHitReacting || bIsStunned;
+	GetCharacterMovement()->MaxWalkSpeed = bShouldStopMove ? 0.f : BaseWalkSpeed;
 }
 
 void AAuraCharacterBase::OnRep_IsStunned()

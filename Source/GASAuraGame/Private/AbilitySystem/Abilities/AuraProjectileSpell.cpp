@@ -52,6 +52,7 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& TargetLocation, const 
 			}
 
 			Projectile->FinishSpawning(SpawnTransform);
+			OnProjectileSpawnFinishedSignature.Broadcast();
 		}
 	}
 }

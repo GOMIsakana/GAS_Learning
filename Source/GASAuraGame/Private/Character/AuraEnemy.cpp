@@ -80,31 +80,30 @@ ECharacterClass AAuraEnemy::GetCharacterClass_Implementation()
 	return CharacterClass;
 }
 
+void AAuraEnemy::SetIsBeingShock_Implementation(bool bInIsBeingShock)
+{
+	bIsBeingShock = bInIsBeingShock;
+	if (bIsBeingShock && AuraAIController && AuraAIController->GetBlackboardComponent())
+	{
+		AuraAIController->GetBlackboardComponent()->SetValueAsBool(FName("IsBeingShock"), bIsBeingShock);
+	}
+}
+
 void AAuraEnemy::OnHitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
 {
 
 	bHitReacting = NewCount > 0;
+	bool bShouldStopMove = bHitReacting || bIsStunned;
+	GetCharacterMovement()->MaxWalkSpeed = bShouldStopMove ? 0.f : BaseWalkSpeed;
 	if (AuraAIController == nullptr || AuraAIController->GetBlackboardComponent() == nullptr) return;
 	AuraAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), bHitReacting);
-	if (bHitReacting || bIsStunned)
-	{
-		GetCharacterMovement()->MaxWalkSpeed = 0.f;
-		return;
-	}
-	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 }
 
 void AAuraEnemy::OnStunTagChanged(FGameplayTag ReceivedTag, int32 NewCount)
 {
-	bIsStunned = NewCount > 0;
+	Super::OnStunTagChanged(ReceivedTag, NewCount);
 	if (AuraAIController == nullptr || AuraAIController->GetBlackboardComponent() == nullptr) return;
 	AuraAIController->GetBlackboardComponent()->SetValueAsBool(FName("IsStunned"), bIsStunned);
-	if (bHitReacting || bIsStunned)
-	{
-		GetCharacterMovement()->MaxWalkSpeed = 0.f;
-		return;
-	}
-	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 }
 
 void AAuraEnemy::BeginPlay()
