@@ -11,6 +11,7 @@
 #include "Components/SplineComponent.h"
 #include "UI/Widgets/DamageTextWidgetComponent.h"
 #include "NiagaraSystem.h"
+#include "Actor/MagicCircle.h"
 #include "AuraPlayerController.generated.h"
 
 class UInputMappingContext;
@@ -33,6 +34,12 @@ public:
 
 	UFUNCTION(Client, Reliable)
 	void ClientShowDamageNumber(float DamageAmount, AActor* Target, bool bCriticalHit, bool bDamageValid);
+
+	UFUNCTION(BlueprintCallable)
+	void ShowMagicCircle();
+
+	UFUNCTION(BlueprintCallable)
+	void HideMagicCircle();
 
 protected:
 	virtual void BeginPlay() override;
@@ -89,4 +96,10 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UNiagaraSystem> ClickNiagaraSystem;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AMagicCircle> MagicCircleClass;
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<AMagicCircle> MagicCircle;
+	void UpdateMagicCircleLocation();
 };

@@ -13,6 +13,7 @@ DECLARE_DELEGATE_OneParam(FForEachAbility, const FGameplayAbilitySpec&);
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FAbilityStatusChanged, const FGameplayTag& /* 技能Tag */, const FGameplayTag& /* 状态Tag */, int32 /* 技能等级 */);
 DECLARE_MULTICAST_DELEGATE_FourParams(FAbilityEquipped, const FGameplayTag& /* 技能Tag */, const FGameplayTag& /* 技能状态Tag */, const FGameplayTag& /* 现在的按键槽位Tag */, const FGameplayTag& /* 先前的按键槽位Tag */);
 DECLARE_MULTICAST_DELEGATE_OneParam(FDeactivatePassiveAbility, const FGameplayTag& /* 技能Tag */);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FActivatePassiveAbility, const FGameplayTag& /* 技能Tag */, bool /* 是否激活 */);
 
 /**
  * 
@@ -31,6 +32,7 @@ public:
 	FAbilityStatusChanged AbilityStatusChanged;
 	FAbilityEquipped AbilityEquippedDelegate;
 	FDeactivatePassiveAbility DeactivatePassiveAbilityDelegate;
+	FActivatePassiveAbility ActivatePassiveAbilityDelegate;
 
 	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& Abilities);
 	void AddCharacterPassiveAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartUpPassiveAbilities);
@@ -46,7 +48,16 @@ public:
 	static FGameplayTag GetInputTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
 	static FGameplayTag GetStatusTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
 	FGameplayTag GetStatusTagFromAbilityTag(const FGameplayTag& AbilityTag);
-	FGameplayTag GetInputTagFromAbilityTag(const FGameplayTag& AbilityTag);
+	FGameplayTag GetSlotFromAbilityTag(const FGameplayTag& AbilityTag);
+	bool SlotIsEmpty(const FGameplayTag& Slot);
+	bool AbilityHasSlot(const FGameplayAbilitySpec& AbilitySpec, const FGameplayTag& Slot);
+	FGameplayAbilitySpec* GetSpecFromSlot(const FGameplayTag& Slot);
+	bool IsPassiveAbility(const FGameplayAbilitySpec& AbilitySpec) const;
+	bool AbilityHasAnySlot(const FGameplayAbilitySpec& AbilitySpec);
+	void AssignAbilityToSlot(FGameplayAbilitySpec& AbilitySpec, const FGameplayTag& Slot);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastActivatePassiveEffect(const FGameplayTag& AbilityTag, bool bActivate);
 
 	FGameplayAbilitySpec* GetAbilitySpecFromAbilityTag(const FGameplayTag& AbilityTag);
 

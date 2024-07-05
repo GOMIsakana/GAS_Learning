@@ -11,6 +11,7 @@
 #include "Net/UnrealNetwork.h"
 #include "NiagaraSystem.h"
 #include "AbilitySystem/Debuff/DebuffNiagaraComponent.h"
+#include "AbilitySystem/Passive/PassiveNiagaraComponent.h"
 #include "AuraCharacterBase.generated.h"
 
 class UAbilitySystemComponent;
@@ -67,6 +68,8 @@ public:
 	bool bIsBeingShock = false;
 
 protected:
+
+	virtual void Tick(float DeltaTime) override;
 	virtual void BeginPlay() override;
 
 	UPROPERTY(BlueprintReadOnly)
@@ -146,6 +149,18 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UDebuffNiagaraComponent> StunDebuffComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UPassiveNiagaraComponent> HaloOfProtectionComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UPassiveNiagaraComponent> LifeSiphonComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UPassiveNiagaraComponent> ManaSiphonComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USceneComponent> EffectAttachComponent;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Abilities")

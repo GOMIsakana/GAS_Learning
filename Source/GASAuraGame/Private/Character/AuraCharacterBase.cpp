@@ -32,6 +32,18 @@ AAuraCharacterBase::AAuraCharacterBase()
 
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	GetCapsuleComponent()->SetGenerateOverlapEvents(false);
+
+	EffectAttachComponent = CreateDefaultSubobject<USceneComponent>(TEXT("被动技能效果附加根节点"));
+	EffectAttachComponent->SetupAttachment(GetRootComponent());
+
+	HaloOfProtectionComponent = CreateDefaultSubobject<UPassiveNiagaraComponent>(TEXT("保护光环技能粒子效果"));
+	HaloOfProtectionComponent->SetupAttachment(EffectAttachComponent);
+
+	LifeSiphonComponent = CreateDefaultSubobject<UPassiveNiagaraComponent>(TEXT("生命虹吸技能粒子效果"));
+	LifeSiphonComponent->SetupAttachment(EffectAttachComponent);
+
+	ManaSiphonComponent = CreateDefaultSubobject<UPassiveNiagaraComponent>(TEXT("法力虹吸技能粒子效果"));
+	ManaSiphonComponent->SetupAttachment(EffectAttachComponent);
 }
 
 UAbilitySystemComponent* AAuraCharacterBase::GetAbilitySystemComponent() const
@@ -191,6 +203,12 @@ void AAuraCharacterBase::OnStunTagChanged(FGameplayTag ReceivedTag, int32 NewCou
 
 void AAuraCharacterBase::OnRep_IsStunned()
 {
+}
+
+void AAuraCharacterBase::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	EffectAttachComponent->SetWorldRotation(FRotator::ZeroRotator);
 }
 
 void AAuraCharacterBase::BeginPlay()

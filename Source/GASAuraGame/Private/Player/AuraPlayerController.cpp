@@ -24,7 +24,22 @@ void AAuraPlayerController::PlayerTick(float DeltaTime)
 	Super::PlayerTick(DeltaTime);
 
 	CursorTrace();
-	AutoRun();
+	AutoRun(); 
+	UpdateMagicCircleLocation();
+}
+
+void AAuraPlayerController::ShowMagicCircle()
+{
+	if (MagicCircle) return;
+	MagicCircle = GetWorld()->SpawnActor<AMagicCircle>(MagicCircleClass);
+}
+
+void AAuraPlayerController::HideMagicCircle()
+{
+	if (MagicCircle)
+	{
+		MagicCircle->Destroy();
+	}
 }
 
 void AAuraPlayerController::ClientShowDamageNumber_Implementation(float DamageAmount, AActor* Target, bool bCriticalHit, bool bDamageValid)
@@ -54,6 +69,14 @@ void AAuraPlayerController::AutoRun()
 		{
 			bAutoRunning = false;
 		}
+	}
+}
+
+void AAuraPlayerController::UpdateMagicCircleLocation()
+{
+	if (MagicCircle)
+	{
+		MagicCircle->SetActorLocation(CursorHit.ImpactPoint);
 	}
 }
 

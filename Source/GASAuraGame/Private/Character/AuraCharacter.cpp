@@ -144,10 +144,14 @@ void AAuraCharacter::AddToCombatLevel_Implementation(int32 InCombatLevel)
 	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
 	if (AuraPlayerState)
 	{
-		AuraPlayerState->SetCombatLevel(AuraPlayerState->GetCombatLevel() + InCombatLevel);
+		int32 OriginCombatLevel = AuraPlayerState->GetCombatLevel();
+		AuraPlayerState->SetCombatLevel(OriginCombatLevel + InCombatLevel);
 		if (UAuraAbilitySystemComponentBase* AuraASC = Cast<UAuraAbilitySystemComponentBase>(GetAbilitySystemComponent()))
 		{
-			AuraASC->UpdateAbilityStatuses(AuraPlayerState->GetCombatLevel());
+			for (int i = OriginCombatLevel + 1; i <= AuraPlayerState->GetCombatLevel(); i++)
+			{
+				AuraASC->UpdateAbilityStatuses(i);
+			}
 		}
 	}
 }

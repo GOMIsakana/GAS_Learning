@@ -257,8 +257,8 @@ void UAuraAttributeSet::HandleXP(FEffectProperties Props)
 			bTopOffHealth = true;
 			bTopOffMana = true;
 
-			IPlayerInterface::Execute_AddToCombatLevel(Props.SourceCharacter, NumOfLevelUp);
 			IPlayerInterface::Execute_LevelUp(Props.SourceCharacter);
+			IPlayerInterface::Execute_AddToCombatLevel(Props.SourceCharacter, NumOfLevelUp);
 			HandleLevelRecovery();
 		}
 
