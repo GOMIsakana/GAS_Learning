@@ -7,8 +7,8 @@ AMagicCircle::AMagicCircle()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	MagicCircalDecal = CreateDefaultSubobject<UDecalComponent>(TEXT("魔法阵贴花"));
-	MagicCircalDecal->SetupAttachment(GetRootComponent());
+	MagicCircleDecal = CreateDefaultSubobject<UDecalComponent>(TEXT("魔法阵贴花"));
+	MagicCircleDecal->SetupAttachment(GetRootComponent());
 }
 
 void AMagicCircle::BeginPlay()
@@ -21,5 +21,14 @@ void AMagicCircle::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AMagicCircle::SetMaterial(UMaterialInterface* InMaterial)
+{
+	if (MagicCircleDecal && InMaterial)
+	{
+		MagicCircleMaterial = InMaterial;
+		MagicCircleDecal->SetDecalMaterial(InMaterial);
+	}
 }
 

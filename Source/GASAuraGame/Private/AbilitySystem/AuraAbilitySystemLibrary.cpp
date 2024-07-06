@@ -3,6 +3,7 @@
 
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Player/AuraPlayerState.h"
 #include "UI/WidgetController/AuraWidgetController.h"
 #include "UI/HUD/AuraHUD.h"
@@ -360,6 +361,38 @@ TArray<FVector> UAuraAbilitySystemLibrary::EvenlyRotatedVector(const FVector& Fo
 		RetVector.Add(Direction);
 	}
 	return RetVector;
+}
+
+TArray<FVector> UAuraAbilitySystemLibrary::GetRandomPointInRadiusSafe(const UObject* WorldContextObject, const FVector& CenterPointPos, int32 NumOfPoints, float Radius)
+{
+	TArray<FVector> Points;
+
+	TArray<AActor*> ActorsInRadius;
+	GetLifePlayerWithinRadius(WorldContextObject, ActorsInRadius, TArray<AActor*>(), Radius, CenterPointPos);
+
+	for (int i = 0; i < NumOfPoints; i++)
+	{
+		// 获取随机点位
+		FVector Point = CenterPointPos + UKismetMathLibrary::RandomUnitVector() * Radius;
+		// 从上到下进行射线检测
+		FHitResult HitResult;
+		FVector TraceHigherLocation = FVector(Point.X, Point.Y, Point.Z + 500.f);
+		FVector TraceLowerLocation = FVector(Point.X, Point.Y, Point.Z - 500.f);
+		FCollisionQueryParams QueryParams;
+		QueryParams.AddIgnoredActors(ActorsInRadius);
+		WorldContextObject->GetWorld()->LineTraceSingleByProfile(HitResult, TraceHigherLocation, TraceLowerLocation, FName("BlockAll"), QueryParams);
+		// 将范围内第一个碰撞点放入数组中
+		if (HitResult.bBlockingHit)
+		{
+			Points.Add(HitResult.ImpactPoint);
+		}
+		else
+		{
+			Points.Add(Point);
+		}
+	}
+
+	return Points;
 }
 
 void UAuraAbilitySystemLibrary::GetLifePlayerWithinRadius(const UObject* WorldContextObject, TArray<AActor*>& OutputOverlappingActor, TArray<AActor*> ActorsToIgnore, float Radius, const FVector& SphereOrigin)

@@ -37,9 +37,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ShowMagicCircle();
-
 	UFUNCTION(BlueprintCallable)
 	void HideMagicCircle();
+	UFUNCTION(BlueprintCallable)
+	void SetMagicCircleMaterial(UMaterialInterface* InMaterial);
 
 protected:
 	virtual void BeginPlay() override;

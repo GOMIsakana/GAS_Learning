@@ -39,6 +39,15 @@ void AAuraPlayerController::HideMagicCircle()
 	if (MagicCircle)
 	{
 		MagicCircle->Destroy();
+		MagicCircle = nullptr;
+	}
+}
+
+void AAuraPlayerController::SetMagicCircleMaterial(UMaterialInterface* InMaterial)
+{
+	if (MagicCircle && InMaterial)
+	{
+		MagicCircle->SetMaterial(InMaterial);
 	}
 }
 

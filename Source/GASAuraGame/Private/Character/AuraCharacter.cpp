@@ -179,6 +179,28 @@ void AAuraCharacter::LevelUp_Implementation()
 	MulticastLevelUpParticles();
 }
 
+void AAuraCharacter::ShowMagicCircle_Implementation(UMaterialInterface* InMagicCircleMaterial)
+{
+	AAuraPlayerController* AuraPC = Cast<AAuraPlayerController>(GetController());
+	if (AuraPC)
+	{
+		AuraPC->ShowMagicCircle();
+		if (InMagicCircleMaterial)
+		{
+			AuraPC->SetMagicCircleMaterial(InMagicCircleMaterial);
+		}
+	}
+}
+
+void AAuraCharacter::HideMagicCircle_Implementation()
+{
+	AAuraPlayerController* AuraPC = Cast<AAuraPlayerController>(GetController());
+	if (AuraPC)
+	{
+		AuraPC->HideMagicCircle();
+	}
+}
+
 int32 AAuraCharacter::GetCombatLevel_Implementation()
 {
 	const AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();

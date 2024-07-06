@@ -16,11 +16,17 @@ public:
 	AMagicCircle();
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION(BlueprintCallable)
+	void SetMaterial(UMaterialInterface* InMaterial);
+
 protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<UDecalComponent> MagicCircalDecal;
+	TObjectPtr<UDecalComponent> MagicCircleDecal;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UMaterialInterface> MagicCircleMaterial;
 
 public:	
 

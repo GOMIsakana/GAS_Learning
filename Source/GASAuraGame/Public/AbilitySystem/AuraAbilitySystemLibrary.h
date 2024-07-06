@@ -115,4 +115,7 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|GameplayMechanics")
 	static TArray<FVector> EvenlyRotatedVector(const FVector& Forward, const FVector& Axis, float Spread, int32 OutputAmount);
+
+	UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|GameplayMechanics")
+	static TArray<FVector> GetRandomPointInRadiusSafe(const UObject* WorldContextObject, const FVector& CenterPointPos, int32 NumOfPoints, float Radius);
 };

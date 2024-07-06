@@ -34,6 +34,8 @@ public:
 	virtual void AddToAttributePointsReward_Implementation(int32 InAttributePoints) override;
 	virtual void AddToSpellPointsReward_Implementation(int32 InSpellPoints) override;
 	virtual void LevelUp_Implementation() override;
+	virtual void ShowMagicCircle_Implementation(UMaterialInterface* InMagicCircleMaterial) override;
+	virtual void HideMagicCircle_Implementation() override;
 	/* 玩家接口结束 */
 
 	/* 战斗接口 */
