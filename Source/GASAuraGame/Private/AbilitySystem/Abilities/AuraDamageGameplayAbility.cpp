@@ -23,7 +23,7 @@ float UAuraDamageGameplayAbility::GetDamage(FGameplayTag InDamageType, float InL
 	return Damage;
 }
 
-FDamageEffectParams UAuraDamageGameplayAbility::MakeDamageEffectParamasFromClassDefaults(AActor* TargetActor) const
+FDamageEffectParams UAuraDamageGameplayAbility::MakeDamageEffectParamasFromClassDefaults(AActor* TargetActor, FVector OriginLocation) const
 {
 	FDamageEffectParams Params;
 	Params.WorldContext = GetAvatarActorFromActorInfo();
@@ -40,6 +40,10 @@ FDamageEffectParams UAuraDamageGameplayAbility::MakeDamageEffectParamasFromClass
 	Params.DeathImpulseMagnitude = DeathImpulseMagnitude;
 	Params.KnockbackChance = KnockbackChance;
 	Params.KnockbackMagnitude = KnockbackMagnitude;
+	Params.bIsRadialDamage = bIsRadialDamage;
+	Params.RadialDamageInnerRadius = RadialDamageInnerRadius;
+	Params.RadialDamageOuterRadius = RadialDamageOuterRadius;
+	Params.DamageOriginLocation = OriginLocation;
 	if (TargetActor)
 	{
 		FRotator Rotation = (TargetActor->GetActorLocation() - GetAvatarActorFromActorInfo()->GetActorLocation()).Rotation();

@@ -14,6 +14,7 @@
 #include "AbilitySystem/Passive/PassiveNiagaraComponent.h"
 #include "AuraCharacterBase.generated.h"
 
+
 class UAbilitySystemComponent;
 class UAttributeSet;
 
@@ -47,9 +48,11 @@ public:
 	virtual FOnDeath& GetOnDeathDelegate() override;
 	virtual bool IsBeingShock_Implementation() override;
 	virtual void SetIsBeingShock_Implementation(bool bInIsBeingShock) override;
+	virtual FOnDamageSignature& GetOnDamageDelegate() override;
 
 	FOnASCRegistered OnASCRegistered;
 	FOnDeath OnDeath;
+	FOnDamageSignature OnDamageDelegate;
 	/* 战斗 接口结束 */
 
 	UFUNCTION(NetMulticast, Reliable)
@@ -66,6 +69,9 @@ public:
 
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Combat")
 	bool bIsBeingShock = false;
+
+	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
 
 protected:
 

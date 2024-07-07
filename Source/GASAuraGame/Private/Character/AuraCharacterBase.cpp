@@ -148,6 +148,11 @@ void AAuraCharacterBase::SetIsBeingShock_Implementation(bool bInIsBeingShock)
 	bIsBeingShock = bInIsBeingShock;
 }
 
+FOnDamageSignature& AAuraCharacterBase::GetOnDamageDelegate()
+{
+	return OnDamageDelegate;
+}
+
 UAnimMontage* AAuraCharacterBase::GetHitReactMontage_Implementation()
 {
 	return HitReactMontage;
@@ -203,6 +208,15 @@ void AAuraCharacterBase::OnStunTagChanged(FGameplayTag ReceivedTag, int32 NewCou
 
 void AAuraCharacterBase::OnRep_IsStunned()
 {
+}
+
+float AAuraCharacterBase::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float DamageTaken = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+
+	OnDamageDelegate.Broadcast(DamageTaken);
+
+	return DamageTaken;
 }
 
 void AAuraCharacterBase::Tick(float DeltaTime)

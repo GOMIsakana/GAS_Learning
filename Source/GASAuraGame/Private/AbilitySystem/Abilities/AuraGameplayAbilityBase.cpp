@@ -30,7 +30,7 @@ float UAuraGameplayAbilityBase::GetCooldown(float InLevel)
 
 float UAuraGameplayAbilityBase::GetSpellCost(FGameplayAttribute CostAttribute, float InLevel) const
 {
-	// 法力消耗 // 目前随着等级提升显示不正确，需要修正！
+	// 法力消耗
 
 	float ManaCost = 0.f;
 	if (const UGameplayEffect* CostEffect = GetCostGameplayEffect())

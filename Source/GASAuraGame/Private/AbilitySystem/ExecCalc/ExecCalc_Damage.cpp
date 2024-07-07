@@ -11,6 +11,9 @@
 #include "Data/CharacterClassInfo.h"
 #include "Interaction/CombatInterface.h"
 #include "AuraAbilityTypes.h"
+#include "Character/AuraCharacterBase.h"
+#include "Kismet/GameplayStatics.h"
+#include "AbilitySystem/Abilities/AuraDamageGameplayAbility.h"
 
 struct AuraDamageStatic
 {
@@ -74,8 +77,8 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	TagsToCaptureDefs.Add(Tags.Attributes_Resist_Lighting, DamageStatic().Resist_LightingDef);
 	TagsToCaptureDefs.Add(Tags.Attributes_Resist_Arcane, DamageStatic().Resist_ArcaneDef);
 
-	const UAbilitySystemComponent* SourceASC = ExecutionParams.GetSourceAbilitySystemComponent();
-	const UAbilitySystemComponent* TargetASC = ExecutionParams.GetTargetAbilitySystemComponent();
+	UAbilitySystemComponent* SourceASC = ExecutionParams.GetSourceAbilitySystemComponent();
+	UAbilitySystemComponent* TargetASC = ExecutionParams.GetTargetAbilitySystemComponent();
 
 	AActor* SourceAvatarActor = SourceASC == nullptr ? nullptr : SourceASC->GetAvatarActor();
 	AActor* TargetAvatarActor = TargetASC == nullptr ? nullptr : TargetASC->GetAvatarActor();
@@ -118,12 +121,53 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 			const FGameplayEffectAttributeCaptureDefinition CaptureDef = TagsToCaptureDefs[DamageResistTag];
 			ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(CaptureDef, EvalParams, ResistValue);
 			ResistValue = ResistValue > 100.f ? 100.f : ResistValue;
-			float DamageValue = EffectSpec.GetSetByCallerMagnitude(Pair.Key, false);	// 获取Caller设置的Damage
-			DamageValue *= (100.f - ResistValue) / 100.f;
-			Damage += DamageValue;
+			float BaseDamageValue = EffectSpec.GetSetByCallerMagnitude(Pair.Key, false);	// 获取Caller设置的Damage
+			float ResistDamageValue = BaseDamageValue * (100.f - ResistValue) / 100.f;
+
+			if (ResistDamageValue <= 0.f) continue;
+
+			Damage += ResistDamageValue;
 		}
 	}
-
+	/*
+	// 范围伤害
+	if (UAuraAbilitySystemLibrary::IsRadialDamage(EffectContextHandle))
+	{
+		TArray<AActor*> TargetActors;
+		TArray<AActor*> ActorsToIgnore;
+		ActorsToIgnore.AddUnique(SourceAvatarActor);
+		UAuraAbilitySystemLibrary::GetLifePlayerWithinRadius(SourceAvatarActor, TargetActors, ActorsToIgnore, UAuraAbilitySystemLibrary::GetRadialDamageOuterRadius(EffectContextHandle), UAuraAbilitySystemLibrary::GetDamageOriginLocation(EffectContextHandle));
+		for (AActor* Target : TargetActors)
+		{
+			if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(Target))
+			{
+				if (!CombatInterface->GetOnDamageDelegate().IsBound())
+				{
+					CombatInterface->GetOnDamageDelegate().AddLambda(
+						[&](float InDamage)
+						{
+							ResistDamageValue = InDamage;
+						}
+					);
+				}
+			}
+		}
+		UGameplayStatics::ApplyRadialDamageWithFalloff(
+			SourceAvatarActor,
+			ResistDamageValue,
+			0.f,
+			UAuraAbilitySystemLibrary::GetDamageOriginLocation(EffectContextHandle),
+			UAuraAbilitySystemLibrary::GetRadialDamageInnerRadius(EffectContextHandle),
+			UAuraAbilitySystemLibrary::GetRadialDamageOuterRadius(EffectContextHandle),
+			1.f,
+			UDamageType::StaticClass(),
+			ActorsToIgnore,
+			SourceAvatarActor,
+			nullptr,
+			ECollisionChannel::ECC_Camera
+		);
+	}
+	*/
 	// 等级差曲线, 等级差越高, 高等级的穿透和防御效率越低
 	UCharacterClassInfo* CharacterClassInfo = UAuraAbilitySystemLibrary::GetCharacterClassInfo(SourceAvatarActor);
 	FRealCurve* DefensePenetrationCurve = CharacterClassInfo->DamageCalculationCoefficients->FindCurve(FName("DefensePenetration"), FString());
