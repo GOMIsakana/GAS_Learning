@@ -11,6 +11,7 @@
 #include "NavigationPath.h"
 #include "Components/WidgetComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "GASAuraGame/GASAuraGame.h"
 
 AAuraPlayerController::AAuraPlayerController()
 {
@@ -95,7 +96,8 @@ void AAuraPlayerController::CursorTrace()
 	{
 		return;
 	}
-	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
+	const ECollisionChannel MouseTraceChannel = MagicCircle ? ECC_ExcludePlayer : ECollisionChannel::ECC_Visibility;
+	GetHitResultUnderCursor(MouseTraceChannel, false, CursorHit);
 	if (!CursorHit.bBlockingHit)
 	{
 		if (HoverActor)	HoverActor->UnHighlightActor();

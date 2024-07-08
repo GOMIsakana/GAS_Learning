@@ -23,7 +23,7 @@ float UAuraDamageGameplayAbility::GetDamage(FGameplayTag InDamageType, float InL
 	return Damage;
 }
 
-FDamageEffectParams UAuraDamageGameplayAbility::MakeDamageEffectParamasFromClassDefaults(AActor* TargetActor, FVector OriginLocation) const
+FDamageEffectParams UAuraDamageGameplayAbility::MakeDamageEffectParamasFromClassDefaults(AActor* TargetActor, FVector OriginLocation, bool bImpluseOverride, FVector KnockbackImpluseOverride, FVector DeathImpluseOverride) const
 {
 	FDamageEffectParams Params;
 	Params.WorldContext = GetAvatarActorFromActorInfo();
@@ -44,13 +44,26 @@ FDamageEffectParams UAuraDamageGameplayAbility::MakeDamageEffectParamasFromClass
 	Params.RadialDamageInnerRadius = RadialDamageInnerRadius;
 	Params.RadialDamageOuterRadius = RadialDamageOuterRadius;
 	Params.DamageOriginLocation = OriginLocation;
+	Params.bKnockbackFromOriginLocation = bKnockbackFromOriginLocation;
+	Params.KnockbackPitch = KnockbackPitch;
 	if (TargetActor)
 	{
-		FRotator Rotation = (TargetActor->GetActorLocation() - GetAvatarActorFromActorInfo()->GetActorLocation()).Rotation();
-		Rotation.Pitch = 45.f;
-		const FVector ToTarget = Rotation.Vector();
-		Params.DeathImpulse = ToTarget * DeathImpulseMagnitude;
-		Params.KnockbackImpulse = ToTarget * KnockbackMagnitude;
+		if (bKnockbackFromOriginLocation)
+		{
+			FRotator Rotation = (TargetActor->GetActorLocation() - OriginLocation).Rotation();
+			Rotation.Pitch = KnockbackPitch;
+			const FVector ToTarget = Rotation.Vector();
+			Params.DeathImpulse = bImpluseOverride ? DeathImpluseOverride : ToTarget * DeathImpulseMagnitude;
+			Params.KnockbackImpulse = bImpluseOverride ? KnockbackImpluseOverride : ToTarget * KnockbackMagnitude;
+		}
+		else
+		{
+			FRotator Rotation = (TargetActor->GetActorLocation() - GetAvatarActorFromActorInfo()->GetActorLocation()).Rotation();
+			Rotation.Pitch = KnockbackPitch;
+			const FVector ToTarget = Rotation.Vector();
+			Params.DeathImpulse = bImpluseOverride ? DeathImpluseOverride : ToTarget * DeathImpulseMagnitude;
+			Params.KnockbackImpulse = bImpluseOverride ? KnockbackImpluseOverride : ToTarget * KnockbackMagnitude;
+		}
 	}
 
 	return Params;

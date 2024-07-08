@@ -54,7 +54,10 @@ struct FDamageEffectParams
 	float KnockbackChance = 0.f;
 
 	UPROPERTY(BlueprintReadWrite)
-	float KnockbackMagnitude = 5000.f;
+	float KnockbackMagnitude = 500.f;
+
+	UPROPERTY(BlueprintReadWrite)
+	float KnockbackPitch = 45.f;
 
 	UPROPERTY(BlueprintReadWrite)
 	FVector KnockbackImpulse = FVector::ZeroVector;
@@ -70,6 +73,9 @@ struct FDamageEffectParams
 
 	UPROPERTY(BlueprintReadWrite)
 	FVector DamageOriginLocation = FVector::ZeroVector;
+
+	UPROPERTY(BlueprintReadWrite)
+	bool bKnockbackFromOriginLocation = false;
 };
 
 USTRUCT(BlueprintType)

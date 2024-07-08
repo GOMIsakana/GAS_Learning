@@ -30,9 +30,9 @@ float UAuraGameplayAbilityBase::GetCooldown(float InLevel)
 
 float UAuraGameplayAbilityBase::GetSpellCost(FGameplayAttribute CostAttribute, float InLevel) const
 {
-	// 法力消耗
+	// 施法资源消耗
 
-	float ManaCost = 0.f;
+	float Cost = 0.f;
 	if (const UGameplayEffect* CostEffect = GetCostGameplayEffect())
 	{
 		for (FGameplayModifierInfo ModifierInfo : CostEffect->Modifiers)
@@ -41,9 +41,9 @@ float UAuraGameplayAbilityBase::GetSpellCost(FGameplayAttribute CostAttribute, f
 			{
 				float OutMagnitude = 0.f;
 				ModifierInfo.ModifierMagnitude.GetStaticMagnitudeIfPossible(InLevel, OutMagnitude);
-				ManaCost -= OutMagnitude;
+				Cost -= OutMagnitude;
 			}
 		}
 	}
-    return ManaCost;
+    return Cost;
 }

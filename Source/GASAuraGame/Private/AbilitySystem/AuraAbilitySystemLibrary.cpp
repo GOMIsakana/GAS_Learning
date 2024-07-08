@@ -11,6 +11,7 @@
 #include "AuraAbilityTypes.h"
 #include "Interaction/CombatInterface.h"
 #include "AbilitySystemBlueprintLibrary.h"
+#include "GameFramework/Character.h"
 
 bool UAuraAbilitySystemLibrary::MakeWidgetControllerParamas(const UObject* WorldContextObject, FWidgetControllerParams& OutWCParams, AAuraHUD*& OutAuraHUD)
 {
@@ -418,6 +419,20 @@ FGameplayEffectContextHandle UAuraAbilitySystemLibrary::ApplyDamageEffect(FDamag
 							[DamageSpecHandle, Params, Target](float InDamage)
 							{
 								UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(DamageSpecHandle, Params.DamageType, InDamage);
+								if (Params.KnockbackChance > FMath::RandRange(0.f, 100.f))
+								{
+									FRotator ImpluseRotation = (Target->GetActorLocation() - Params.SourceASC->GetAvatarActor()->GetActorLocation()).Rotation();
+									if (Params.bKnockbackFromOriginLocation)
+									{
+										ImpluseRotation = (Target->GetActorLocation() - Params.DamageOriginLocation).Rotation();
+									}
+									ImpluseRotation.Pitch = Params.KnockbackPitch;
+									FVector ImpluseVector = ImpluseRotation.Vector() * Params.KnockbackMagnitude;
+									if (ACharacter* TargetCharacter = Cast<ACharacter>(Target))
+									{
+										TargetCharacter->LaunchCharacter(ImpluseVector, true, false);
+									}
+								}
 								Params.SourceASC->ApplyGameplayEffectSpecToTarget(*DamageSpecHandle.Data.Get(), UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Target));
 							}
 						);
