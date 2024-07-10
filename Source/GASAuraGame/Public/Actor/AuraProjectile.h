@@ -34,10 +34,13 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Destroyed() override;
 
-	void OnHit();
+	UFUNCTION(BlueprintCallable)
+	virtual void OnHit();
+
+	bool bHit = false;
 
 	UFUNCTION()
-	void OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	virtual void OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UCapsuleComponent> Capsule;
@@ -54,7 +57,6 @@ protected:
 	TObjectPtr<UAudioComponent> LoopSoundComponent;
 
 private:
-	bool bHit = false;
 	UPROPERTY(EditDefaultsOnly)
 	float LifeSpan = 15.f;
 };

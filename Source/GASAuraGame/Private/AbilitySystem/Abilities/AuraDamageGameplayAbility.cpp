@@ -25,6 +25,8 @@ float UAuraDamageGameplayAbility::GetDamage(FGameplayTag InDamageType, float InL
 
 FDamageEffectParams UAuraDamageGameplayAbility::MakeDamageEffectParamasFromClassDefaults(AActor* TargetActor, FVector OriginLocation, bool bImpluseOverride, FVector KnockbackImpluseOverride, FVector DeathImpluseOverride) const
 {
+	/* TODO: 将类似法强的效果做到damageparam里面, 让伤害携带不同幅度的属性 */
+
 	FDamageEffectParams Params;
 	Params.WorldContext = GetAvatarActorFromActorInfo();
 	Params.DamageEffectClass = DamageEffectClass;

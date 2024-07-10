@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystem/Abilities/AuraDamageGameplayAbility.h"
-#include "Actor/AuraProjectile.h"
+#include "Actor/AuraFireBall.h"
 #include "AuraFireBlast.generated.h"
 
 /**
@@ -19,10 +19,14 @@ public:
 	virtual FString GetDescription(int32 Level) override;
 	virtual FString GetDescriptionNextLevel(int32 Level) override;
 
+	UFUNCTION(BlueprintCallable)
+	TArray<AAuraFireBall*> SpawnFireBalls();
+
 protected:
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = "Combat")
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Combat")
 	int32 NumOfProjectile = 12;
 
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = "Combat")
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "Combat")
 	TSubclassOf<AAuraProjectile> ProjectileClass;
 };

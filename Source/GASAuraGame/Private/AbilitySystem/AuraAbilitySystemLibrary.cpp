@@ -465,11 +465,12 @@ TArray<FRotator> UAuraAbilitySystemLibrary::EvenlySpacedRotator(const FVector& F
 {
 	TArray<FRotator> RetRotator;
 	FVector LeftRotator = Forward;
-	if (OutputAmount > 1)
+	float DeltaSpread = Spread / OutputAmount;
+	if (OutputAmount > 1 && FMath::Fmod(Spread, 360.f) != 0.f)
 	{
 		LeftRotator = Forward.RotateAngleAxis(-Spread / 2.f, Axis);
+		DeltaSpread = Spread / (OutputAmount - 1);
 	}
-	float DeltaSpread = OutputAmount == 1 ? Spread : Spread / (OutputAmount - 1);
 	for (int32 i = 0; i < OutputAmount; i++)
 	{
 		FVector Direction = LeftRotator.RotateAngleAxis(DeltaSpread * i, FVector::UpVector);
@@ -482,11 +483,12 @@ TArray<FVector> UAuraAbilitySystemLibrary::EvenlyRotatedVector(const FVector& Fo
 {
 	TArray<FVector> RetVector;
 	FVector LeftRotator = Forward;
-	if (OutputAmount > 1)
+	float DeltaSpread = Spread / OutputAmount;
+	if (OutputAmount > 1 && FMath::Fmod(Spread, 360.f) != 0.f)
 	{
 		LeftRotator = Forward.RotateAngleAxis(-Spread / 2.f, Axis);
+		DeltaSpread = Spread / (OutputAmount - 1);
 	}
-	float DeltaSpread = OutputAmount == 1 ? Spread : Spread / (OutputAmount - 1);
 	for (int32 i = 0; i < OutputAmount; i++)
 	{
 		FVector Direction = LeftRotator.RotateAngleAxis(DeltaSpread * i, FVector::UpVector);

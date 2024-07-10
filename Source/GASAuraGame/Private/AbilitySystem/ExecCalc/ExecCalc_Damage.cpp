@@ -129,45 +129,6 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 			Damage += ResistDamageValue;
 		}
 	}
-	/*
-	// 范围伤害
-	if (UAuraAbilitySystemLibrary::IsRadialDamage(EffectContextHandle))
-	{
-		TArray<AActor*> TargetActors;
-		TArray<AActor*> ActorsToIgnore;
-		ActorsToIgnore.AddUnique(SourceAvatarActor);
-		UAuraAbilitySystemLibrary::GetLifePlayerWithinRadius(SourceAvatarActor, TargetActors, ActorsToIgnore, UAuraAbilitySystemLibrary::GetRadialDamageOuterRadius(EffectContextHandle), UAuraAbilitySystemLibrary::GetDamageOriginLocation(EffectContextHandle));
-		for (AActor* Target : TargetActors)
-		{
-			if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(Target))
-			{
-				if (!CombatInterface->GetOnDamageDelegate().IsBound())
-				{
-					CombatInterface->GetOnDamageDelegate().AddLambda(
-						[&](float InDamage)
-						{
-							ResistDamageValue = InDamage;
-						}
-					);
-				}
-			}
-		}
-		UGameplayStatics::ApplyRadialDamageWithFalloff(
-			SourceAvatarActor,
-			ResistDamageValue,
-			0.f,
-			UAuraAbilitySystemLibrary::GetDamageOriginLocation(EffectContextHandle),
-			UAuraAbilitySystemLibrary::GetRadialDamageInnerRadius(EffectContextHandle),
-			UAuraAbilitySystemLibrary::GetRadialDamageOuterRadius(EffectContextHandle),
-			1.f,
-			UDamageType::StaticClass(),
-			ActorsToIgnore,
-			SourceAvatarActor,
-			nullptr,
-			ECollisionChannel::ECC_Camera
-		);
-	}
-	*/
 	// 等级差曲线, 等级差越高, 高等级的穿透和防御效率越低
 	UCharacterClassInfo* CharacterClassInfo = UAuraAbilitySystemLibrary::GetCharacterClassInfo(SourceAvatarActor);
 	FRealCurve* DefensePenetrationCurve = CharacterClassInfo->DamageCalculationCoefficients->FindCurve(FName("DefensePenetration"), FString());
