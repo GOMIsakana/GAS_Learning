@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "Data/AbilityInfo.h"
+#include "UI/ViewMode/MVVM_LoadSlot.h"
+#include "LoadScreenSaveGame.h"
 #include "AuraGameModeBase.generated.h"
 
 class UCharacterClassInfo;
@@ -23,4 +25,10 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "AbilityInfo")
 	TObjectPtr<UAbilityInfo> AbilityInfo;
+
+	UFUNCTION(BlueprintCallable)
+	void SaveSlotData(UMVVM_LoadSlot* LoadSlot, int32 SlotIndex);
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<ULoadScreenSaveGame> LoadScreenSaveClass;
 };
