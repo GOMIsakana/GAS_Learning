@@ -7,6 +7,8 @@
 #include "UI/ViewMode/MVVM_LoadSlot.h"
 #include "MVVM_LoadScreen.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSelectButtonPressedSignature);
+
 /**
  * 
  */
@@ -32,6 +34,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SelectSaveButtonPressed(int32 SlotIndex);
+
+	UFUNCTION(BlueprintCallable)
+	void LoadSlot();
+
+	UPROPERTY(BlueprintAssignable)
+	FSelectButtonPressedSignature SelectButtonPressedDelegate;
 
 private:
 	UPROPERTY()

@@ -5,5 +5,11 @@
 
 void UMVVM_LoadSlot::InitializeLoadSlot()
 {
-	SetWidgetSwitcherIndexDelegate.Broadcast(1);
+	int32 SwitcherIndex = SlotStatus.GetValue();
+	SetWidgetSwitcherIndexDelegate.Broadcast(SwitcherIndex);
+}
+
+void UMVVM_LoadSlot::SetPlayerName(const FString& InPlayerName)
+{
+	UE_MVVM_SET_PROPERTY_VALUE(PlayerName, InPlayerName);
 }

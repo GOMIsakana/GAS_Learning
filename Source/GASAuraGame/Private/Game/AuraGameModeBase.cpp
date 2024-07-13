@@ -19,6 +19,31 @@ void AAuraGameModeBase::SaveSlotData(UMVVM_LoadSlot* LoadSlot, int32 SlotIndex)
 		ULoadScreenSaveGame* LoadScreenSaveGame = Cast<ULoadScreenSaveGame>(GameSaveObject);
 		// 将存档对象的槽位名称改为对应存档槽位的名称
 		LoadScreenSaveGame->LoadSlotName = LoadSlot->LoadSlotName;
+		LoadScreenSaveGame->PlayerName = LoadSlot->PlayerName;
+		LoadScreenSaveGame->SlotStatus = LoadSlot->SlotStatus;
 		UGameplayStatics::SaveGameToSlot(LoadScreenSaveGame, LoadSlot->LoadSlotName, SlotIndex);
+	}
+}
+
+ULoadScreenSaveGame* AAuraGameModeBase::GetSaveSlotData(const FString& SlotName, int32 SlotIndex) const
+{
+	USaveGame* GameSaveObject = nullptr;
+	if (UGameplayStatics::DoesSaveGameExist(SlotName, SlotIndex))
+	{
+		GameSaveObject = UGameplayStatics::LoadGameFromSlot(SlotName, SlotIndex);
+	}
+	else if (LoadScreenSaveClass)
+	{
+		GameSaveObject = UGameplayStatics::CreateSaveGameObject(LoadScreenSaveClass);
+	}
+	ULoadScreenSaveGame* LoadScreenSaveGame = Cast<ULoadScreenSaveGame>(GameSaveObject);
+	return LoadScreenSaveGame;
+}
+
+void AAuraGameModeBase::DeleteSlotData(UMVVM_LoadSlot* LoadSlot, int32 SlotIndex)
+{
+	if (UGameplayStatics::DoesSaveGameExist(LoadSlot->LoadSlotName, SlotIndex))
+	{
+		UGameplayStatics::DeleteGameInSlot(LoadSlot->LoadSlotName, SlotIndex);
 	}
 }
