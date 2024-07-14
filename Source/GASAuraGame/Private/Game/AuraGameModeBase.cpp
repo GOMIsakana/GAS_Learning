@@ -3,14 +3,12 @@
 
 #include "Game/AuraGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameFramework/PlayerStart.h"
 
 void AAuraGameModeBase::SaveSlotData(UMVVM_LoadSlot* LoadSlot, int32 SlotIndex)
 {
 	// 若同一位置存在旧存档，则将其删除
-	if (UGameplayStatics::DoesSaveGameExist(LoadSlot->LoadSlotName, SlotIndex))
-	{
-		UGameplayStatics::DeleteGameInSlot(LoadSlot->LoadSlotName, SlotIndex);
-	}
+	DeleteSlotData(LoadSlot->LoadSlotName, SlotIndex);
 	// 尝试存档
 	if (LoadScreenSaveClass)
 	{
@@ -19,7 +17,8 @@ void AAuraGameModeBase::SaveSlotData(UMVVM_LoadSlot* LoadSlot, int32 SlotIndex)
 		ULoadScreenSaveGame* LoadScreenSaveGame = Cast<ULoadScreenSaveGame>(GameSaveObject);
 		// 将存档对象的槽位名称改为对应存档槽位的名称
 		LoadScreenSaveGame->LoadSlotName = LoadSlot->LoadSlotName;
-		LoadScreenSaveGame->PlayerName = LoadSlot->PlayerName;
+		LoadScreenSaveGame->PlayerName = LoadSlot->GetPlayerName();
+		LoadScreenSaveGame->MapName = LoadSlot->GetMapName();
 		LoadScreenSaveGame->SlotStatus = LoadSlot->SlotStatus;
 		UGameplayStatics::SaveGameToSlot(LoadScreenSaveGame, LoadSlot->LoadSlotName, SlotIndex);
 	}
@@ -40,10 +39,43 @@ ULoadScreenSaveGame* AAuraGameModeBase::GetSaveSlotData(const FString& SlotName,
 	return LoadScreenSaveGame;
 }
 
-void AAuraGameModeBase::DeleteSlotData(UMVVM_LoadSlot* LoadSlot, int32 SlotIndex)
+void AAuraGameModeBase::DeleteSlotData(FString SlotName, int32 SlotIndex)
 {
-	if (UGameplayStatics::DoesSaveGameExist(LoadSlot->LoadSlotName, SlotIndex))
+	if (UGameplayStatics::DoesSaveGameExist(SlotName, SlotIndex))
 	{
-		UGameplayStatics::DeleteGameInSlot(LoadSlot->LoadSlotName, SlotIndex);
+		UGameplayStatics::DeleteGameInSlot(SlotName, SlotIndex);
 	}
+}
+
+void AAuraGameModeBase::TravelToMap(UMVVM_LoadSlot* LoadSlot)
+{
+	UGameplayStatics::OpenLevelBySoftObjectPtr(LoadSlot, GameMaps[LoadSlot->GetMapName()]);
+}
+
+AActor* AAuraGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
+{
+	TArray<AActor*> Actors;
+	UGameplayStatics::GetAllActorsOfClass(this, APlayerStart::StaticClass(), Actors);
+	AActor* ChosenPlayerStart = nullptr;
+	if (Actors.Num() > 0)
+	{
+		ChosenPlayerStart = Actors[0];
+		for (AActor* FoundActor : Actors)
+		{
+			if (APlayerStart* PlayerStart = Cast<APlayerStart>(FoundActor))
+			{
+				if (PlayerStart->PlayerStartTag == FName("Placeholder"))
+				{
+					ChosenPlayerStart = PlayerStart;
+					break;
+				}
+			}
+		}
+	}
+	return ChosenPlayerStart;
+}
+
+void AAuraGameModeBase::BeginPlay()
+{
+	GameMaps.Add(StartupMapName, DefaultMap);
 }

@@ -11,10 +11,13 @@ void UMVVM_LoadScreen::InitializeLoadSlots()
 
 	LoadSlot_0 = NewObject<UMVVM_LoadSlot>(this, LoadSlotClass);
 	LoadSlot_0->LoadSlotName = FString("LoadSlot_0");
+	LoadSlot_0->SlotIndex = 0;
 	LoadSlot_1 = NewObject<UMVVM_LoadSlot>(this, LoadSlotClass);
 	LoadSlot_1->LoadSlotName = FString("LoadSlot_1");
+	LoadSlot_1->SlotIndex = 1;
 	LoadSlot_2 = NewObject<UMVVM_LoadSlot>(this, LoadSlotClass);
 	LoadSlot_2->LoadSlotName = FString("LoadSlot_2");
+	LoadSlot_2->SlotIndex = 2;
 
 	LoadSlotMap.Add(0, LoadSlot_0);
 	LoadSlotMap.Add(1, LoadSlot_1);
@@ -31,7 +34,8 @@ void UMVVM_LoadScreen::CreateNewSaveButtonPressed(int32 SlotIndex, const FString
 	AAuraGameModeBase* Gamemode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(this));
 
 	LoadSlotMap[SlotIndex]->SetPlayerName(EnteredName);
-	LoadSlotMap[SlotIndex]->SlotStatus = Taken;
+	LoadSlotMap[SlotIndex]->SlotStatus = ESaveSlotStatus::Taken;
+	LoadSlotMap[SlotIndex]->SetMapName(Gamemode->StartupMapName);
 
 	Gamemode->SaveSlotData(LoadSlotMap[SlotIndex], SlotIndex);
 	LoadSlotMap[SlotIndex]->InitializeLoadSlot();
@@ -49,6 +53,30 @@ void UMVVM_LoadScreen::SelectSaveButtonPressed(int32 SlotIndex)
 	{
 		Slot.Value->EnableSelectButtonDelegate.Broadcast(Slot.Key != SlotIndex);
 	}
+	SelectedSlot = LoadSlotMap[SlotIndex];
+}
+
+void UMVVM_LoadScreen::DeleteButtonPressed()
+{
+	if (IsValid(SelectedSlot))
+	{
+		if (AAuraGameModeBase* Gamemode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(this)))
+		{
+			Gamemode->DeleteSlotData(SelectedSlot->LoadSlotName, SelectedSlot->SlotIndex);
+		}
+		SelectedSlot->SlotStatus = ESaveSlotStatus::Vacant;
+		SelectedSlot->InitializeLoadSlot();
+		SelectedSlot->EnableSelectButtonDelegate.Broadcast(true);
+	}
+}
+
+void UMVVM_LoadScreen::PlayButtonPressed()
+{
+	AAuraGameModeBase* AuraGamemode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(this));
+	if (AuraGamemode && SelectedSlot)
+	{
+		AuraGamemode->TravelToMap(SelectedSlot);
+	}
 }
 
 void UMVVM_LoadScreen::LoadSlot()
@@ -60,9 +88,11 @@ void UMVVM_LoadScreen::LoadSlot()
 
 		TEnumAsByte<ESaveSlotStatus> SaveSlotStatus = GameSaveObject->SlotStatus;
 		const FString PlayerName = GameSaveObject->PlayerName;
+		const FString MapName = GameSaveObject->MapName;
 
 		Slot.Value->SlotStatus = SaveSlotStatus;
 		Slot.Value->SetPlayerName(PlayerName);
+		Slot.Value->SetMapName(MapName);
 		Slot.Value->InitializeLoadSlot();
 	}
 }

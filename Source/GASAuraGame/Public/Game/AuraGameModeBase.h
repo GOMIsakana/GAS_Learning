@@ -30,8 +30,24 @@ public:
 
 	ULoadScreenSaveGame* GetSaveSlotData(const FString& SlotName, int32 SlotIndex) const;
 
-	void DeleteSlotData(UMVVM_LoadSlot* LoadSlot, int32 SlotIndex);
+	void DeleteSlotData(FString SlotName, int32 SlotIndex);
+
+	void TravelToMap(UMVVM_LoadSlot* LoadSlot);
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<ULoadScreenSaveGame> LoadScreenSaveClass;
+
+	UPROPERTY(EditDefaultsOnly)
+	FString StartupMapName;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSoftObjectPtr<UWorld> DefaultMap;
+
+	UPROPERTY(EditDefaultsOnly)
+	TMap<FString, TSoftObjectPtr<UWorld>> GameMaps;
+
+	AActor* ChoosePlayerStart_Implementation(AController* Player) override;
+
+protected:
+	virtual void BeginPlay() override;
 };

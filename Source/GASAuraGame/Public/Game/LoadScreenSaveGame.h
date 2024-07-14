@@ -34,5 +34,8 @@ public:
 	FString PlayerName = FString("Default Name");
 
 	UPROPERTY(BlueprintReadOnly)
+	FString MapName = FString("Default Dungeon Name");
+
+	UPROPERTY(BlueprintReadOnly)
 	TEnumAsByte<ESaveSlotStatus> SlotStatus = Vacant;
 };
