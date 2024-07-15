@@ -10,6 +10,9 @@
 #include "NiagaraComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Game/AuraGameModeBase.h"
+#include "Game/LoadScreenSaveGame.h"
+#include "AbilitySystem/AuraAbilitySystemLibrary.h"
 
 AAuraCharacter::AAuraCharacter()
 {
@@ -49,8 +52,7 @@ void AAuraCharacter::PossessedBy(AController* NewController)
 	// 在 服务器上 初始化角色能力信息(AbilityActorInfo)
 	// 如果其他没有PossessBy函数的Actor中设置ASC(AbilitySystemComponent)的OnwerActor,需要手动给改Acotr设置一个有效的Controller作为Onwer，以保证ASC的Mixed网络模式正常运行
 	InitAbilityActorInfo();
-	InitializeDefaultAttribute();
-	AddCharacterAbilities();
+	LoadProgress();
 }
 
 void AAuraCharacter::OnRep_PlayerState()
@@ -59,7 +61,6 @@ void AAuraCharacter::OnRep_PlayerState()
 	Super::OnRep_PlayerState();
 
 	// 在 客户端上 初始化角色能力信息(AbilityActorInfo)
-	InitAbilityActorInfo();
 
 	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
 	UAuraAbilitySystemComponentBase* AuraASC = Cast<UAuraAbilitySystemComponentBase>(GetAbilitySystemComponent());
@@ -201,6 +202,32 @@ void AAuraCharacter::HideMagicCircle_Implementation()
 	}
 }
 
+void AAuraCharacter::SaveProgress_Implementation(const FName& PlayerStartTag)
+{
+	if (AAuraGameModeBase* AuraGamemode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(this)))
+	{
+		ULoadScreenSaveGame* GameSave = AuraGamemode->RetrieveInGameSaveData();
+		if (GameSave == nullptr) return;
+		GameSave->PlayerStartTag = PlayerStartTag;
+
+		if (AAuraPlayerState* AuraPlayerState = Cast<AAuraPlayerState>(GetPlayerState()))
+		{
+			GameSave->CombatLevel = AuraPlayerState->GetCombatLevel();
+			GameSave->CombatXP = AuraPlayerState->GetXP();
+			GameSave->SpellPoints = AuraPlayerState->GetSpellPoint();
+			GameSave->AttributePoints = AuraPlayerState->GetAttributePoint();
+		}
+		GameSave->Strength = UAuraAttributeSet::GetStrengthAttribute().GetNumericValue(GetAttributeSet());
+		GameSave->Intelligence = UAuraAttributeSet::GetIntelligenceAttribute().GetNumericValue(GetAttributeSet());
+		GameSave->Resilience = UAuraAttributeSet::GetResilienceAttribute().GetNumericValue(GetAttributeSet());
+		GameSave->Vigor = UAuraAttributeSet::GetVigorAttribute().GetNumericValue(GetAttributeSet());
+
+		GameSave->bFirstTimeLoadIn = false;
+
+		AuraGamemode->SaveInGameSaveData(GameSave);
+	}
+}
+
 int32 AAuraCharacter::GetCombatLevel_Implementation()
 {
 	const AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
@@ -240,6 +267,33 @@ void AAuraCharacter::OnRep_IsStunned()
 		{
 			AuraASC->RemoveLooseGameplayTags(BlockTags);
 			StunDebuffComponent->Deactivate();
+		}
+	}
+}
+
+void AAuraCharacter::LoadProgress()
+{
+	if (AAuraGameModeBase* AuraGamemode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(this)))
+	{
+		ULoadScreenSaveGame* GameSave = AuraGamemode->RetrieveInGameSaveData();
+		if (GameSave == nullptr) return;
+
+		if (GameSave->bFirstTimeLoadIn)
+		{
+			InitializeDefaultAttribute();
+			AddCharacterAbilities();
+		}
+		else
+		{
+			if (AAuraPlayerState* AuraPlayerState = Cast<AAuraPlayerState>(GetPlayerState()))
+			{
+				AuraPlayerState->SetCombatLevel(GameSave->CombatLevel, false);
+				AuraPlayerState->SetXP(GameSave->CombatXP);
+				AuraPlayerState->SetAttributePoint(GameSave->AttributePoints);
+				AuraPlayerState->SetSpellPoint(GameSave->SpellPoints);
+			}
+
+			UAuraAbilitySystemLibrary::InitializeDefaultAttributesFromSaveData(this, GetAbilitySystemComponent(), GameSave);
 		}
 	}
 }

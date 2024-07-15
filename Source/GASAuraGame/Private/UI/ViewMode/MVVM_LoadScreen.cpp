@@ -4,6 +4,7 @@
 #include "UI/ViewMode/MVVM_LoadScreen.h"
 #include "Game/AuraGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
+#include "Game/AuraGameInstance.h"
 
 void UMVVM_LoadScreen::InitializeLoadSlots()
 {
@@ -31,14 +32,23 @@ UMVVM_LoadSlot* UMVVM_LoadScreen::GetLoadSlotByIndex(int32 Index)
 
 void UMVVM_LoadScreen::CreateNewSaveButtonPressed(int32 SlotIndex, const FString& EnteredName)
 {
-	AAuraGameModeBase* Gamemode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(this));
+	if (AAuraGameModeBase* Gamemode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(this)))
+	{
+		LoadSlotMap[SlotIndex]->SetPlayerName(EnteredName);
+		LoadSlotMap[SlotIndex]->SlotStatus = ESaveSlotStatus::Taken;
+		LoadSlotMap[SlotIndex]->SetMapName(Gamemode->StartupMapName);
+		LoadSlotMap[SlotIndex]->SetPlayerStartTag(Gamemode->DefaultMapPlayerStartTag);
 
-	LoadSlotMap[SlotIndex]->SetPlayerName(EnteredName);
-	LoadSlotMap[SlotIndex]->SlotStatus = ESaveSlotStatus::Taken;
-	LoadSlotMap[SlotIndex]->SetMapName(Gamemode->StartupMapName);
+		Gamemode->SaveSlotData(LoadSlotMap[SlotIndex], SlotIndex);
+		LoadSlotMap[SlotIndex]->InitializeLoadSlot();
 
-	Gamemode->SaveSlotData(LoadSlotMap[SlotIndex], SlotIndex);
-	LoadSlotMap[SlotIndex]->InitializeLoadSlot();
+		if (UAuraGameInstance* GameInstance = Cast<UAuraGameInstance>(Gamemode->GetGameInstance()))
+		{
+			GameInstance->PlayerStartTag = Gamemode->DefaultMapPlayerStartTag;
+			GameInstance->LoadSlotName = LoadSlotMap[SlotIndex]->LoadSlotName;
+			GameInstance->LoadSlotIndex = SlotIndex;
+		}
+	}
 }
 
 void UMVVM_LoadScreen::ToCreateButtonPressed(int32 SlotIndex)
@@ -73,9 +83,18 @@ void UMVVM_LoadScreen::DeleteButtonPressed()
 void UMVVM_LoadScreen::PlayButtonPressed()
 {
 	AAuraGameModeBase* AuraGamemode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(this));
-	if (AuraGamemode && SelectedSlot)
+	if (AuraGamemode)
 	{
-		AuraGamemode->TravelToMap(SelectedSlot);
+		if (UAuraGameInstance* GameInstance = Cast<UAuraGameInstance>(AuraGamemode->GetGameInstance()))
+		{
+			GameInstance->PlayerStartTag = SelectedSlot->GetPlayerStartTag();
+			GameInstance->LoadSlotName = SelectedSlot->LoadSlotName;
+			GameInstance->LoadSlotIndex = SelectedSlot->SlotIndex;
+		}
+		if (SelectedSlot)
+		{
+			AuraGamemode->TravelToMap(SelectedSlot);
+		}
 	}
 }
 
@@ -89,10 +108,14 @@ void UMVVM_LoadScreen::LoadSlot()
 		TEnumAsByte<ESaveSlotStatus> SaveSlotStatus = GameSaveObject->SlotStatus;
 		const FString PlayerName = GameSaveObject->PlayerName;
 		const FString MapName = GameSaveObject->MapName;
+		const FName PlayerStartTag = GameSaveObject->PlayerStartTag;
+		const int32 PlayerLevel = GameSaveObject->CombatLevel;
 
 		Slot.Value->SlotStatus = SaveSlotStatus;
+		Slot.Value->SetPlayerLevel(PlayerLevel);
 		Slot.Value->SetPlayerName(PlayerName);
 		Slot.Value->SetMapName(MapName);
+		Slot.Value->SetPlayerStartTag(PlayerStartTag);
 		Slot.Value->InitializeLoadSlot();
 	}
 }

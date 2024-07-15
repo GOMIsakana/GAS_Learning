@@ -41,9 +41,13 @@ public:
 
 	void SetPlayerName(const FString& InPlayerName);
 	void SetMapName(const FString& InMapName);
+	void SetPlayerStartTag(const FName& InPlayerStartTag);
+	void SetPlayerLevel(const int32& InLevel);
 
 	FString GetPlayerName() const { return PlayerName; }
 	FString GetMapName() const { return MapName; }
+	FName GetPlayerStartTag() const { return PlayerStartTag; }
+	int32 GetPlayerLevel() const { return PlayerLevel; }
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta = (AllowPrivateAccess = "true"))
@@ -51,4 +55,10 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta = (AllowPrivateAccess = "true"))
 	FString MapName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta = (AllowPrivateAccess = "true"))
+	FName PlayerStartTag;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta = (AllowPrivateAccess = "true"))
+	int32 PlayerLevel;
 };

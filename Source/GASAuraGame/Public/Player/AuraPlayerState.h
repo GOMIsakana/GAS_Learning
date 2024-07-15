@@ -13,8 +13,8 @@
 class UAbilitySystemComponent;
 class UAttributeSet;
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnFloatPlayerStateChangeSignature, float/* NewFloat */);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnIntPlayerStateChangeSignature, int32/* NewInt32 */);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnFloatPlayerStateChangeSignature, float/* NewFloat */, bool/* bBroadcastToNotify */);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnIntPlayerStateChangeSignature, int32/* NewInt32 */, bool/* bBroadcastToNotify */);
 
 /**
  * 
@@ -31,7 +31,7 @@ public:
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 
 	FORCEINLINE int32 GetCombatLevel() const { return Level; }
-	void SetCombatLevel(int32 NewLevel);
+	void SetCombatLevel(int32 NewLevel, bool bBroadcastLevelupNotify = true);
 
 	FORCEINLINE float GetXP() const { return XP; }
 	void SetXP(float NewXP);

@@ -34,6 +34,9 @@ public:
 
 	void TravelToMap(UMVVM_LoadSlot* LoadSlot);
 
+	ULoadScreenSaveGame* RetrieveInGameSaveData() const;
+	void SaveInGameSaveData(ULoadScreenSaveGame* SaveObject);
+
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<ULoadScreenSaveGame> LoadScreenSaveClass;
 
@@ -42,6 +45,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSoftObjectPtr<UWorld> DefaultMap;
+
+	UPROPERTY(EditDefaultsOnly)
+	FName DefaultMapPlayerStartTag;
 
 	UPROPERTY(EditDefaultsOnly)
 	TMap<FString, TSoftObjectPtr<UWorld>> GameMaps;

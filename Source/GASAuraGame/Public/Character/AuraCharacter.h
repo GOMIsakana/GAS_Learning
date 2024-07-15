@@ -36,6 +36,7 @@ public:
 	virtual void LevelUp_Implementation() override;
 	virtual void ShowMagicCircle_Implementation(UMaterialInterface* InMagicCircleMaterial) override;
 	virtual void HideMagicCircle_Implementation() override;
+	virtual void SaveProgress_Implementation(const FName& PlayerStartTag) override;
 	/* 玩家接口结束 */
 
 	/* 战斗接口 */
@@ -48,6 +49,7 @@ protected:
 
 	virtual void OnStunTagChanged(FGameplayTag ReceivedTag, int32 NewCount) override;
 	virtual void OnRep_IsStunned() override;
+	void LoadProgress();
 
 private:
 

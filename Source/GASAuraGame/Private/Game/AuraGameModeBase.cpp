@@ -4,6 +4,7 @@
 #include "Game/AuraGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerStart.h"
+#include "Game/AuraGameInstance.h"
 
 void AAuraGameModeBase::SaveSlotData(UMVVM_LoadSlot* LoadSlot, int32 SlotIndex)
 {
@@ -20,6 +21,7 @@ void AAuraGameModeBase::SaveSlotData(UMVVM_LoadSlot* LoadSlot, int32 SlotIndex)
 		LoadScreenSaveGame->PlayerName = LoadSlot->GetPlayerName();
 		LoadScreenSaveGame->MapName = LoadSlot->GetMapName();
 		LoadScreenSaveGame->SlotStatus = LoadSlot->SlotStatus;
+		LoadScreenSaveGame->PlayerStartTag = LoadSlot->GetPlayerStartTag();
 		UGameplayStatics::SaveGameToSlot(LoadScreenSaveGame, LoadSlot->LoadSlotName, SlotIndex);
 	}
 }
@@ -52,8 +54,30 @@ void AAuraGameModeBase::TravelToMap(UMVVM_LoadSlot* LoadSlot)
 	UGameplayStatics::OpenLevelBySoftObjectPtr(LoadSlot, GameMaps[LoadSlot->GetMapName()]);
 }
 
+ULoadScreenSaveGame* AAuraGameModeBase::RetrieveInGameSaveData() const
+{
+	if (UAuraGameInstance* GameInstance = Cast<UAuraGameInstance>(GetGameInstance()))
+	{
+		return GetSaveSlotData(GameInstance->LoadSlotName, GameInstance->LoadSlotIndex);
+	}
+	return nullptr;
+}
+
+void AAuraGameModeBase::SaveInGameSaveData(ULoadScreenSaveGame* SaveObject)
+{
+	if (UAuraGameInstance* GameInstance = Cast<UAuraGameInstance>(GetGameInstance()))
+	{
+		FString LoadSlotName = GameInstance->LoadSlotName;
+		int32 LoadSlotIndex = GameInstance->LoadSlotIndex;
+		GameInstance->PlayerStartTag = SaveObject->PlayerStartTag;
+
+		UGameplayStatics::SaveGameToSlot(SaveObject, LoadSlotName, LoadSlotIndex);
+	}
+}
+
 AActor* AAuraGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 {
+	UAuraGameInstance* GameInstance = Cast<UAuraGameInstance>(GetGameInstance());
 	TArray<AActor*> Actors;
 	UGameplayStatics::GetAllActorsOfClass(this, APlayerStart::StaticClass(), Actors);
 	AActor* ChosenPlayerStart = nullptr;
@@ -64,7 +88,7 @@ AActor* AAuraGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 		{
 			if (APlayerStart* PlayerStart = Cast<APlayerStart>(FoundActor))
 			{
-				if (PlayerStart->PlayerStartTag == FName("Placeholder"))
+				if (GameInstance && PlayerStart->PlayerStartTag == GameInstance->PlayerStartTag)
 				{
 					ChosenPlayerStart = PlayerStart;
 					break;

@@ -91,6 +91,44 @@ void UAuraAbilitySystemLibrary::InitializeDefaultAttributes(const UObject* World
 	}
 }
 
+void UAuraAbilitySystemLibrary::InitializeDefaultAttributesFromSaveData(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, ULoadScreenSaveGame* SaveData)
+{
+	UCharacterClassInfo* ClassInfo = GetCharacterClassInfo(WorldContextObject);
+	if (ASC && ClassInfo)
+	{
+		FAuraGameplayTags GameplayTags = FAuraGameplayTags::Get();
+
+		if (ClassInfo->PrimaryAttributes_SetByCaller)
+		{
+			FGameplayEffectContextHandle PrimaryAttributeContextHandle = ASC->MakeEffectContext();
+			PrimaryAttributeContextHandle.AddSourceObject(ASC);
+			FGameplayEffectSpecHandle PrimaryAttributeEffectSpecHandle = ASC->MakeOutgoingSpec(ClassInfo->PrimaryAttributes_SetByCaller, 1.f, PrimaryAttributeContextHandle);
+			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(PrimaryAttributeEffectSpecHandle, GameplayTags.Attributes_Primary_Strength, SaveData->Strength);
+			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(PrimaryAttributeEffectSpecHandle, GameplayTags.Attributes_Primary_Intelligence, SaveData->Intelligence);
+			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(PrimaryAttributeEffectSpecHandle, GameplayTags.Attributes_Primary_Resilience, SaveData->Resilience);
+			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(PrimaryAttributeEffectSpecHandle, GameplayTags.Attributes_Primary_Vigor, SaveData->Vigor);
+
+			ASC->ApplyGameplayEffectSpecToSelf(*PrimaryAttributeEffectSpecHandle.Data.Get());
+		}
+
+		if (ClassInfo->SecondaryAttributes_Infinite)
+		{
+			FGameplayEffectContextHandle SecondaryAttributeContextHandle = ASC->MakeEffectContext();
+			SecondaryAttributeContextHandle.AddSourceObject(ASC);
+			FGameplayEffectSpecHandle SecondaryAttributeEffectSpecHandle = ASC->MakeOutgoingSpec(ClassInfo->SecondaryAttributes_Infinite, 1.f, SecondaryAttributeContextHandle);
+			ASC->ApplyGameplayEffectSpecToSelf(*SecondaryAttributeEffectSpecHandle.Data.Get());
+		}
+
+		if (ClassInfo->VitalAttributes_Infinite)
+		{
+			FGameplayEffectContextHandle VitalAttributeContextHandle = ASC->MakeEffectContext();
+			VitalAttributeContextHandle.AddSourceObject(ASC);
+			FGameplayEffectSpecHandle VitalAttributeEffectSpecHandle = ASC->MakeOutgoingSpec(ClassInfo->VitalAttributes_Infinite, 1.f, VitalAttributeContextHandle);
+			ASC->ApplyGameplayEffectSpecToSelf(*VitalAttributeEffectSpecHandle.Data.Get());
+		}
+	}
+}
+
 void UAuraAbilitySystemLibrary::GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, ECharacterClass CharacterClass)
 {
 	UCharacterClassInfo* CharacterClassInfo = GetCharacterClassInfo(WorldContextObject);

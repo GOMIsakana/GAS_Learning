@@ -39,6 +39,13 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TMap<ECharacterClass, FCharacterClassDefaultInfo> CharacterClassInfomation;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Aura Speical")
+	TSubclassOf<UGameplayEffect> PrimaryAttributes_SetByCaller;
+	UPROPERTY(EditDefaultsOnly, Category = "Aura Speical")
+	TSubclassOf<UGameplayEffect> SecondaryAttributes_Infinite;
+	UPROPERTY(EditDefaultsOnly, Category = "Aura Speical")
+	TSubclassOf<UGameplayEffect> VitalAttributes_Infinite;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Common Class Defaults")
 	TSubclassOf<UGameplayEffect> SecondaryAttributes;
 	UPROPERTY(EditDefaultsOnly, Category = "Common Class Defaults")

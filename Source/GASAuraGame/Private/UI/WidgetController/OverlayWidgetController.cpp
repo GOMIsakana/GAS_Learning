@@ -19,9 +19,9 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 {
 	GetAuraPlayerState()->OnXPChangeDelegate.AddUObject(this, &UOverlayWidgetController::OnXPChanged);
 	GetAuraPlayerState()->OnLevelChangeDelegate.AddLambda(
-		[this](int32 NewLevel)
+		[this](int32 NewLevel, bool bBroadCastNotify)
 		{
-			OnPlayerLevelChangedDelegate.Broadcast(NewLevel);
+			OnPlayerLevelChangedDelegate.Broadcast(NewLevel, bBroadCastNotify);
 		}
 	);
 
@@ -79,7 +79,7 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 	}
 }
 
-void UOverlayWidgetController::OnXPChanged(float NewXp)
+void UOverlayWidgetController::OnXPChanged(float NewXp, bool bBroadcastNotify)
 {
 	const ULevelUpInfo* LevelUpInfo = GetAuraPlayerState()->LevelUpInfo;
 	if (LevelUpInfo)

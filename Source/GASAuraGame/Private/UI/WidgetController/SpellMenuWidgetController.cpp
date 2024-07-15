@@ -34,7 +34,7 @@ void USpellMenuWidgetController::BindCallbacksToDependencies()
 		}
 	);
 	GetAuraPlayerState()->OnSpellPointChangeDelegate.AddLambda(
-		[this](int32 NewSpellPoint)
+		[this](int32 NewSpellPoint, bool bBroadcastNotify)
 		{
 			SpellPointDelegate.Broadcast(NewSpellPoint);
 			CurrentSpellPoint = NewSpellPoint;

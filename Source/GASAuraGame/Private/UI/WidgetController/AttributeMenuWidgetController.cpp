@@ -25,13 +25,13 @@ void UAttributeMenuWidgetController::BindCallbacksToDependencies()
 	if (GetAuraPlayerState())
 	{
 		GetAuraPlayerState()->OnAttributePointChangeDelegate.AddLambda(
-			[this](int32 Points)
+			[this](int32 Points, bool bBroadcastNotify)
 			{
 				AttributePointDelegate.Broadcast(Points);
 			}
 		);
 		GetAuraPlayerState()->OnSpellPointChangeDelegate.AddLambda(
-			[this](int32 Points)
+			[this](int32 Points, bool bBroadcastNotify)
 			{
 				SpellPointDelegate.Broadcast(Points);
 			}

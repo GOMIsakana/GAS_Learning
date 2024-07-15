@@ -53,4 +53,7 @@ public:
 	void ShowMagicCircle(UMaterialInterface* InMagicCircleMaterial);
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void HideMagicCircle();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SaveProgress(const FName& PlayerStartTag);
 };

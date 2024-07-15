@@ -18,3 +18,13 @@ void UMVVM_LoadSlot::SetMapName(const FString& InMapName)
 {
 	UE_MVVM_SET_PROPERTY_VALUE(MapName, InMapName);
 }
+
+void UMVVM_LoadSlot::SetPlayerStartTag(const FName& InPlayerStartTag)
+{
+	UE_MVVM_SET_PROPERTY_VALUE(PlayerStartTag, InPlayerStartTag);
+}
+
+void UMVVM_LoadSlot::SetPlayerLevel(const int32& InLevel)
+{
+	UE_MVVM_SET_PROPERTY_VALUE(PlayerLevel, InLevel);
+}

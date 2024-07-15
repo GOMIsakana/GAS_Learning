@@ -37,5 +37,39 @@ public:
 	FString MapName = FString("Default Dungeon Name");
 
 	UPROPERTY(BlueprintReadOnly)
+	FName PlayerStartTag;
+
+	UPROPERTY(BlueprintReadOnly)
 	TEnumAsByte<ESaveSlotStatus> SlotStatus = Vacant;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool bFirstTimeLoadIn = true;
+
+	/* 玩家数据(来自PlayerState) */
+
+	UPROPERTY()
+	int32 CombatLevel = 0;
+
+	UPROPERTY()
+	float CombatXP = 0.f;
+
+	UPROPERTY()
+	int32 SpellPoints = 0;
+
+	UPROPERTY()
+	int32 AttributePoints = 0;
+
+	/* 玩家数据(来自AttribuetSet) */
+
+	UPROPERTY()
+	float Strength = 0.f;
+
+	UPROPERTY()
+	float Intelligence = 0.f;
+
+	UPROPERTY()
+	float Resilience = 0.f;
+
+	UPROPERTY()
+	float Vigor = 0.f;
 };
