@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
+#include "Abilities/GameplayAbility.h"
 #include "LoadScreenSaveGame.generated.h"
 
 UENUM(BlueprintType)
@@ -12,6 +13,67 @@ enum ESaveSlotStatus
 	Vacant,
 	EnterName,
 	Taken
+};
+
+USTRUCT(BlueprintType)
+struct FSavedAbility
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ClassDefaults")
+	TSubclassOf<UGameplayAbility> GameplayAbilityClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FGameplayTag AbilityTag = FGameplayTag();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FGameplayTag AbilityType = FGameplayTag();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FGameplayTag AbilityStatus = FGameplayTag();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FGameplayTag AbilitySlot = FGameplayTag();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float AbilityLevel;
+};
+
+inline bool operator==(const FSavedAbility& A, const FSavedAbility& B)
+{
+	return A.AbilityTag.MatchesTagExact(B.AbilityTag);
+}
+
+USTRUCT(BlueprintType)
+struct FSavedActor
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FName ActorName = FName();
+
+	UPROPERTY()
+	FTransform ActorTransform;
+
+	UPROPERTY()
+	TArray<uint8> Bytes;	/* 保存了Actor的Serialized的变量(这些变量需要用宏标记为SaveGame才会被序列化保存) */
+};
+
+inline bool operator==(const FSavedActor& A, const FSavedActor& B)
+{
+	return A.ActorName == B.ActorName;
+}
+
+USTRUCT()
+struct FSavedMap
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FString MapAssetName;
+
+	UPROPERTY()
+	TArray<FSavedActor> MapSavedActors;
 };
 
 /**
@@ -72,4 +134,16 @@ public:
 
 	UPROPERTY()
 	float Vigor = 0.f;
+
+	/* 技能数据 */
+
+	UPROPERTY()
+	TArray<FSavedAbility> SavedAbilities;
+
+	/* 地图数据 */
+	UPROPERTY()
+	TArray<FSavedMap> SavedMaps;
+
+	// 找到地图时返回true, 未找到地图时返回false
+	bool GetSavedMapWithMapName(FString InMapName, FSavedMap& OutSavedMap);
 };

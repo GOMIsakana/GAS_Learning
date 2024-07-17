@@ -3,6 +3,8 @@
 
 #include "CheckPoint/CheckPoint.h"
 #include "Interaction/PlayerInterface.h"
+#include "Game/AuraGameModeBase.h"
+#include "Kismet/GameplayStatics.h"
 
 ACheckPoint::ACheckPoint(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -19,6 +21,14 @@ ACheckPoint::ACheckPoint(const FObjectInitializer& ObjectInitializer) : Super(Ob
 	Sphere->SetCollisionResponseToChannel(ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
 	Sphere->SetCollisionResponseToChannel(ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
 	Sphere->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Overlap);
+}
+
+void ACheckPoint::LoadActor_Implementation()
+{
+	if (bReached)
+	{
+		HandleCheckPointGlowEffect();
+	}
 }
 
 void ACheckPoint::HandleCheckPointGlowEffect()
@@ -41,15 +51,20 @@ void ACheckPoint::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 {
 	if (OtherActor && OtherActor->ActorHasTag(FName("Player")))
 	{
-		HandleCheckPointGlowEffect();
 		if (OtherActor->Implements<UPlayerInterface>())
 		{
+			bReached = true;
+			if (AAuraGameModeBase* AuraGameMode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(this)))
+			{
+				AuraGameMode->SaveWorldState(GetWorld());
+			}
 			/*
 			* 此处存档的管线是:
 			* 玩家走进检查点范围 -> 检查点调用玩家的存档函数 -> 玩家获取Gamemode中的存档 -> 玩家修改存档中的玩家信息 ->
 			* 玩家调用Gamemode中的存档函数 -> Gamemode将修改后的存档中的数据同步到当前GameInstance中(保证当前的信息是正确的), 并保存存档(存档数据会在游戏开始前读取到GameInstance中)
 			*/
 			IPlayerInterface::Execute_SaveProgress(OtherActor, PlayerStartTag);
+			HandleCheckPointGlowEffect();
 		}
 	}
 }

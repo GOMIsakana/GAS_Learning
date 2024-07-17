@@ -11,7 +11,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Game/AuraGameModeBase.h"
-#include "Game/LoadScreenSaveGame.h"
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
 
 AAuraCharacter::AAuraCharacter()
@@ -53,6 +52,11 @@ void AAuraCharacter::PossessedBy(AController* NewController)
 	// 如果其他没有PossessBy函数的Actor中设置ASC(AbilitySystemComponent)的OnwerActor,需要手动给改Acotr设置一个有效的Controller作为Onwer，以保证ASC的Mixed网络模式正常运行
 	InitAbilityActorInfo();
 	LoadProgress();
+
+	if (AAuraGameModeBase* AuraGameMode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(this)))
+	{
+		AuraGameMode->LoadWorldState(GetWorld());
+	}
 }
 
 void AAuraCharacter::OnRep_PlayerState()
@@ -224,6 +228,31 @@ void AAuraCharacter::SaveProgress_Implementation(const FName& PlayerStartTag)
 
 		GameSave->bFirstTimeLoadIn = false;
 
+		if (!HasAuthority()) return;
+
+		UAuraAbilitySystemComponentBase* AuraASC = Cast<UAuraAbilitySystemComponentBase>(AbilitySystemComponent);
+		FForEachAbility LoadForEachAbility;
+		GameSave->SavedAbilities.Empty();
+		LoadForEachAbility.BindLambda(
+			[this, AuraASC, GameSave](const FGameplayAbilitySpec& AbilitySpec)
+			{
+				const FGameplayTag& AbilityTag = AuraASC->GetAbilityTagFromSpec(AbilitySpec);
+				UAbilityInfo* AbilityInfo = UAuraAbilitySystemLibrary::GetAbilityInfo(this);
+				FAuraAbilityInfo Info = AbilityInfo->FindAbilityInfoByTag(AbilityTag);
+
+				FSavedAbility SavedAbility;
+				SavedAbility.GameplayAbilityClass = Info.Ability;
+				SavedAbility.AbilityTag = AbilityTag;
+				SavedAbility.AbilitySlot = AuraASC->GetSlotFromAbilityTag(AbilityTag);
+				SavedAbility.AbilityStatus = AuraASC->GetStatusTagFromAbilityTag(AbilityTag);
+				SavedAbility.AbilityType = Info.AbilityType;
+				SavedAbility.AbilityLevel = AbilitySpec.Level;
+
+				GameSave->SavedAbilities.AddUnique(SavedAbility);
+			}
+		);
+		AuraASC->ForEachAbility(LoadForEachAbility);
+
 		AuraGamemode->SaveInGameSaveData(GameSave);
 	}
 }
@@ -285,6 +314,10 @@ void AAuraCharacter::LoadProgress()
 		}
 		else
 		{
+			if (UAuraAbilitySystemComponentBase* AuraASC = Cast<UAuraAbilitySystemComponentBase>(AbilitySystemComponent))
+			{
+				AuraASC->AddCharacterAbilitiesFromSaveData(GameSave);
+			}
 			if (AAuraPlayerState* AuraPlayerState = Cast<AAuraPlayerState>(GetPlayerState()))
 			{
 				AuraPlayerState->SetCombatLevel(GameSave->CombatLevel, false);

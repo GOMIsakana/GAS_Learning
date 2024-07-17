@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "Game/LoadScreenSaveGame.h"
 #include "AuraAbilitySystemComponentBase.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FEffectAssetTags, const FGameplayTagContainer& /* 资产的Tag */);
@@ -34,6 +35,7 @@ public:
 	FDeactivatePassiveAbility DeactivatePassiveAbilityDelegate;
 	FActivatePassiveAbility ActivatePassiveAbilityDelegate;
 
+	void AddCharacterAbilitiesFromSaveData(ULoadScreenSaveGame* SaveData);
 	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& Abilities);
 	void AddCharacterPassiveAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartUpPassiveAbilities);
 	bool bStartupAbilitiesGiven = false;

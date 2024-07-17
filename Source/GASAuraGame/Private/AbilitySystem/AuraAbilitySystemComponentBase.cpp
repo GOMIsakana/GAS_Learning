@@ -8,11 +8,43 @@
 #include "Interaction/PlayerInterface.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
+#include "AuraGameplayTags.h"
 
 void UAuraAbilitySystemComponentBase::AbilityActorInfoSet()
 {
 	OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &UAuraAbilitySystemComponentBase::ClientOnEffectApplied);
 
+}
+
+void UAuraAbilitySystemComponentBase::AddCharacterAbilitiesFromSaveData(ULoadScreenSaveGame* SaveData)
+{
+	if (SaveData == nullptr) return;
+
+	const FAuraGameplayTags& GameplayTags = FAuraGameplayTags::Get();
+	for (const FSavedAbility& SavedAbility : SaveData->SavedAbilities)
+	{
+		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(SavedAbility.GameplayAbilityClass, SavedAbility.AbilityLevel);
+		AbilitySpec.DynamicAbilityTags.AddTag(SavedAbility.AbilitySlot);	// 按键绑定信息
+		AbilitySpec.DynamicAbilityTags.AddTag(SavedAbility.AbilityStatus);	// 技能解锁状态信息
+		AbilitySpec.SourceObject = GetAvatarActor();
+		if (SavedAbility.AbilityType.MatchesTagExact(GameplayTags.Abilities_Type_Offsensive))
+		{
+			GiveAbility(AbilitySpec);
+		}
+		else if (SavedAbility.AbilityType.MatchesTagExact(GameplayTags.Abilities_Type_Passive))
+		{
+			if (SavedAbility.AbilityStatus.MatchesTagExact(GameplayTags.Abilities_Status_Equipped))
+			{
+				GiveAbilityAndActivateOnce(AbilitySpec);
+			}
+			else
+			{
+				GiveAbility(AbilitySpec);
+			}
+		}
+	}
+	bStartupAbilitiesGiven = true;
+	AbilityGivenDelegate.Broadcast();
 }
 
 void UAuraAbilitySystemComponentBase::AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& Abilities)
@@ -37,6 +69,7 @@ void UAuraAbilitySystemComponentBase::AddCharacterPassiveAbilities(const TArray<
 	for (const TSubclassOf<UGameplayAbility> AbilityClass : StartUpPassiveAbilities)
 	{
 		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
+		AbilitySpec.DynamicAbilityTags.AddTag(FAuraGameplayTags::Get().Abilities_Status_Equipped);
 		GiveAbilityAndActivateOnce(AbilitySpec);
 	}
 }
@@ -98,9 +131,12 @@ void UAuraAbilitySystemComponentBase::ClientOnEffectApplied_Implementation(UAbil
 
 void UAuraAbilitySystemComponentBase::ForEachAbility(const FForEachAbility& Delegate)
 {
+	// 锁定技能状态，避免被垃圾回收导致内存访问失败
 	FScopedAbilityListLock ActiveScopeLock(*this);
+	// 循环每个技能, 并广播到这个委托, 执行对应函数(传入的委托一般是当场创建、当场绑定、当场传入此处执行)
 	for (const FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
 	{
+		// 如果传入的委托没有绑定任何函数, 则执行失败爆出错误提示
 		if (!Delegate.ExecuteIfBound(AbilitySpec))
 		{
 			UE_LOG(LogAura, Error, TEXT("Failed To execute delegate in %hs"), __FUNCTION__)
@@ -334,10 +370,15 @@ void UAuraAbilitySystemComponentBase::ServerEquipAbility_Implementation(const FG
 			}
 
 			// 对于被动技能, 如果它之前没有装备在任意槽位上, 则尝试激活
-			if (IsPassiveAbility(*AbilitySpec) && !AbilityHasAnySlot(*AbilitySpec))
+			if (!AbilityHasAnySlot(*AbilitySpec))
 			{
-				TryActivateAbility(AbilitySpec->Handle);
-				MulticastActivatePassiveEffect(AbilityTag, true);
+				if (IsPassiveAbility(*AbilitySpec))
+				{
+					TryActivateAbility(AbilitySpec->Handle);
+					MulticastActivatePassiveEffect(AbilityTag, true);
+				}
+				AbilitySpec->DynamicAbilityTags.RemoveTag(GetStatusTagFromSpec(*AbilitySpec));
+				AbilitySpec->DynamicAbilityTags.AddTag(FAuraGameplayTags::Get().Abilities_Status_Equipped);
 			}
 
 			// 交换技能位置(清空技能原来的槽位信息, 赋予它新的槽位信息)
