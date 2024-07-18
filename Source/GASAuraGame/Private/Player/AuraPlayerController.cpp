@@ -100,18 +100,47 @@ void AAuraPlayerController::CursorTrace()
 	GetHitResultUnderCursor(MouseTraceChannel, false, CursorHit);
 	if (!CursorHit.bBlockingHit)
 	{
-		if (HoverActor)	HoverActor->UnHighlightActor();
-		LastActor = nullptr;
-
+		if (TracingActor)
+		{
+			UnhighlightActor(TracingActor);
+		}
+		LastTraceActor = nullptr;
+		TracingActor = nullptr;
+		TargetingStatus = ETargetingStatus::NoTargeting;
 		return;
 	}
 
-	LastActor = HoverActor;
-	HoverActor = Cast<IEnemyInterface>(CursorHit.GetActor());
-	if (HoverActor != LastActor)
+	LastTraceActor = TracingActor;
+	if (IsValid(CursorHit.GetActor()) && CursorHit.GetActor()->Implements<UHighlightInterface>())
 	{
-		if (HoverActor) HoverActor->HighlightActor();
-		if (LastActor) LastActor->UnHighlightActor();
+		TracingActor = CursorHit.GetActor();
+		TargetingStatus = TracingActor->Implements<UEnemyInterface>() ? ETargetingStatus::TargetingEnemy : ETargetingStatus::TargetingNonEnemy;
+	}
+	else
+	{
+		TracingActor = nullptr;
+		TargetingStatus = ETargetingStatus::NoTargeting;
+	}
+	if (TracingActor != LastTraceActor)
+	{
+		if (TracingActor) HighlightActor(TracingActor);
+		if (LastTraceActor) UnhighlightActor(LastTraceActor);
+	}
+}
+
+void AAuraPlayerController::HighlightActor(AActor* Actor)
+{
+	if (IsValid(Actor) && Actor->Implements<UHighlightInterface>())
+	{
+		IHighlightInterface::Execute_HighlightActor(Actor);
+	}
+}
+
+void AAuraPlayerController::UnhighlightActor(AActor* Actor)
+{
+	if (IsValid(Actor) && Actor->Implements<UHighlightInterface>())
+	{
+		IHighlightInterface::Execute_UnhighlightActor(Actor);
 	}
 }
 
@@ -125,7 +154,14 @@ void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 	// 当按下右键时，检测右键是否正在对准目标，并禁用自动移动(在下方根据长按还是点按重新分配自动移动)
 	if (InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_RMB))
 	{
-		bTargeting = HoverActor ? true : false;
+		if (TracingActor)
+		{
+			TargetingStatus = TracingActor->Implements<UEnemyInterface>() ? ETargetingStatus::TargetingEnemy : ETargetingStatus::TargetingNonEnemy;
+		}
+		else
+		{
+			TargetingStatus = ETargetingStatus::NoTargeting;
+		}
 		bAutoRunning = false;
 	}
 }
@@ -147,8 +183,14 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 	if (GetAuraASC()) GetAuraASC()->AbilityInputTagReleased(InputTag);
 
 	// 如果对准地板且没按下shift，则使用导航系统从当前位置到目标位置生成一条导航线，并获取其中转折点作为spline的点，然后使用spline进行导航
-	if (!bTargeting && !bShiftKeyDown)
+	if (TargetingStatus != ETargetingStatus::TargetingEnemy && !bShiftKeyDown)
 	{
+		// 如果目标重载了被点击位置, 则使用目标的被点击函数提供的位置, 否则使用在Held时实时计算的鼠标落下位置
+		if (TracingActor && TracingActor->Implements<UHighlightInterface>())
+		{
+			IHighlightInterface::Execute_SetMoveToDestination(TracingActor, CachedDestination);
+		}
+		// 上面重载过后, 会在被点击的位置生成移动箭头的粒子效果
 		if (ClickNiagaraSystem && GetAuraASC() && !GetAuraASC()->HasMatchingGameplayTag(FAuraGameplayTags::Get().Player_Block_InputPressed))
 		{
 			UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ClickNiagaraSystem, CachedDestination);
@@ -162,7 +204,7 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 				for (const FVector& PointLoc : Path->PathPoints)
 				{
 					Spline->AddSplinePoint(PointLoc, ESplineCoordinateSpace::World);
-					DrawDebugSphere(GetWorld(), PointLoc, 10.f, 8, FColor::Red, false, 5.f);
+					// DrawDebugSphere(GetWorld(), PointLoc, 10.f, 8, FColor::Red, false, 5.f);
 				}
 				if (Path->PathPoints.Num())
 				{
@@ -173,7 +215,6 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 		}
 
 		FollowTime = 0.f;
-		bTargeting = false;
 	}
 
 	if (GetAuraASC() == nullptr) return;
@@ -192,7 +233,7 @@ void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 		return;
 	}
 
-	if (bTargeting || bShiftKeyDown)
+	if (TargetingStatus == ETargetingStatus::TargetingEnemy || bShiftKeyDown)
 	{
 		if (GetAuraASC()) GetAuraASC()->AbilityInputTagHeld(InputTag);
 	}

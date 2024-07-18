@@ -12,12 +12,19 @@
 #include "UI/Widgets/DamageTextWidgetComponent.h"
 #include "NiagaraSystem.h"
 #include "Actor/MagicCircle.h"
+#include "Interaction/HighlightInterface.h"
 #include "AuraPlayerController.generated.h"
 
 class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
-class IEnemyInterface;
+
+enum class ETargetingStatus : uint8
+{
+	TargetingEnemy,
+	TargetingNonEnemy,
+	NoTargeting
+};
 
 /**
  * 
@@ -64,8 +71,11 @@ private:
 	void Move(const struct FInputActionValue& InputActionValue);
 
 	void CursorTrace();
-	IEnemyInterface* LastActor;
-	IEnemyInterface* HoverActor;
+	AActor* LastTraceActor;
+	AActor* TracingActor;
+
+	void HighlightActor(AActor* Actor);
+	void UnhighlightActor(AActor* Actor);
 
 	void AbilityInputTagPressed(FGameplayTag InputTag);
 	void AbilityInputTagReleased(FGameplayTag InputTag);
@@ -85,7 +95,7 @@ private:
 	bool bAutoRunning = false;
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	float AutoRunAcceptanceRadius = 50.f;
-	bool bTargeting = false;
+	ETargetingStatus TargetingStatus = ETargetingStatus::NoTargeting;
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USplineComponent> Spline;

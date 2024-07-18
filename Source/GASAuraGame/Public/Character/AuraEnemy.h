@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Character/AuraCharacterBase.h"
 #include "Interaction/EnemyInterface.h"
+#include "Interaction/HighlightInterface.h"
 #include "Components/WidgetComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
@@ -18,7 +19,7 @@ class AAuraAIController;
  * 
  */
 UCLASS()
-class GASAURAGAME_API AAuraEnemy : public AAuraCharacterBase, public IEnemyInterface
+class GASAURAGAME_API AAuraEnemy : public AAuraCharacterBase, public IEnemyInterface, public IHighlightInterface
 {
 	GENERATED_BODY()
 	
@@ -27,14 +28,18 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 
 	/* 敌人接口 */
-	virtual void HighlightActor() override;
-	virtual void UnHighlightActor() override;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void SetCombatTarget(AActor* InCombatTarget);
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	AActor* GetCombatTarget() const;
 	/* 敌人接口结尾 */
+
+	/* 高亮接口 */
+	virtual void HighlightActor_Implementation() override;
+	virtual void UnhighlightActor_Implementation() override;
+	virtual void SetMoveToDestination_Implementation(FVector& OutDestination) override;
+	/* 高亮接口结尾 */
 
 	/* 战斗接口 */
 	virtual int32 GetCombatLevel_Implementation() override;
