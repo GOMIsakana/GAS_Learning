@@ -98,6 +98,9 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	FString MapName = FString("Default Dungeon Name");
 
+	UPROPERTY(EditDefaultsOnly)
+	FString MapAssetName = FString("Default Dungeon Asset Name");
+
 	UPROPERTY(BlueprintReadOnly)
 	FName PlayerStartTag;
 

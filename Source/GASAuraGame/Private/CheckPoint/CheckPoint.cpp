@@ -39,7 +39,10 @@ void ACheckPoint::LoadActor_Implementation()
 
 void ACheckPoint::HighlightActor_Implementation()
 {
-	CheckPointMesh->SetRenderCustomDepth(true);
+	if (!bReached)
+	{
+		CheckPointMesh->SetRenderCustomDepth(true);
+	}
 }
 
 void ACheckPoint::UnhighlightActor_Implementation()

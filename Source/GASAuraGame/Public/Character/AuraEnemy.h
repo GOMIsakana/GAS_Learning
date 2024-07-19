@@ -63,6 +63,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
 	TObjectPtr<AActor> CombatTarget;
 
+	FORCEINLINE void SetEnemyLevel(int32 InLevel) { Level = InLevel; }
+	FORCEINLINE void SetCharacterClass(ECharacterClass InCharacterClass) { CharacterClass = InCharacterClass; }
+
 protected:
 	virtual void OnStunTagChanged(FGameplayTag ReceivedTag, int32 NewCount) override;
 

@@ -78,7 +78,7 @@ void AAuraGameModeBase::SaveInGameSaveData(ULoadScreenSaveGame* SaveObject)
 	}
 }
 
-void AAuraGameModeBase::SaveWorldState(UWorld* WorldToSave)
+void AAuraGameModeBase::SaveWorldState(UWorld* WorldToSave, const FString& DestinationMapAssetName)
 {
 	if (WorldToSave == nullptr) return;
 	FString WorldName = WorldToSave->GetMapName();
@@ -87,6 +87,12 @@ void AAuraGameModeBase::SaveWorldState(UWorld* WorldToSave)
 
 	if (ULoadScreenSaveGame* GameSave = GetSaveSlotData(GameInstance->LoadSlotName, GameInstance->LoadSlotIndex))
 	{
+		// 如果是进入其他地图的存档(第二个输入不为空), 则将游戏存档中的目标地图名称改为新地图
+		if (DestinationMapAssetName != FString(""))
+		{
+			GameSave->MapAssetName = DestinationMapAssetName;
+			GameSave->MapName = GetMapNameFromMapAssetName(DestinationMapAssetName);
+		}
 		FSavedMap SavedMap;
 		// 没找到就原地新建一个
 		if (!GameSave->GetSavedMapWithMapName(WorldName, SavedMap))
@@ -179,6 +185,18 @@ void AAuraGameModeBase::LoadWorldState(UWorld* WorldToLoad)
 			}
 		}
 	}
+}
+
+FString AAuraGameModeBase::GetMapNameFromMapAssetName(FString MapAssetName)
+{
+	for (TTuple<FString, TSoftObjectPtr<UWorld>> Map : GameMaps)
+	{
+		if (Map.Value.ToSoftObjectPath().GetAssetName() == MapAssetName)
+		{
+			return Map.Key;
+		}
+	}
+	return FString();
 }
 
 AActor* AAuraGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
