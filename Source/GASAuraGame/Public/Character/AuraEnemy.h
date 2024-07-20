@@ -66,6 +66,9 @@ public:
 	FORCEINLINE void SetEnemyLevel(int32 InLevel) { Level = InLevel; }
 	FORCEINLINE void SetCharacterClass(ECharacterClass InCharacterClass) { CharacterClass = InCharacterClass; }
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void SpawnLoots();
+
 protected:
 	virtual void OnStunTagChanged(FGameplayTag ReceivedTag, int32 NewCount) override;
 
@@ -73,7 +76,7 @@ protected:
 
 	virtual void InitAbilityActorInfo() override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Default")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character Class Default")
 	int32 Level = 1;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Default")
 	ECharacterClass CharacterClass;

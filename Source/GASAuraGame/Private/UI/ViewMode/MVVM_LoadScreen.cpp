@@ -39,6 +39,7 @@ void UMVVM_LoadScreen::CreateNewSaveButtonPressed(int32 SlotIndex, const FString
 		LoadSlotMap[SlotIndex]->SlotStatus = ESaveSlotStatus::Taken;
 		LoadSlotMap[SlotIndex]->SetMapName(Gamemode->StartupMapName);
 		LoadSlotMap[SlotIndex]->SetPlayerStartTag(Gamemode->DefaultMapPlayerStartTag);
+		LoadSlotMap[SlotIndex]->MapAssetName = Gamemode->DefaultMap.ToSoftObjectPath().GetAssetName();
 
 		Gamemode->SaveSlotData(LoadSlotMap[SlotIndex], SlotIndex);
 		LoadSlotMap[SlotIndex]->InitializeLoadSlot();
@@ -116,12 +117,14 @@ void UMVVM_LoadScreen::LoadSlot()
 		const FString MapName = GameSaveObject->MapName;
 		const FName PlayerStartTag = GameSaveObject->PlayerStartTag;
 		const int32 PlayerLevel = GameSaveObject->CombatLevel;
+		const FString MapAssetName = GameSaveObject->MapAssetName;
 
 		Slot.Value->SlotStatus = SaveSlotStatus;
 		Slot.Value->SetPlayerLevel(PlayerLevel);
 		Slot.Value->SetPlayerName(PlayerName);
 		Slot.Value->SetMapName(MapName);
 		Slot.Value->SetPlayerStartTag(PlayerStartTag);
+		Slot.Value->MapAssetName = MapAssetName;
 		Slot.Value->InitializeLoadSlot();
 	}
 }

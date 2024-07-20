@@ -13,6 +13,39 @@ AAuraEffectActor::AAuraEffectActor()
 	SetRootComponent(CreateDefaultSubobject<USceneComponent>("SceneRoot"));
 }
 
+void AAuraEffectActor::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (SineCount >= SineResetClampInPI * PI)
+	{
+		SineCount = 0.f;
+	}
+	if (bShouldRotation)
+	{
+		DoTickRotation(DeltaTime);
+	}
+	if (bShouldFloating)
+	{
+		DoTickFloating(DeltaTime);
+	}
+	SineCount += DeltaTime;
+}
+
+void AAuraEffectActor::DoTickRotation(float DeltaTime)
+{
+	FRotator RotatorToAdd;
+	RotatorToAdd.Yaw = DeltaTime * RotationRate;
+	AddActorWorldRotation(RotatorToAdd.Quaternion());
+}
+
+void AAuraEffectActor::DoTickFloating(float DeltaTime)
+{
+	FVector Offset;
+	Offset.Z = DeltaTime * FMath::Sin(SineCount * ZAxisFloatingSpeed) * ZAxisFloatingDistance;
+	AddActorWorldOffset(Offset);
+}
+
 void AAuraEffectActor::BeginPlay()
 {
 	Super::BeginPlay();

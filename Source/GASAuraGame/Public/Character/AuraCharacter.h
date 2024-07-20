@@ -40,6 +40,7 @@ public:
 	/* 玩家接口结束 */
 
 	/* 战斗接口 */
+	virtual void Die(const FVector& DeathImpulse) override;
 	virtual int32 GetCombatLevel_Implementation() override;
 	/* 战斗接口结束 */
 
@@ -50,6 +51,11 @@ protected:
 	virtual void OnStunTagChanged(FGameplayTag ReceivedTag, int32 NewCount) override;
 	virtual void OnRep_IsStunned() override;
 	void LoadProgress();
+
+	FTimerHandle DeathTimer;
+
+	UPROPERTY(EditAnywhere)
+	float DeathTimerDelay = 5.f;
 
 private:
 

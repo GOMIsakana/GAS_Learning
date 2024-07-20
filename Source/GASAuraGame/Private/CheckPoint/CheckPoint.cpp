@@ -83,7 +83,10 @@ void ACheckPoint::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 			bReached = true;
 			if (AAuraGameModeBase* AuraGameMode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(this)))
 			{
-				AuraGameMode->SaveWorldState(GetWorld());
+				UWorld* World = GetWorld();
+				FString WorldAssetName = World->GetMapName();
+				WorldAssetName.RemoveFromStart(World->StreamingLevelsPrefix);
+				AuraGameMode->SaveWorldState(World, WorldAssetName);
 			}
 			/*
 			* 此处存档的管线是:

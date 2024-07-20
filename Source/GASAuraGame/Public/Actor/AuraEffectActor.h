@@ -35,6 +35,27 @@ class GASAURAGAME_API AAuraEffectActor : public AActor
 public:	
 	AAuraEffectActor();
 
+	virtual void Tick(float DeltaTime) override;
+
+	void DoTickRotation(float DeltaTime);
+
+	void DoTickFloating(float DeltaTime);
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Effects")
+	bool bShouldRotation = false;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Effects")
+	bool bShouldFloating = false;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Effects")
+	float RotationRate = 120.f;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Effects")
+	float ZAxisFloatingDistance = 50.f;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Effects")
+	float ZAxisFloatingSpeed = 4.f;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -74,9 +95,14 @@ protected:
 	// TMap<FActiveGameplayEffectHandle, UAbilitySystemComponent*> InfiniteEffectHandlesMap;
 	TMap<UAbilitySystemComponent*, FActiveGameplayEffectHandle> InfiniteEffectHandlesMap;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Apply Effect")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Apply Effect")
 	float ActorLevel = 1.f;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Apply Effect")
 	TArray<FName> AffectableTag;
+
+	float SineCount = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects")
+	float SineResetClampInPI = 2.f;
 };

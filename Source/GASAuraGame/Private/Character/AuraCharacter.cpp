@@ -257,6 +257,24 @@ void AAuraCharacter::SaveProgress_Implementation(const FName& PlayerStartTag)
 	}
 }
 
+void AAuraCharacter::Die(const FVector& DeathImpulse)
+{
+	Super::Die(DeathImpulse);
+
+	FTimerDelegate DeathTimerDelegate;
+	DeathTimerDelegate.BindLambda(
+		[this]()
+		{
+			if (AAuraGameModeBase* Gamemode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(this)))
+			{
+				Gamemode->PlayerDied(this);
+			}
+		}
+	);
+	GetWorldTimerManager().SetTimer(DeathTimer, DeathTimerDelegate, DeathTimerDelay, false);
+	FollowCamera->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+}
+
 int32 AAuraCharacter::GetCombatLevel_Implementation()
 {
 	const AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();

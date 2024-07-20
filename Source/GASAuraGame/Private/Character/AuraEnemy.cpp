@@ -151,7 +151,7 @@ void AAuraEnemy::Die(const FVector& DeathImpluse)
 {
 	SetLifeSpan(LifeSpan);
 	if (AuraAIController) AuraAIController->GetBlackboardComponent()->SetValueAsBool(FName("Dead"), true);
-
+	SpawnLoots();
 	HealthBar->SetVisibility(false);
 	Super::Die(DeathImpluse);
 }

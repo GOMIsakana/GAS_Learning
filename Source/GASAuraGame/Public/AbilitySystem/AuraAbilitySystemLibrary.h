@@ -8,6 +8,7 @@
 #include "UI/WidgetController/SpellMenuWidgetController.h"
 #include "UI/WidgetController/SpellMenuWidgetController.h"
 #include "Data/CharacterClassInfo.h"
+#include "Data/LootTiers.h"
 #include "Game/LoadScreenSaveGame.h"
 #include "AuraAbilitySystemLibrary.generated.h"
 
@@ -50,6 +51,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary|AbilityInfo")
 	static UAbilityInfo* GetAbilityInfo(const UObject* WorldContextObject);
+
+	UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary|AbilityInfo", meta = (DefaultToSelf = "WorldContextObject"))
+	static ULootTiers* GetLootTiers(const UObject* WorldContextObject);
 
 	/*
 	* 伤害参数的快速GET

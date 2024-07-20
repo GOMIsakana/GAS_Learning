@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "Data/AbilityInfo.h"
+#include "Data/LootTiers.h"
 #include "UI/ViewMode/MVVM_LoadSlot.h"
 #include "LoadScreenSaveGame.h"
 #include "AuraGameModeBase.generated.h"
@@ -25,6 +26,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "AbilityInfo")
 	TObjectPtr<UAbilityInfo> AbilityInfo;
+
+	UPROPERTY(EditDefaultsOnly, Category = "LootTiers")
+	TObjectPtr<ULootTiers> LootTiers;
 
 	void SaveSlotData(UMVVM_LoadSlot* LoadSlot, int32 SlotIndex);
 
@@ -60,6 +64,7 @@ public:
 
 	AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 
+	void PlayerDied(ACharacter* DeadPlayer);
 protected:
 	virtual void BeginPlay() override;
 };

@@ -8,6 +8,7 @@
 #include "EngineUtils.h"
 #include "Interaction/SaveInterface.h"
 #include "Serialization/ObjectAndNameAsStringProxyArchive.h"
+#include "GameFramework/Character.h"
 
 void AAuraGameModeBase::SaveSlotData(UMVVM_LoadSlot* LoadSlot, int32 SlotIndex)
 {
@@ -23,6 +24,7 @@ void AAuraGameModeBase::SaveSlotData(UMVVM_LoadSlot* LoadSlot, int32 SlotIndex)
 		LoadScreenSaveGame->LoadSlotName = LoadSlot->LoadSlotName;
 		LoadScreenSaveGame->PlayerName = LoadSlot->GetPlayerName();
 		LoadScreenSaveGame->MapName = LoadSlot->GetMapName();
+		LoadScreenSaveGame->MapAssetName = LoadSlot->MapAssetName;
 		LoadScreenSaveGame->SlotStatus = LoadSlot->SlotStatus;
 		LoadScreenSaveGame->PlayerStartTag = LoadSlot->GetPlayerStartTag();
 		UGameplayStatics::SaveGameToSlot(LoadScreenSaveGame, LoadSlot->LoadSlotName, SlotIndex);
@@ -223,7 +225,16 @@ AActor* AAuraGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 	return ChosenPlayerStart;
 }
 
+void AAuraGameModeBase::PlayerDied(ACharacter* DeadPlayer)
+{
+	ULoadScreenSaveGame* GameSave = RetrieveInGameSaveData();
+	if (!IsValid(GameSave)) return;
+
+	UGameplayStatics::OpenLevel(DeadPlayer, FName(GameSave->MapAssetName));
+}
+
 void AAuraGameModeBase::BeginPlay()
 {
+	Super::BeginPlay();
 	GameMaps.Add(StartupMapName, DefaultMap);
 }
