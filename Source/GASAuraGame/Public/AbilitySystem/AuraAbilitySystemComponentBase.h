@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Game/LoadScreenSaveGame.h"
+#include "AbilitySystem/ExecCalc/ExecCalc_Damage.h"
 #include "AuraAbilitySystemComponentBase.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FEffectAssetTags, const FGameplayTagContainer& /* 资产的Tag */);
@@ -85,6 +86,10 @@ public:
 	void ClearSlot(FGameplayAbilitySpec* Spec);
 	void ClearAbilitiesOfSlot(const FGameplayTag& Slot);
 	static bool AbilityHasSlot(FGameplayAbilitySpec* AbilitySpec, const FGameplayTag& Slot);
+
+	UFUNCTION(BlueprintCallable)
+	void ActivatePassiveAbilities(UAbilitySystemComponent* TargetASC, FDamageModifier& DamageModifier, const FGameplayTag& TriggerTag);
+
 protected:
 	UFUNCTION(Client, Reliable)
 	void ClientOnEffectApplied(UAbilitySystemComponent* TargetASC, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle);

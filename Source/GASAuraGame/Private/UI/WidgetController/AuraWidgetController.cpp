@@ -2,6 +2,11 @@
 
 
 #include "UI/WidgetController/AuraWidgetController.h"
+#include "Character/AuraCharacter.h"
+#include "Interaction/PlayerInterface.h"
+#include "Game/AuraGameModeBase.h"
+#include "Kismet/GameplayStatics.h"
+#include "Game/LoadScreenSaveGame.h"
 
 void UAuraWidgetController::SetWidgetControllerParams(const FWidgetControllerParams& WCP)
 {
@@ -74,6 +79,23 @@ UAuraAttributeSet* UAuraWidgetController::GetAuraAttributeSet()
 		AuraAttributeSet = Cast<UAuraAttributeSet>(AttributeSet);
 	}
 	return AuraAttributeSet;
+}
+
+void UAuraWidgetController::SaveGameForOwner()
+{
+	if (AAuraCharacter* OwnerCharacter = Cast<AAuraCharacter>(GetAuraPlayerController()->GetCharacter()))
+	{
+		if (OwnerCharacter->Implements<UPlayerInterface>())
+		{
+			AAuraGameModeBase* AuraGamemode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(OwnerCharacter));
+			if (AuraGamemode)
+			{
+				AuraGamemode->SaveWorldState(OwnerCharacter->GetWorld());
+				ULoadScreenSaveGame* GameSave = AuraGamemode->RetrieveInGameSaveData();
+				IPlayerInterface::Execute_SaveProgress(OwnerCharacter, GameSave->PlayerStartTag);
+			}
+		}
+	}
 }
 
 void UAuraWidgetController::OnInitializeStartupAbilities(UAuraAbilitySystemComponentBase* AuraASC)

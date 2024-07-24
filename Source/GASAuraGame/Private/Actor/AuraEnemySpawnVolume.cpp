@@ -20,7 +20,7 @@ void AAuraEnemySpawnVolume::LoadActor_Implementation()
 {
 	if (bReached)
 	{
-		Destroy();
+		Box->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	}
 }
 

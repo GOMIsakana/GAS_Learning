@@ -6,6 +6,21 @@
 #include "GameplayEffectExecutionCalculation.h"
 #include "ExecCalc_Damage.generated.h"
 
+USTRUCT(BlueprintType)
+struct FDamageModifier
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite)
+	float Damage;
+
+	UPROPERTY(BlueprintReadWrite)
+	float DamageIncrease;
+
+	UPROPERTY(BlueprintReadWrite)
+	float DamageDecrease;
+};
+
 /**
  * 
  */

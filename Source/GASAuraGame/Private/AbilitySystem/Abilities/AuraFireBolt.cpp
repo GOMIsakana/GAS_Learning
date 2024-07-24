@@ -53,7 +53,10 @@ void UAuraFireBolt::SpawnProjectileWithSpread(const FVector& TargetLocation, con
 			float ScaledDamage = ScalableDamage.GetValueAtLevel(GetAbilityLevel());
 			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, DamageType, ScaledDamage);
 
-			Projectile->DamageEffectParams = MakeDamageEffectParamasFromClassDefaults();
+			FDamageEffectParams ProjectileEffectParams = MakeDamageEffectParamasFromClassDefaults();
+			float AdditionalDamage = GetAbilitySystemComponentFromActorInfo()->GetNumericAttribute(UAuraAttributeSet::GetMagicalDamageAttribute()) * GetAdditionalAttributeValueByName(FName("FireBolt.Hit"), GetAbilityLevel()) / 100.f;
+			SetScalableDamage(ProjectileEffectParams, GetScalableDamage(ProjectileEffectParams) + AdditionalDamage);
+			Projectile->DamageEffectParams = ProjectileEffectParams;
 		}
 
 		Projectile->HomingTargetSceneComponent = NewObject<USceneComponent>(USceneComponent::StaticClass());
@@ -70,6 +73,7 @@ void UAuraFireBolt::SpawnProjectileWithSpread(const FVector& TargetLocation, con
 
 FString UAuraFireBolt::GetDescription(int32 Level)
 {
+	// 在技能未激活时去GetASCFromActorInfo()会因为ActorInfo不存在而失败
 	FAuraGameplayTags GameplayTags = FAuraGameplayTags::Get();
 	float Damage = GetDamage(GameplayTags.Damage_Fire, Level);
 	float CooldownTime = GetCooldown(Level);
@@ -78,14 +82,14 @@ FString UAuraFireBolt::GetDescription(int32 Level)
 
 	return FString::Printf(TEXT("<Title>火焰箭</> <Level>Lv. %d</>\n \
 <SubTitle>弓箭手, 放箭 !!!</>\n \
-		<Default>朝目标发射 %d 枚火焰箭, 命中时造成</> <Damage>%.1f</> <Default>点</><FireDamage>火属性伤害,</> \
+		<Default>朝目标发射 %d 枚火焰箭, 命中时造成</> <Damage>%.1f + %.1f%%法术伤害</> <Default>点</><FireDamage>火属性伤害,</> \
 <Default>并有 %.2f%% 概率使目标</><FireDamage>燃烧</> <Default>%.2f 秒, 每 %.2f 秒造成</> <Damage> %.1f </><Default>点</><FireDamage>火属性伤害</>\n\n \
 <Default>冷却时间:</> <Cooldown>%.2f</> <Default>秒</>\n \
 <Default>法力消耗:</> <ManaCost>%.2f</> \n \
 		"), 
 		Level, 
 
-		EffectiveProjectileNum, Damage,
+		EffectiveProjectileNum, Damage, GetAdditionalAttributeValueByName(FName("FireBolt.Hit"), Level),
 		DebuffChance, DebuffDuration, DebuffFrequency, DebuffDamage,
 		CooldownTime, 
 		ManaCost);
@@ -101,14 +105,14 @@ FString UAuraFireBolt::GetDescriptionNextLevel(int32 Level)
 
 	return FString::Printf(TEXT("<Title>升级预览</> <Level>Lv. %d</>\n \
 <SubTitle>弓箭手, 放箭 !!!</>\n \
-		<Default>朝目标发射 %d 枚火焰箭, 命中时造成</> <Damage>%.1f</> <Default>点</><FireDamage>火属性伤害,</> \
+		<Default>朝目标发射 %d 枚火焰箭, 命中时造成</> <Damage>%.1f + %.1f%%法术伤害</> <Default>点</><FireDamage>火属性伤害,</> \
 <Default>并有 %.2f%% 概率使目标</><FireDamage>燃烧</> <Default>%.2f 秒, 每 %.2f 秒造成</> <Damage> %.1f </><Default>点</><FireDamage>火属性伤害</>\n\n \
 <Default>冷却时间:</> <Cooldown>%.2f</> <Default>秒</>\n \
 <Default>法力消耗:</> <ManaCost>%.2f</> \n \
 		"), 
 		Level,
 
-		EffectiveProjectileNum, Damage,
+		EffectiveProjectileNum, Damage, GetAdditionalAttributeValueByName(FName("FireBolt.Hit"), Level),
 		DebuffChance, DebuffDuration, DebuffFrequency, DebuffDamage,
 		CooldownTime,
 		ManaCost);

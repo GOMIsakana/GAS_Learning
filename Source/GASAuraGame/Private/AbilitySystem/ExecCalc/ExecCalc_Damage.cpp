@@ -66,16 +66,16 @@ UExecCalc_Damage::UExecCalc_Damage()
 void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
 {
 	TMap<FGameplayTag, FGameplayEffectAttributeCaptureDefinition> TagsToCaptureDefs;
-	const FAuraGameplayTags& Tags = FAuraGameplayTags::Get();
+	const FAuraGameplayTags& GameplayTags = FAuraGameplayTags::Get();
 
-	TagsToCaptureDefs.Add(Tags.Attributes_Secondary_PhysicalDamage, DamageStatic().PhysicalDamageDef);
-	TagsToCaptureDefs.Add(Tags.Attributes_Secondary_Defense, DamageStatic().DefenseDef);
-	TagsToCaptureDefs.Add(Tags.Attributes_Secondary_DefensePenetration, DamageStatic().DefensePenetrationDef);
-	TagsToCaptureDefs.Add(Tags.Attributes_Secondary_CritChance, DamageStatic().CritChanceDef);
-	TagsToCaptureDefs.Add(Tags.Attributes_Secondary_CritDamage, DamageStatic().CritDamageDef);
-	TagsToCaptureDefs.Add(Tags.Attributes_Resist_Fire, DamageStatic().Resist_FireDef);
-	TagsToCaptureDefs.Add(Tags.Attributes_Resist_Lighting, DamageStatic().Resist_LightingDef);
-	TagsToCaptureDefs.Add(Tags.Attributes_Resist_Arcane, DamageStatic().Resist_ArcaneDef);
+	TagsToCaptureDefs.Add(GameplayTags.Attributes_Secondary_PhysicalDamage, DamageStatic().PhysicalDamageDef);
+	TagsToCaptureDefs.Add(GameplayTags.Attributes_Secondary_Defense, DamageStatic().DefenseDef);
+	TagsToCaptureDefs.Add(GameplayTags.Attributes_Secondary_DefensePenetration, DamageStatic().DefensePenetrationDef);
+	TagsToCaptureDefs.Add(GameplayTags.Attributes_Secondary_CritChance, DamageStatic().CritChanceDef);
+	TagsToCaptureDefs.Add(GameplayTags.Attributes_Secondary_CritDamage, DamageStatic().CritDamageDef);
+	TagsToCaptureDefs.Add(GameplayTags.Attributes_Resist_Fire, DamageStatic().Resist_FireDef);
+	TagsToCaptureDefs.Add(GameplayTags.Attributes_Resist_Lighting, DamageStatic().Resist_LightingDef);
+	TagsToCaptureDefs.Add(GameplayTags.Attributes_Resist_Arcane, DamageStatic().Resist_ArcaneDef);
 
 	UAbilitySystemComponent* SourceASC = ExecutionParams.GetSourceAbilitySystemComponent();
 	UAbilitySystemComponent* TargetASC = ExecutionParams.GetTargetAbilitySystemComponent();
@@ -103,9 +103,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	EvalParams.TargetTags = TargetTags;
 
 	float Damage = 0;	// 获取Caller设置的Damage
-	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatic().PhysicalDamageDef, EvalParams, Damage);
-
-	const FAuraGameplayTags GameplayTags = FAuraGameplayTags::Get();
+	// ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatic().PhysicalDamageDef, EvalParams, Damage);
 
 	// Debuff相关
 	HandleDebuff(ExecutionParams, EffectSpec, EvalParams, TagsToCaptureDefs);
@@ -137,9 +135,12 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	const float DefenseCoefficients = DefenseCurve->Eval(FMath::Max<float>(1.f, TargetCombatLevel - SourceCombatLevel));
 
 	float TargetDefense = 0.f, SourceDefensePenetration = 0.f;
+	// 不知道两种方法的区别, 目前测试出来没区别(只是在Modifier中不能像Execution里面获取ASC)
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatic().DefenseDef, EvalParams, TargetDefense);
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatic().DefensePenetrationDef, EvalParams, SourceDefensePenetration);
-	Damage += SourceDefensePenetration * DefensePenetrationCoefficients - TargetDefense * DefenseCoefficients;	// 加减法防御
+	// TargetDefense = TargetASC->GetNumericAttribute(UAuraAttributeSet::GetDefenseAttribute());
+	// SourceDefensePenetration = SourceASC->GetNumericAttribute(UAuraAttributeSet::GetDefensePenetrationAttribute());
+	Damage += SourceDefensePenetration * DefensePenetrationCoefficients - TargetDefense * DefenseCoefficients;	// 加减法防御。魔抗没有必要所以删了
 
 	// 获取暴击率, 决定其是否生效
 	// 如果它生效, 则增加伤害
@@ -152,8 +153,28 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	{
 		Damage *= CritDamageValue / 100.f;
 	}
-
 	UAuraAbilitySystemLibrary::SetIsCriticalHit(EffectContextHandle, bIsCriticalHit);
+
+	FDamageModifier DamageModifier{};
+	DamageModifier.Damage = Damage;
+	// 攻击者触发造成伤害时的被动, 并处理伤害
+	if (SourceASC)
+	{
+		if (UAuraAbilitySystemComponentBase* AuraASC = Cast<UAuraAbilitySystemComponentBase>(SourceASC))
+		{
+			AuraASC->ActivatePassiveAbilities(TargetASC, DamageModifier, GameplayTags.Abilities_Trigger_Passive_OnCauseDamage);
+		}
+	}
+	// 受击者触发受到伤害时的被动, 并处理伤害
+	if (TargetASC)
+	{
+		if (UAuraAbilitySystemComponentBase* AuraASC = Cast<UAuraAbilitySystemComponentBase>(TargetASC))
+		{
+			AuraASC->ActivatePassiveAbilities(SourceASC, DamageModifier, GameplayTags.Abilities_Trigger_Passive_OnTakeDamage);
+		}
+	}
+	Damage = DamageModifier.Damage * (1 + DamageModifier.DamageIncrease - DamageModifier.DamageDecrease);
+
 	if (Damage > 0.f)
 	{
 		UAuraAbilitySystemLibrary::SetIsDamageValid(EffectContextHandle, true);

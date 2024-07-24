@@ -12,6 +12,7 @@
 #include "Interaction/CombatInterface.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "GameFramework/Character.h"
+#include "GASAuraGame/GASAuraGame.h"
 
 bool UAuraAbilitySystemLibrary::MakeWidgetControllerParamas(const UObject* WorldContextObject, FWidgetControllerParams& OutWCParams, AAuraHUD*& OutAuraHUD)
 {
@@ -290,6 +291,15 @@ float UAuraAbilitySystemLibrary::GetRadialDamageOuterRadius(const FGameplayEffec
 	return 0.0f;
 }
 
+float UAuraAbilitySystemLibrary::GetMinRadialDamage(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FAuraGameplayEffectContext* AuraEffectContext = static_cast<const FAuraGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return AuraEffectContext->GetMinRadialDamage();
+	}
+	return 0.0f;
+}
+
 FVector UAuraAbilitySystemLibrary::GetDamageOriginLocation(const FGameplayEffectContextHandle& EffectContextHandle)
 {
 	if (const FAuraGameplayEffectContext* AuraEffectContext = static_cast<const FAuraGameplayEffectContext*>(EffectContextHandle.Get()))
@@ -396,6 +406,14 @@ void UAuraAbilitySystemLibrary::SetRadialDamageOuterRadius(UPARAM(ref) FGameplay
 	}
 }
 
+void UAuraAbilitySystemLibrary::SetMinRadialDamage(UPARAM(ref)FGameplayEffectContextHandle& EffectContextHandle, float InMinRadialDamage)
+{
+	if (FAuraGameplayEffectContext* AuraEffectContext = static_cast<FAuraGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		AuraEffectContext->SetMinRadialDamage(InMinRadialDamage);
+	}
+}
+
 void UAuraAbilitySystemLibrary::SetDamageOriginLocation(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, const FVector& InDamageOriginLocation)
 {
 	if (FAuraGameplayEffectContext* AuraEffectContext = static_cast<FAuraGameplayEffectContext*>(EffectContextHandle.Get()))
@@ -436,6 +454,7 @@ FGameplayEffectContextHandle UAuraAbilitySystemLibrary::ApplyDamageEffect(FDamag
 	SetIsRadialDamage(DamageContextHandle, Params.bIsRadialDamage);
 	SetRadialDamageInnerRadius(DamageContextHandle, Params.RadialDamageInnerRadius);
 	SetRadialDamageOuterRadius(DamageContextHandle, Params.RadialDamageOuterRadius);
+	SetMinRadialDamage(DamageContextHandle, Params.MinRadialDamage);
 	SetDamageOriginLocation(DamageContextHandle, Params.DamageOriginLocation);
 
 	FVector DamageOriginLocation = Params.DamageOriginLocation;
@@ -461,36 +480,34 @@ FGameplayEffectContextHandle UAuraAbilitySystemLibrary::ApplyDamageEffect(FDamag
 			{
 				if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(Target))
 				{
-					if (!CombatInterface->GetOnDamageDelegate().IsBound())
-					{
-						CombatInterface->GetOnDamageDelegate().AddLambda(
-							[DamageSpecHandle, Params, Target](float InDamage)
+					CombatInterface->GetOnDamageDelegate().Clear();
+					FDelegateHandle DamageDelgateHandle = CombatInterface->GetOnDamageDelegate().AddLambda(
+						[DamageSpecHandle, Params, Target](float InDamage)
+						{
+							UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(DamageSpecHandle, Params.DamageType, InDamage);
+							if (Params.KnockbackChance > FMath::RandRange(0.f, 100.f))
 							{
-								UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(DamageSpecHandle, Params.DamageType, InDamage);
-								if (Params.KnockbackChance > FMath::RandRange(0.f, 100.f))
+								FRotator ImpluseRotation = (Target->GetActorLocation() - Params.SourceASC->GetAvatarActor()->GetActorLocation()).Rotation();
+								if (Params.bKnockbackFromOriginLocation)
 								{
-									FRotator ImpluseRotation = (Target->GetActorLocation() - Params.SourceASC->GetAvatarActor()->GetActorLocation()).Rotation();
-									if (Params.bKnockbackFromOriginLocation)
-									{
-										ImpluseRotation = (Target->GetActorLocation() - Params.DamageOriginLocation).Rotation();
-									}
-									ImpluseRotation.Pitch = Params.KnockbackPitch;
-									FVector ImpluseVector = ImpluseRotation.Vector() * Params.KnockbackMagnitude;
-									if (ACharacter* TargetCharacter = Cast<ACharacter>(Target))
-									{
-										TargetCharacter->LaunchCharacter(ImpluseVector, true, false);
-									}
+									ImpluseRotation = (Target->GetActorLocation() - Params.DamageOriginLocation).Rotation();
 								}
-								Params.SourceASC->ApplyGameplayEffectSpecToTarget(*DamageSpecHandle.Data.Get(), UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Target));
+								ImpluseRotation.Pitch = Params.KnockbackPitch;
+								FVector ImpluseVector = ImpluseRotation.Vector() * Params.KnockbackMagnitude;
+								if (ACharacter* TargetCharacter = Cast<ACharacter>(Target))
+								{
+									TargetCharacter->LaunchCharacter(ImpluseVector, true, false);
+								}
 							}
-						);
-					}
+							Params.SourceASC->ApplyGameplayEffectSpecToTarget(*DamageSpecHandle.Data.Get(), UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Target));
+						}
+					);
 				}
 			}
 			UGameplayStatics::ApplyRadialDamageWithFalloff(
 				SourceAvatarActor,
 				Params.BaseDamage,
-				0.f,
+				Params.MinRadialDamage,
 				UAuraAbilitySystemLibrary::GetDamageOriginLocation(DamageContextHandle),
 				UAuraAbilitySystemLibrary::GetRadialDamageInnerRadius(DamageContextHandle),
 				UAuraAbilitySystemLibrary::GetRadialDamageOuterRadius(DamageContextHandle),
@@ -499,13 +516,13 @@ FGameplayEffectContextHandle UAuraAbilitySystemLibrary::ApplyDamageEffect(FDamag
 				ActorToIgnore,
 				SourceAvatarActor,
 				nullptr,
-				ECollisionChannel::ECC_Camera
+				ECC_Projectile
 			);
 		}
 		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(DamageSpecHandle, Params.DamageType, Params.BaseDamage);
 		Params.SourceASC->ApplyGameplayEffectSpecToTarget(*DamageSpecHandle.Data.Get(), Params.TargetASC);
 	}
-
+	
 	return DamageContextHandle;
 }
 

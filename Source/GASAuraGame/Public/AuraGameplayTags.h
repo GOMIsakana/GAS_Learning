@@ -95,6 +95,13 @@ public:
 	FGameplayTag Abilities_Passive_LifeSiphon;
 	FGameplayTag Abilities_Passive_ManaSiphon;
 
+	FGameplayTag Abilities_Activating_HaloOfProtection;
+	FGameplayTag Abilities_Activating_LifeSiphon;
+	FGameplayTag Abilities_Activating_ManaSiphon;
+
+	FGameplayTag Abilities_Trigger_Passive_OnCauseDamage;
+	FGameplayTag Abilities_Trigger_Passive_OnTakeDamage;
+
 	FGameplayTag CombatSocket_Weapon;
 	FGameplayTag CombatSocket_LeftHand;
 	FGameplayTag CombatSocket_RightHand;

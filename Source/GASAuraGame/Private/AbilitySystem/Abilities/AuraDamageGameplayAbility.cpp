@@ -45,6 +45,7 @@ FDamageEffectParams UAuraDamageGameplayAbility::MakeDamageEffectParamasFromClass
 	Params.bIsRadialDamage = bIsRadialDamage;
 	Params.RadialDamageInnerRadius = RadialDamageInnerRadius;
 	Params.RadialDamageOuterRadius = RadialDamageOuterRadius;
+	Params.MinRadialDamage = MinRadialDamage;
 	Params.DamageOriginLocation = OriginLocation;
 	Params.bKnockbackFromOriginLocation = bKnockbackFromOriginLocation;
 	Params.KnockbackPitch = KnockbackPitch;
@@ -69,6 +70,16 @@ FDamageEffectParams UAuraDamageGameplayAbility::MakeDamageEffectParamasFromClass
 	}
 
 	return Params;
+}
+
+void UAuraDamageGameplayAbility::SetScalableDamage(FDamageEffectParams& InDEP, float NewDamage)
+{
+	InDEP.BaseDamage = NewDamage;
+}
+
+float UAuraDamageGameplayAbility::GetScalableDamage(FDamageEffectParams& InDEP)
+{
+	return InDEP.BaseDamage;
 }
 
 float UAuraDamageGameplayAbility::GetDamageAtLevel() const

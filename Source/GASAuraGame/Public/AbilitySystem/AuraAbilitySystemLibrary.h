@@ -96,6 +96,9 @@ public:
 	static float GetRadialDamageOuterRadius(const FGameplayEffectContextHandle& EffectContextHandle);
 
 	UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|GameplayEffects")
+	static float GetMinRadialDamage(const FGameplayEffectContextHandle& EffectContextHandle);
+
+	UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|GameplayEffects")
 	static FVector GetDamageOriginLocation(const FGameplayEffectContextHandle& EffectContextHandle);
 
 	/*
@@ -137,6 +140,9 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|GameplayEffects")
 	static void SetRadialDamageOuterRadius(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, float InRadialDamageOuterRadius);
+
+	UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|GameplayEffects")
+	static void SetMinRadialDamage(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, float InMinRadialDamage);
 
 	UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|GameplayEffects")
 	static void SetDamageOriginLocation(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, const FVector& InDamageOriginLocation);

@@ -2,6 +2,7 @@
 
 
 #include "AbilitySystem/Abilities/AuraGameplayAbilityBase.h"
+#include "AbilitySystemBlueprintLibrary.h"
 
 FString UAuraGameplayAbilityBase::GetDescription(int32 Level)
 {
@@ -46,4 +47,13 @@ float UAuraGameplayAbilityBase::GetSpellCost(FGameplayAttribute CostAttribute, f
 		}
 	}
     return Cost;
+}
+
+float UAuraGameplayAbilityBase::GetAdditionalAttributeValueByName(FName AttributeName, float InLevel)
+{
+	if (SpellAdditionalAttributeMap.Contains(AttributeName))
+	{
+		return SpellAdditionalAttributeMap[AttributeName].GetValueAtLevel(InLevel);
+	}
+	return 0.0f;
 }

@@ -25,6 +25,12 @@ public:
 	UFUNCTION(BlueprintPure)
 	FDamageEffectParams MakeDamageEffectParamasFromClassDefaults(AActor* TargetActor = nullptr, FVector OriginLocation = FVector::ZeroVector, bool bImpluseOverride = false, FVector KnockbackImpluseOverride = FVector::ZeroVector, FVector DeathImpluseOverride = FVector::ZeroVector) const;
 
+	UFUNCTION(BlueprintCallable)
+	void SetScalableDamage(FDamageEffectParams& InDEP, float NewDamage);
+
+	UFUNCTION(BlueprintCallable)
+	float GetScalableDamage(FDamageEffectParams& InDEP);
+
 	UFUNCTION(BlueprintPure)
 	float GetDamageAtLevel() const;
 protected:
@@ -59,5 +65,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
 	float RadialDamageOuterRadius = 0.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
+	float MinRadialDamage = 0.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
 	bool bKnockbackFromOriginLocation = false;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
+	float MinRadialDamagePercentage = 10.f;
 };

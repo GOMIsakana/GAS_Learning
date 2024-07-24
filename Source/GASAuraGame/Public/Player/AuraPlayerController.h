@@ -13,6 +13,7 @@
 #include "NiagaraSystem.h"
 #include "Actor/MagicCircle.h"
 #include "Interaction/HighlightInterface.h"
+#include "UI/Widgets/FloatingTextWidgetComponent.h"
 #include "AuraPlayerController.generated.h"
 
 class UInputMappingContext;
@@ -41,6 +42,9 @@ public:
 
 	UFUNCTION(Client, Reliable)
 	void ClientShowDamageNumber(float DamageAmount, AActor* Target, bool bCriticalHit, bool bDamageValid);
+
+	UFUNCTION(Client, Reliable)
+	void ClientShowFloatingTextNumber(float Number, AActor* Target, const FString& TextPrefix = FString(""), const FString& TextSuffix = FString(""), FSlateColor ColorOverride = FLinearColor::Green);
 
 	UFUNCTION(BlueprintCallable)
 	void ShowMagicCircle();
@@ -104,6 +108,8 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UDamageTextWidgetComponent> DamageTextComponentClass;
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UFloatingTextWidgetComponent> FloatingTextComponentClass;
 
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UNiagaraSystem> ClickNiagaraSystem;

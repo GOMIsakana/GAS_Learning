@@ -28,4 +28,10 @@ public:
 	float GetCooldown(float InLevel = 1.f);
 	UFUNCTION(BlueprintCallable)
 	float GetSpellCost(FGameplayAttribute CostAttribute, float InLevel = 1.f) const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	float GetAdditionalAttributeValueByName(FName AttributeName, float InLevel = 1.f);
+private:
+	UPROPERTY(EditDefaultsOnly)
+	TMap<FName, FScalableFloat> SpellAdditionalAttributeMap;
 };

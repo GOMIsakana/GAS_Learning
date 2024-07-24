@@ -65,6 +65,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	UAuraAttributeSet* GetAuraAttributeSet();
 
+	UFUNCTION(BlueprintCallable)
+	void SaveGameForOwner();
+
 protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "WidgetController")

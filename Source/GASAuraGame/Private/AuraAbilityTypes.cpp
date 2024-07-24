@@ -83,13 +83,17 @@ bool FAuraGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 		{
 			RepBits |= 1 << 18;
 		}
-		if (DamageOriginLocation != FVector::ZeroVector)
+		if (MinRadialDamage > 0.f)
 		{
 			RepBits |= 1 << 19;
 		}
+		if (DamageOriginLocation != FVector::ZeroVector)
+		{
+			RepBits |= 1 << 20;
+		}
 	}
 
-	Ar.Serialize(&RepBits, 20);
+	Ar.Serialize(&RepBits, 21);
 
 	if (RepBits & (1 << 0))
 	{
@@ -187,6 +191,10 @@ bool FAuraGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 		Ar << RadialDamageOuterRadius;
 	}
 	if (RepBits & (1 << 19))
+	{
+		Ar << MinRadialDamage;
+	}
+	if (RepBits & (1 << 20))
 	{
 		DamageOriginLocation.NetSerialize(Ar, Map, bOutSuccess);
 	}

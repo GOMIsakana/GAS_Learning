@@ -68,6 +68,13 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Abilities_Passive_LifeSiphon = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.LifeSiphon"), TEXT("生命虹吸被动技能"));
 	GameplayTags.Abilities_Passive_ManaSiphon = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.ManaSiphon"), TEXT("法力虹吸被动技能"));
 
+	GameplayTags.Abilities_Activating_HaloOfProtection = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Activating.HaloOfProtection"), TEXT("守护光环激活时持有的Tag"));
+	GameplayTags.Abilities_Activating_LifeSiphon = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Activating.LifeSiphon"), TEXT("生命虹吸激活时持有的Tag"));
+	GameplayTags.Abilities_Activating_ManaSiphon = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Activating.ManaSiphon"), TEXT("法力虹吸激活时持有的Tag"));
+
+	GameplayTags.Abilities_Trigger_Passive_OnCauseDamage = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Trigger.Passive.OnCauseDamage"), TEXT("攻击触发的被动技能"));
+	GameplayTags.Abilities_Trigger_Passive_OnTakeDamage = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Trigger.Passive.OnTakeDamage"), TEXT("受击触发的被动技能"));
+
 	GameplayTags.CombatSocket_Weapon = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatSocket.Weapon"), TEXT("使用武器攻击的插槽"));
 	GameplayTags.CombatSocket_LeftHand = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatSocket.LeftHand"), TEXT("使用左手攻击的插槽"));
 	GameplayTags.CombatSocket_RightHand = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatSocket.RightHand"), TEXT("使用右手攻击的插槽"));

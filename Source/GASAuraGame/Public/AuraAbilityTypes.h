@@ -72,6 +72,9 @@ struct FDamageEffectParams
 	float RadialDamageOuterRadius = 0.f;
 
 	UPROPERTY(BlueprintReadWrite)
+	float MinRadialDamage = 0.f;
+
+	UPROPERTY(BlueprintReadWrite)
 	FVector DamageOriginLocation = FVector::ZeroVector;
 
 	UPROPERTY(BlueprintReadWrite)
@@ -96,6 +99,7 @@ public:
 	bool IsRadialDamage() const { return bIsRadialDamage; }
 	float GetRadialDamageInnerRadius() const { return RadialDamageInnerRadius; }
 	float GetRadialDamageOuterRadius() const { return RadialDamageOuterRadius; }
+	float GetMinRadialDamage() const { return MinRadialDamage; }
 	FVector GetDamageOriginLocation() const { return DamageOriginLocation; }
 
 	void SetIsCriticalHit(bool bInIsCriticalHit) { bIsCriticalHit = bInIsCriticalHit; }
@@ -110,6 +114,7 @@ public:
 	void SetIsRadialDamage(bool InbIsRadialDamage) { bIsRadialDamage = InbIsRadialDamage; }
 	void SetRadialDamageInnerRadius(float InRadialDamageInnerRadius) { RadialDamageInnerRadius = InRadialDamageInnerRadius; }
 	void SetRadialDamageOuterRadius(float InRadialDamageOuterRadius) { RadialDamageOuterRadius = InRadialDamageOuterRadius; }
+	void SetMinRadialDamage(float InMinRadialDamage) { MinRadialDamage = InMinRadialDamage; }
 	void SetDamageOriginLocation(const FVector& InDamageOriginLocation) { DamageOriginLocation = InDamageOriginLocation; }
 
 	virtual UScriptStruct* GetScriptStruct() const
@@ -153,6 +158,9 @@ protected:
 
 	UPROPERTY()
 	float RadialDamageOuterRadius = 0.f;
+
+	UPROPERTY()
+	float MinRadialDamage = 0.f;
 
 	UPROPERTY()
 	FVector DamageOriginLocation = FVector::ZeroVector;

@@ -64,6 +64,18 @@ void AAuraPlayerController::ClientShowDamageNumber_Implementation(float DamageAm
 	}
 }
 
+void AAuraPlayerController::ClientShowFloatingTextNumber_Implementation(float Number, AActor* Target, const FString& TextPrefix, const FString& TextSuffix, FSlateColor ColorOverride)
+{
+	if (IsValid(Target) && FloatingTextComponentClass)
+	{
+		UFloatingTextWidgetComponent* FloatingText = NewObject<UFloatingTextWidgetComponent>(Target, FloatingTextComponentClass);
+		FloatingText->RegisterComponent();
+		FloatingText->AttachToComponent(Target->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+		FloatingText->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+		FloatingText->UpdateFloatingText(Number, TextPrefix, TextSuffix, ColorOverride);
+	}
+}
+
 void AAuraPlayerController::AutoRun()
 {
 	if (!bAutoRunning) return;

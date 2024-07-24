@@ -21,3 +21,8 @@ void UAuraPassiveAbility::OnReceiveDeactivate(const FGameplayTag& AbilityTag)
 		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 	}
 }
+
+void UAuraPassiveAbility::ActivatePassiveAbility(UAbilitySystemComponent* SourceASC, UAbilitySystemComponent* TargetASC, FDamageModifier& DamageModifier, const FGameplayTag& TriggerTag)
+{
+
+}

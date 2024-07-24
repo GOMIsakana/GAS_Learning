@@ -13,5 +13,17 @@ UCLASS()
 class GASAURAGAME_API UAuraManaSiphon : public UAuraPassiveAbility
 {
 	GENERATED_BODY()
-	
+
+public:
+
+	virtual FString GetDescription(int32 Level) override;
+	virtual FString GetDescriptionNextLevel(int32 Level) override;
+
+	virtual void ActivatePassiveAbility(UAbilitySystemComponent* SourceASC, UAbilitySystemComponent* TargetASC, FDamageModifier& DamageModifier, const FGameplayTag& TriggerTag) override;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UGameplayEffect> ManaSiphonEffect;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FScalableFloat ManaSiphonEffectiveValue;
 };
