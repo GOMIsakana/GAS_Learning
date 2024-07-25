@@ -83,11 +83,13 @@ public:
 
 	FGameplayTag Abilities_Fire_FireBolt;
 	FGameplayTag Abilities_Fire_FireBlast;
+	FGameplayTag Abilities_Fire_FireNado;
 	FGameplayTag Abilities_Lighting_Electrocute;
 	FGameplayTag Abilities_Arcane_ArcaneShards;
 
 	FGameplayTag Cooldown_Fire_FireBolt;
 	FGameplayTag Cooldown_Fire_FireBlast;
+	FGameplayTag Cooldown_Fire_FireNado;
 	FGameplayTag Cooldown_Lighting_Electrocute;
 	FGameplayTag Cooldown_Arcane_ArcaneShards;
 
