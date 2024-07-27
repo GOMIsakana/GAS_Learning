@@ -21,6 +21,8 @@ class GASAURAGAME_API UAuraFireNado : public UAuraDamageGameplayAbility
 public:
 	UFUNCTION(BlueprintCallable)
 	void SpawnTornado(FVector SpawnLocation);
+	virtual FString GetDescription(int32 Level) override;
+	virtual FString GetDescriptionNextLevel(int32 Level) override;
 
 	UPROPERTY(BlueprintAssignable)
 	FTornadoSpawnComponentSignature TornadoSpawnComponentDelegate;
@@ -34,6 +36,9 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Tornado")
 	float TornadoDuration = 5.f;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Tornado")
+	bool bOverrideTornadoDurationByLevel = true;
 
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Tornado")
 	float DealDamageFrequency = 0.5f;

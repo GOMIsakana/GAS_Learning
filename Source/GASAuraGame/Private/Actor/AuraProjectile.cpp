@@ -33,7 +33,10 @@ void AAuraProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Capsule->OnComponentBeginOverlap.AddDynamic(this, &AAuraProjectile::OnCapsuleBeginOverlap);
+	if (bBindCapsuleBeginOverlapDelegate)
+	{
+		Capsule->OnComponentBeginOverlap.AddDynamic(this, &AAuraProjectile::OnCapsuleBeginOverlap);
+	}
 
 	SetLifeSpan(LifeSpan);
 	SetReplicateMovement(true);

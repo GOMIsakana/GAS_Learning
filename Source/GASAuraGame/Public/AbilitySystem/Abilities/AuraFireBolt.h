@@ -14,14 +14,11 @@ class GASAURAGAME_API UAuraFireBolt : public UAuraProjectileSpell
 {
 	GENERATED_BODY()
 public:
-	UFUNCTION(BlueprintCallable)
-	void SpawnProjectileWithSpread(const FVector& TargetLocation, const FGameplayTag& SocketTag, bool bOverridePitch = false, float PitchOverride = 0.f, AActor* HomingTarget = nullptr);
+	virtual void SpawnProjectileWithSpread(const FVector& TargetLocation, const FGameplayTag& SocketTag, bool bOverridePitch = false, float PitchOverride = 0.f, AActor* HomingTarget = nullptr) override;
 	virtual FString GetDescription(int32 Level) override;
 	virtual FString GetDescriptionNextLevel(int32 Level) override;
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "FireBolt")
-	float ProjectileSpread = 90.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "FireBolt")
 	float HomingAccelerationMin = 1600.f;

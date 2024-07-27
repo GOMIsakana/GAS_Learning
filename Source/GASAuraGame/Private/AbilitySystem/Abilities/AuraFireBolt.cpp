@@ -25,7 +25,7 @@ void UAuraFireBolt::SpawnProjectileWithSpread(const FVector& TargetLocation, con
 
 	FRotator Rotation = (TargetLocation - SocketLocation).Rotation();
 	const FVector Forward = Rotation.Vector();
-	int32 EffectiveProjectileNum = FMath::Max(NumProjectile, int32(GetAbilityLevel() / 3));
+	int32 EffectiveProjectileNum = bOverrideNumProjectileByLevel ? FMath::Max(1, int32(GetAbilityLevel() / 3)) : NumProjectile;
 	TArray<FRotator> ProjectileSpawnRotations = UAuraAbilitySystemLibrary::EvenlySpacedRotator(Forward, FVector::UpVector, ProjectileSpread, EffectiveProjectileNum);
 	for (FRotator SpawnRots : ProjectileSpawnRotations)
 	{
@@ -67,8 +67,8 @@ void UAuraFireBolt::SpawnProjectileWithSpread(const FVector& TargetLocation, con
 		Projectile->ProjectileMovementComponent->HomingAccelerationMagnitude = FMath::RandRange(HomingAccelerationMin, HomingAccelerationMax);
 
 		Projectile->FinishSpawning(SpawnTransform);
-		OnProjectileSpawnFinishedSignature.Broadcast();
 	}
+	OnProjectileSpawnFinishedSignature.Broadcast();
 }
 
 FString UAuraFireBolt::GetDescription(int32 Level)
@@ -78,7 +78,7 @@ FString UAuraFireBolt::GetDescription(int32 Level)
 	float Damage = GetDamage(GameplayTags.Damage_Fire, Level);
 	float CooldownTime = GetCooldown(Level);
 	float ManaCost = GetSpellCost(UAuraAttributeSet::GetManaAttribute(), Level);
-	int32 EffectiveProjectileNum = FMath::Max(NumProjectile, int32(Level / 3));
+	int32 EffectiveProjectileNum = bOverrideNumProjectileByLevel ? FMath::Max(1, int32(GetAbilityLevel() / 3)) : NumProjectile;
 
 	return FString::Printf(TEXT("<Title>火焰箭</> <Level>Lv. %d</>\n \
 <SubTitle>弓箭手, 放箭 !!!</>\n \
@@ -101,7 +101,7 @@ FString UAuraFireBolt::GetDescriptionNextLevel(int32 Level)
 	float Damage = GetDamage(GameplayTags.Damage_Fire, Level);
 	float CooldownTime = GetCooldown(Level);
 	float ManaCost = GetSpellCost(UAuraAttributeSet::GetManaAttribute(), Level);
-	int32 EffectiveProjectileNum = FMath::Max(NumProjectile, int32(Level / 3));
+	int32 EffectiveProjectileNum = bOverrideNumProjectileByLevel ? FMath::Max(1, int32(GetAbilityLevel() / 3)) : NumProjectile;
 
 	return FString::Printf(TEXT("<Title>升级预览</> <Level>Lv. %d</>\n \
 <SubTitle>弓箭手, 放箭 !!!</>\n \
