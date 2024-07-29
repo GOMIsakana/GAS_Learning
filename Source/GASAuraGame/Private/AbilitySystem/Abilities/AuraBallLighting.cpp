@@ -89,22 +89,13 @@ void UAuraBallLighting::SpawnProjectileWithSpread(const FVector& TargetLocation,
 		LightingBall->MaxConnectingDistance = MaxConnectingDistance;
 		LightingBall->TargetSearchingDistance = TargetSearchingDistance;
 
-		FGameplayCueParameters CueParams;
-		CueParams.AbilityLevel = MaxTargetAmount;	// 能力等级用来储存闪电链的数量
-		CueParams.RawMagnitude = TargetSearchingDistance;	// 初始幅度为寻找目标的范围
-		CueParams.NormalizedMagnitude = MaxConnectingDistance;	// 统一化幅度为断开连接的范围
-		CueParams.TargetAttachComponent = LightingBall->GetRootComponent();	// 方便将特效附加到球上, 附加到GC本身会出bug
-		CueParams.SourceObject = GetAvatarActorFromActorInfo();	// SourceObject作为主人, 防止连接到主人
-		LightingBall->LightingChainsCueParameters = CueParams;
-		LightingBall->LightingChainsGameplayCueTag = FAuraGameplayTags::Get().GameplayCue_BallLighting;
-
+		LightingBall->SetOwner(GetAvatarActorFromActorInfo());
 
 		SetupDamageEffectParamsForProjectile(LightingBall);
 
 		LightingBall->FinishSpawning(SpawnTransform);
 
 		LightingBall->SetLifeSpan(LightingBallLifeSpan);
-		LightingBall->StartGameplayCue();
 
 	}
 	OnProjectileSpawnFinishedSignature.Broadcast();

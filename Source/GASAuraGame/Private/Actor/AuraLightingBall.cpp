@@ -8,60 +8,50 @@
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "GameplayCueFunctionLibrary.h"
+#include "Interaction/CombatInterface.h"
 
 AAuraLightingBall::AAuraLightingBall() : Super()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 }
 
 void AAuraLightingBall::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	UpdateLightingChainsEndLocation();
 }
 
 void AAuraLightingBall::RefreshTargetArray()
 {
-	// 保证Cue的逻辑和这里一样, 即可实现相同的功能
-
-	// 清除不符合条件的老目标
-	for (int32 i = 0; i < LightingChainTargets.Num(); i++)
-	{
-		AActor* Target = LightingChainTargets[i];
-		if (Target && IsValid(Target))
-		{
-			float ToTargetDistance = (GetActorLocation() - Target->GetActorLocation()).Length();
-			if (ToTargetDistance > MaxConnectingDistance)
-			{
-				LightingChainTargets[i] = nullptr;
-			}
-		}
-	}
-
 	// 获取新目标
-	UAuraAbilitySystemLibrary::GetLifePlayerWithinRadius(this, Targets, ActorsToIgnore, TargetSearchingDistance, GetActorLocation());
+	UAuraAbilitySystemLibrary::GetLifePlayerWithinRadius(GetOwner(), Targets, ActorsToIgnore, TargetSearchingDistance, GetActorLocation());
 	for (AActor* Target : Targets)
 	{
-		int32 FirstEmptySystemSlot = -1;
+		UNiagaraComponent* FirstEmptySystemSlot = nullptr;
 		bool bTargetInMap = false;
 
-		for (int32 i = 0; i < LightingChainTargets.Num(); i++)
+		// 目标实现了战斗接口而且没似才会算到目标里面
+		if (Target->Implements<UCombatInterface>() && !ICombatInterface::Execute_IsDead(Target))
 		{
-			AActor* ChainTarget = LightingChainTargets[i];
-			if (FirstEmptySystemSlot == -1 && (!IsValid(ChainTarget) || ChainTarget == nullptr))
+			for (TTuple<UNiagaraComponent*, AActor*>& Pair : LightingChains)
 			{
-				FirstEmptySystemSlot = i;
+				if (FirstEmptySystemSlot == nullptr && (!IsValid(Pair.Value) || Pair.Value == nullptr))
+				{
+					FirstEmptySystemSlot = Pair.Key;
+				}
+				if (Pair.Value == Target)
+				{
+					bTargetInMap = true;
+					break;
+				}
 			}
-			if (ChainTarget == Target)
-			{
-				bTargetInMap = true;
-				break;
-			}
-		}
 
-		// 如果目标先前不在锁定的目标Map中, 而且目标Map中还有空位, 则将当前目标放到第一个找到的空位里
-		if (FirstEmptySystemSlot != -1 && !bTargetInMap)
-		{
-			LightingChainTargets[FirstEmptySystemSlot] = Target;
+			// 如果目标先前不在锁定的目标Map中, 而且目标Map中还有空位, 则将当前目标放到第一个找到的空位里
+			if (FirstEmptySystemSlot != nullptr && !bTargetInMap)
+			{
+				LightingChains[FirstEmptySystemSlot] = Target;
+			}
 		}
 	}
 }
@@ -70,46 +60,39 @@ void AAuraLightingBall::DealDamage()
 {
 	// 查询附近是否有敌人, 如果有不重复的敌人, 则将其添加到列表中
 	RefreshTargetArray();
-	for (AActor* ChainTarget : LightingChainTargets)
+	for (TTuple<UNiagaraComponent*, AActor*>& Pair : LightingChains)
 	{
-		if (IsValid(ChainTarget) && DamageEffectParams.SourceASC)
+		if (IsValid(Pair.Value) && DamageEffectParams.SourceASC)
 		{
-			DamageEffectParams.TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(ChainTarget);
+			DamageEffectParams.TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Pair.Value);
 			UAuraAbilitySystemLibrary::ApplyDamageEffect(DamageEffectParams);
 		}
 		else
 		{
-			ChainTarget = nullptr;
+			Pair.Value = nullptr;
 		}
 	}
 }
 
 void AAuraLightingBall::SetDealingDamage(bool bShouldDealDamage)
 {
-	if (bShouldDealDamage && !DealDamageTimer.IsValid())
+	if (GetOwner() && GetOwner()->GetWorld())
 	{
-		GetWorldTimerManager().SetTimer(
-			DealDamageTimer,
-			this,
-			&AAuraLightingBall::DealDamage,
-			DealDamageFrequency,
-			true
-		);
+		if (bShouldDealDamage && !DealDamageTimer.IsValid())
+		{
+			GetOwner()->GetWorld()->GetTimerManager().SetTimer(
+				DealDamageTimer,
+				this,
+				&AAuraLightingBall::DealDamage,
+				DealDamageFrequency,
+				true
+			);
+		}
+		else
+		{
+			GetOwner()->GetWorld()->GetTimerManager().ClearTimer(DealDamageTimer);
+		}
 	}
-	else
-	{
-		GetWorldTimerManager().ClearTimer(DealDamageTimer);
-	}
-}
-
-void AAuraLightingBall::StartGameplayCue()
-{
-	UGameplayCueFunctionLibrary::AddGameplayCueOnActor(GetOwner(), LightingChainsGameplayCueTag, LightingChainsCueParameters);
-}
-
-void AAuraLightingBall::EndGameplayCue()
-{
-	UGameplayCueFunctionLibrary::RemoveGameplayCueOnActor(GetOwner(), LightingChainsGameplayCueTag, LightingChainsCueParameters);
 }
 
 void AAuraLightingBall::BeginPlay()
@@ -118,7 +101,7 @@ void AAuraLightingBall::BeginPlay()
 
 	ActorsToIgnore.Add(GetOwner());
 	SetDealingDamage(true);
-	InitializeLightingChainTargets();
+	InitializeLightingChains();
 }
 
 void AAuraLightingBall::Destroyed()
@@ -128,18 +111,61 @@ void AAuraLightingBall::Destroyed()
 
 void AAuraLightingBall::LifeSpanExpired()
 {
-	EndGameplayCue();
 	OnHit();
 
 	Super::LifeSpanExpired();
 }
 
-void AAuraLightingBall::InitializeLightingChainTargets()
+void AAuraLightingBall::InitializeLightingChains()
 {
-	LightingChainTargets.Empty(MaxTargetAmount);
-	for (int32 i = 0; i < MaxTargetAmount; i++)
+	if (LightingChainSystem)
 	{
-		LightingChainTargets.Add(nullptr);
+		for (int32 i = 0; i < MaxTargetAmount; i++)
+		{
+			UNiagaraComponent* Chain = UNiagaraFunctionLibrary::SpawnSystemAttached(LightingChainSystem, GetRootComponent(), FName(), FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTargetIncludingScale, true);
+			LightingChains.Add(Chain, nullptr);
+		}
+	}
+}
+
+void AAuraLightingBall::UpdateLightingChainsEndLocation()
+{
+	// 清除不符合条件的老目标
+	for (TTuple<UNiagaraComponent*, AActor*>& Pair : LightingChains)
+	{
+		if (Pair.Value && IsValid(Pair.Value))
+		{
+			if (!Pair.Value->Implements<UCombatInterface>() || ICombatInterface::Execute_IsDead(Pair.Value))
+			{
+				Pair.Value = nullptr;
+				continue;
+			}
+			float ToTargetDistance = (GetActorLocation() - Pair.Value->GetActorLocation()).Length();
+			if (ToTargetDistance > MaxConnectingDistance)
+			{
+				Pair.Value = nullptr;
+			}
+		}
+		else
+		{
+			Pair.Value = nullptr;
+		}
+	}
+	for (TTuple<UNiagaraComponent*, AActor*>& Pair : LightingChains)
+	{
+		// 清除目标的逻辑在刷新目标处
+		
+		// 有目标就连到目标身上
+		if (Pair.Value != nullptr && IsValid(Pair.Value))
+		{
+			Pair.Key->SetNiagaraVariableVec3(FString("Beam End"), Pair.Value->GetActorLocation());
+		}
+		// 没目标就随便跳
+		else
+		{
+			FVector RandomLocation = GetActorLocation() + UKismetMathLibrary::RandomUnitVector() * TargetSearchingDistance;
+			Pair.Key->SetNiagaraVariableVec3(FString("Beam End"), RandomLocation);
+		}
 	}
 }
 

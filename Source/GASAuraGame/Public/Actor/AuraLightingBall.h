@@ -46,12 +46,6 @@ public:
 
 	UFUNCTION()
 	void SetDealingDamage(bool bShouldDealDamage);
-
-	UFUNCTION()
-	void StartGameplayCue();
-	UFUNCTION()
-	void EndGameplayCue();
-
 	UPROPERTY()
 	FGameplayTag LightingChainsGameplayCueTag;
 
@@ -63,7 +57,8 @@ protected:
 	virtual void Destroyed() override;
 	virtual void LifeSpanExpired() override;
 
-	void InitializeLightingChainTargets();
+	void InitializeLightingChains();
+	void UpdateLightingChainsEndLocation();
 
 	UPROPERTY(BlueprintReadWrite)
 	TArray<AActor*> Targets;
@@ -71,7 +66,7 @@ protected:
 	TArray<AActor*> ActorsToIgnore;
 
 	UPROPERTY(BlueprintReadWrite)
-	TArray<AActor*> LightingChainTargets;
+	TMap<UNiagaraComponent*, AActor*> LightingChains;
 
 private:
 	FTimerHandle DealDamageTimer;
