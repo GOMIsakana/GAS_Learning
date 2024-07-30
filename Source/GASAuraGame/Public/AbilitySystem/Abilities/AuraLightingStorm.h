@@ -15,6 +15,8 @@ class GASAURAGAME_API UAuraLightingStorm : public UAuraDamageGameplayAbility
 	GENERATED_BODY()
 	
 public:
+	virtual FString GetDescription(int32 Level) override;
+	virtual FString GetDescriptionNextLevel(int32 Level) override;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Lighting Storm")
 	float AdditionalRadiusPerLevel = 50.f;

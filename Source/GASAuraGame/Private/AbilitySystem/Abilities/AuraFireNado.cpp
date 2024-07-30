@@ -49,7 +49,7 @@ FString UAuraFireNado::GetDescription(int32 Level)
 	float AdditionalMagicalDebuffDamage = GetAdditionalAttributeValueByName(FName("FireNado.DebuffDamage"), Level);
 	return FString::Printf(TEXT("<Title>火龙卷</> <Level>Lv. %d</>\n\
 		<SubTitle>将一切烧毁在火龙卷之中吧</>\n\
-		<Default>在选取的位置处生成 %d 个持续 %.1f 秒的火龙卷, 火龙卷会自己寻找并接近距离自己最近的敌人作为目标。</>\n\
+		<Default>在选取的位置处生成 %d 个持续 %.1f 秒的火龙卷, 火龙卷会自己寻找并接近距离自己最近的敌人。</>\n\
 		<Default>火龙卷每 %.2f 秒对附近的敌人造成</> <Damage>%.1f + %.1f%%法术伤害</> <Default>点伤害, </>\
 <Default>命中时有 %.2f%% 概率使目标</><FireDamage>燃烧</><Default> %.2f 秒, 每 %.2f 秒造成</> <Damage>%.1f%%法术伤害</> <Default>点</><FireDamage>火属性伤害</>\n\
 <SubTitle>火龙卷造成的范围伤害从中心点的 %.0f 范围处开始衰减, 在 %.0f 范围处降至最低伤害</>\n\n\
@@ -78,7 +78,7 @@ FString UAuraFireNado::GetDescriptionNextLevel(int32 Level)
 	float AdditionalMagicalDebuffDamage = GetAdditionalAttributeValueByName(FName("FireNado.DebuffDamage"), Level);
 	return FString::Printf(TEXT("<Title>升级预览</> <Level>Lv. %d</>\n\
 		<SubTitle>将一切烧毁在火龙卷之中吧</>\n\
-		<Default>在选取的位置处生成 %d 个持续 %.1f 秒的火龙卷, 火龙卷会自己寻找并接近距离自己最近的敌人作为目标。</>\n\
+		<Default>在选取的位置处生成 %d 个持续 %.1f 秒的火龙卷, 火龙卷会自己寻找并接近距离自己最近的敌人。</>\n\
 		<Default>火龙卷每 %.2f 秒对附近的敌人造成</> <Damage>%.1f + %.1f%%法术伤害</> <Default>点伤害, </>\
 <Default>命中时有 %.2f%% 概率使目标</><FireDamage>燃烧</><Default> %.2f 秒, 每 %.2f 秒造成</> <Damage>%.1f%%法术伤害</> <Default>点</><FireDamage>火属性伤害</>\n\
 <SubTitle>火龙卷造成的范围伤害从中心点的 %.0f 范围处开始衰减, 在 %.0f 范围处降至最低伤害</>\n\n\

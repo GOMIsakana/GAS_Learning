@@ -101,6 +101,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|GameplayEffects")
 	static FVector GetDamageOriginLocation(const FGameplayEffectContextHandle& EffectContextHandle);
 
+	UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|GameplayEffects")
+	static bool IsActivateHitReact(const FGameplayEffectContextHandle& EffectContextHandle);
+
 	/*
 	* 伤害参数的快速SET
 	*/
@@ -146,6 +149,9 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|GameplayEffects")
 	static void SetDamageOriginLocation(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, const FVector& InDamageOriginLocation);
+
+	UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|GameplayEffects")
+	static void SetActivateHitReact(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, bool bInActivateHitReact);
 
 	/*
 	* 游戏机制相关

@@ -79,6 +79,9 @@ struct FDamageEffectParams
 
 	UPROPERTY(BlueprintReadWrite)
 	bool bKnockbackFromOriginLocation = false;
+
+	UPROPERTY(BlueprintReadWrite)
+	bool bActivateHitReact = true;
 };
 
 USTRUCT(BlueprintType)
@@ -101,6 +104,7 @@ public:
 	float GetRadialDamageOuterRadius() const { return RadialDamageOuterRadius; }
 	float GetMinRadialDamage() const { return MinRadialDamage; }
 	FVector GetDamageOriginLocation() const { return DamageOriginLocation; }
+	bool IsActivateHitReact() const { return bActivateHitReact; }
 
 	void SetIsCriticalHit(bool bInIsCriticalHit) { bIsCriticalHit = bInIsCriticalHit; }
 	void SetIsDamageValid(bool bInIsDamageValid) { bIsDamageValid = bInIsDamageValid; }
@@ -116,6 +120,7 @@ public:
 	void SetRadialDamageOuterRadius(float InRadialDamageOuterRadius) { RadialDamageOuterRadius = InRadialDamageOuterRadius; }
 	void SetMinRadialDamage(float InMinRadialDamage) { MinRadialDamage = InMinRadialDamage; }
 	void SetDamageOriginLocation(const FVector& InDamageOriginLocation) { DamageOriginLocation = InDamageOriginLocation; }
+	void SetActivateHitReact(bool bInActivateHitReact) { bActivateHitReact = bInActivateHitReact; }
 
 	virtual UScriptStruct* GetScriptStruct() const
 	{
@@ -164,6 +169,9 @@ protected:
 
 	UPROPERTY()
 	FVector DamageOriginLocation = FVector::ZeroVector;
+
+	UPROPERTY()
+	bool bActivateHitReact = true;
 };
 
 

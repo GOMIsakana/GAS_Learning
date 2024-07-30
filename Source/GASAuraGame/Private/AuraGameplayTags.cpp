@@ -61,6 +61,8 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Abilities_Lighting_BallLighting = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Lighting.BallLighting"), TEXT("球状闪电技能"));
 	GameplayTags.Abilities_Lighting_LightingStorm = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Lighting.LightingStorm"), TEXT("雷电风暴技能"));
 	GameplayTags.Abilities_Arcane_ArcaneShards = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Arcane.ArcaneShards"), TEXT("符文碎片技能"));
+	GameplayTags.Abilities_Arcane_ArcaneBlast = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Arcane.ArcaneBlast"), TEXT("符文弹球技能"));
+	GameplayTags.Abilities_Arcane_ArcaneStorm = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Arcane.ArcaneStorm"), TEXT("符文风暴技能"));
 
 	GameplayTags.Cooldown_Fire_FireBolt = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Fire.FireBolt"), TEXT("火焰箭技能冷却"));
 	GameplayTags.Cooldown_Fire_FireBlast = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Fire.FireBlast"), TEXT("碎裂火焰技能冷却"));
@@ -69,6 +71,8 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Cooldown_Lighting_BallLighting = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Lighting.BallLighting"), TEXT("球状闪电技能冷却"));
 	GameplayTags.Cooldown_Lighting_LightingStorm = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Lighting.LightingStorm"), TEXT("雷电风暴技能冷却"));
 	GameplayTags.Cooldown_Arcane_ArcaneShards = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Arcane.ArcaneShards"), TEXT("符文碎片技能冷却"));
+	GameplayTags.Cooldown_Arcane_ArcaneBlast = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Arcane.ArcaneBlast"), TEXT("符文弹球技能冷却"));
+	GameplayTags.Cooldown_Arcane_ArcaneStorm = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Arcane.ArcaneStorm"), TEXT("符文风暴技能冷却"));
 
 	GameplayTags.Abilities_Passive_HaloOfProtection = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.HaloOfProtection"), TEXT("守护光环被动技能"));
 	GameplayTags.Abilities_Passive_LifeSiphon = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.LifeSiphon"), TEXT("生命虹吸被动技能"));
@@ -123,4 +127,6 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.GameplayCue_FireBlast = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.FireBlast"), TEXT("碎裂火焰的GC的Tag"));
 	GameplayTags.GameplayCue_BallLighting = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.BallLigthing"), TEXT("球状闪电的GC的Tag"));
 	GameplayTags.GameplayCue_LightingStorm = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.LightingStorm"), TEXT("雷电风暴的GC的Tag"));
+	GameplayTags.GameplayCue_ArcaneBlast = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.ArcaneBlast"), TEXT("符文弹球的GC的Tag"));
+	GameplayTags.GameplayCue_ArcaneStorm = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.ArcaneStorm"), TEXT("符文风暴的GC的Tag"));
 }

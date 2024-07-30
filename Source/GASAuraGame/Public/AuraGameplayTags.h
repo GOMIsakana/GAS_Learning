@@ -88,6 +88,8 @@ public:
 	FGameplayTag Abilities_Lighting_BallLighting;
 	FGameplayTag Abilities_Lighting_LightingStorm;
 	FGameplayTag Abilities_Arcane_ArcaneShards;
+	FGameplayTag Abilities_Arcane_ArcaneBlast;
+	FGameplayTag Abilities_Arcane_ArcaneStorm;
 
 	FGameplayTag Cooldown_Fire_FireBolt;
 	FGameplayTag Cooldown_Fire_FireBlast;
@@ -96,6 +98,8 @@ public:
 	FGameplayTag Cooldown_Lighting_BallLighting;
 	FGameplayTag Cooldown_Lighting_LightingStorm;
 	FGameplayTag Cooldown_Arcane_ArcaneShards;
+	FGameplayTag Cooldown_Arcane_ArcaneBlast;
+	FGameplayTag Cooldown_Arcane_ArcaneStorm;
 
 	FGameplayTag Abilities_Passive_HaloOfProtection;
 	FGameplayTag Abilities_Passive_LifeSiphon;
@@ -126,6 +130,8 @@ public:
 	FGameplayTag GameplayCue_FireBlast;
 	FGameplayTag GameplayCue_BallLighting;
 	FGameplayTag GameplayCue_LightingStorm;
+	FGameplayTag GameplayCue_ArcaneBlast;
+	FGameplayTag GameplayCue_ArcaneStorm;
 
 	TMap<FGameplayTag, FGameplayTag> DamageTypeToResist;
 	TMap<FGameplayTag, FGameplayTag> DamageTypeToDebuff;

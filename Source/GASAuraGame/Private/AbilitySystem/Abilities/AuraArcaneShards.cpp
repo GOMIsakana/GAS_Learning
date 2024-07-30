@@ -16,7 +16,7 @@ FString UAuraArcaneShards::GetDescription(int32 Level)
 <SubTitle>伤害从中心点的 %.0f 范围处开始衰减, 在 %.0f 范围处降至最低伤害</>\n\n\
 <Default>冷却时间:</> <Cooldown>%.2f</> <Default>秒</>\n\
 <Default>法力消耗:</> <ManaCost>%.2f</>\n\
-<Default>最低伤害:</> <Damage>%.1f%%最大伤害</>\n\
+<Default>最低伤害:</> <Damage>%.1f%% 最大伤害</>\n\
 		"), 
 		Level,
 
@@ -34,7 +34,7 @@ FString UAuraArcaneShards::GetDescription(int32 Level)
 <SubTitle>伤害从中心点的 %.0f 范围处开始衰减, 在 %.0f 范围处降至最低伤害</>\n\n\
 <Default>冷却时间:</> <Cooldown>%.2f</> <Default>秒</>\n\
 <Default>法力消耗:</> <ManaCost>%.2f</>\n\
-<Default>最低伤害:</> <Damage>%.1f%%最大伤害</>\n\
+<Default>最低伤害:</> <Damage>%.1f%% 最大伤害</>\n\
 		"),
 			Level,
 
@@ -61,7 +61,7 @@ FString UAuraArcaneShards::GetDescriptionNextLevel(int32 Level)
 <SubTitle>伤害从中心点的 %.0f 范围处开始衰减, 在 %.0f 范围处降至最低伤害</>\n\n\
 <Default>冷却时间:</> <Cooldown>%.2f</> <Default>秒</>\n\
 <Default>法力消耗:</> <ManaCost>%.2f</>\n\
-<Default>最低伤害:</> <Damage>%.1f%%最大伤害</>\n\
+<Default>最低伤害:</> <Damage>%.1f%% 最大伤害</>\n\
 		"),
 		Level,
 
@@ -79,7 +79,7 @@ FString UAuraArcaneShards::GetDescriptionNextLevel(int32 Level)
 <SubTitle>伤害从中心点的 %.0f 范围处开始衰减, 在 %.0f 范围处降至最低伤害</>\n\n\
 <Default>冷却时间:</> <Cooldown>%.2f</> <Default>秒</>\n\
 <Default>法力消耗:</> <ManaCost>%.2f</>\n\
-<Default>最低伤害:</> <Damage>%.1f%%最大伤害</>\n\
+<Default>最低伤害:</> <Damage>%.1f%% 最大伤害</>\n\
 		"),
 			Level,
 

@@ -205,9 +205,11 @@ void UAuraAttributeSet::HandleDamage(FEffectProperties Props)
 		}
 		else
 		{
+			// 受击硬直
 			FGameplayTagContainer Tags;
 			Tags.AddTag(FAuraGameplayTags::Get().Abilities_HitReact);
-			if (Props.TargetCharacter->Implements<UCombatInterface>() && !ICombatInterface::Execute_IsBeingShock(Props.TargetCharacter))
+			bool bActivateHitReact = UAuraAbilitySystemLibrary::IsActivateHitReact(Props.EffectContextHandle);
+			if (bActivateHitReact && Props.TargetCharacter->Implements<UCombatInterface>() && !ICombatInterface::Execute_IsBeingShock(Props.TargetCharacter))
 			{
 				Props.TargetASC->TryActivateAbilitiesByTag(Tags);
 			}
@@ -292,11 +294,6 @@ void UAuraAttributeSet::HandleDebuff(FEffectProperties Props)
 
 	if (DebuffTag.MatchesTagExact(GameplayTags.Debuff_Type_Stun))
 	{
-		/* FGameplayTagContainer BlockTags;
-		BlockTags.AddTag(GameplayTags.Player_Block_InputHeld);
-		BlockTags.AddTag(GameplayTags.Player_Block_InputPressed);
-		BlockTags.AddTag(GameplayTags.Player_Block_InputReleased);
-		Props.TargetASC->AddLooseGameplayTags(BlockTags);*/
 		DebuffEffect->InheritableOwnedTagsContainer.AddTag(GameplayTags.Player_Block_InputHeld);
 		DebuffEffect->InheritableOwnedTagsContainer.AddTag(GameplayTags.Player_Block_InputPressed);
 		DebuffEffect->InheritableOwnedTagsContainer.AddTag(GameplayTags.Player_Block_InputReleased);
@@ -319,6 +316,7 @@ void UAuraAttributeSet::HandleDebuff(FEffectProperties Props)
 		TSharedPtr<FGameplayTag> DebuffDamageType = MakeShareable<FGameplayTag>(new FGameplayTag(DamageType));
 		AuraContext->SetDamageType(DebuffDamageType);
 		AuraContext->SetDebuffDamage(DebuffDamage);
+		AuraContext->SetActivateHitReact(false);
 		Props.SourceASC->ApplyGameplayEffectSpecToTarget(*MutableSpec, Props.TargetASC);
 	}
 }

@@ -58,18 +58,21 @@ void AAuraLightingBall::RefreshTargetArray()
 
 void AAuraLightingBall::DealDamage()
 {
-	// 查询附近是否有敌人, 如果有不重复的敌人, 则将其添加到列表中
-	RefreshTargetArray();
-	for (TTuple<UNiagaraComponent*, AActor*>& Pair : LightingChains)
+	if (HasAuthority())
 	{
-		if (IsValid(Pair.Value) && DamageEffectParams.SourceASC)
+		// 查询附近是否有敌人, 如果有不重复的敌人, 则将其添加到列表中
+		RefreshTargetArray();
+		for (TTuple<UNiagaraComponent*, AActor*>& Pair : LightingChains)
 		{
-			DamageEffectParams.TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Pair.Value);
-			UAuraAbilitySystemLibrary::ApplyDamageEffect(DamageEffectParams);
-		}
-		else
-		{
-			Pair.Value = nullptr;
+			if (IsValid(Pair.Value) && DamageEffectParams.SourceASC)
+			{
+				DamageEffectParams.TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Pair.Value);
+				UAuraAbilitySystemLibrary::ApplyDamageEffect(DamageEffectParams);
+			}
+			else
+			{
+				Pair.Value = nullptr;
+			}
 		}
 	}
 }

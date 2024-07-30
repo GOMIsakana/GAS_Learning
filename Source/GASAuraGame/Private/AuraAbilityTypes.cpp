@@ -91,9 +91,13 @@ bool FAuraGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 		{
 			RepBits |= 1 << 20;
 		}
+		if (bActivateHitReact)
+		{
+			RepBits |= 1 << 21;
+		}
 	}
 
-	Ar.Serialize(&RepBits, 21);
+	Ar.Serialize(&RepBits, 22);
 
 	if (RepBits & (1 << 0))
 	{
@@ -197,6 +201,10 @@ bool FAuraGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 	if (RepBits & (1 << 20))
 	{
 		DamageOriginLocation.NetSerialize(Ar, Map, bOutSuccess);
+	}
+	if (RepBits & (1 << 21))
+	{
+		Ar << bActivateHitReact;
 	}
 
 	if (Ar.IsLoading())

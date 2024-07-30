@@ -67,7 +67,7 @@ public:
 	UPROPERTY(ReplicatedUsing = OnRep_IsStunned, BlueprintReadOnly, Category = "Combat")
 	bool bIsStunned = false;
 
-	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Combat")
+	UPROPERTY(Replicated, BlueprintReadWrite, Category = "Combat")
 	bool bIsBeingShock = false;
 
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;

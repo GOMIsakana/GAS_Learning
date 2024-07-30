@@ -91,7 +91,7 @@ ECharacterClass AAuraEnemy::GetCharacterClass_Implementation()
 void AAuraEnemy::SetIsBeingShock_Implementation(bool bInIsBeingShock)
 {
 	bIsBeingShock = bInIsBeingShock;
-	if (bIsBeingShock && AuraAIController && AuraAIController->GetBlackboardComponent())
+	if (AuraAIController && AuraAIController->GetBlackboardComponent())
 	{
 		AuraAIController->GetBlackboardComponent()->SetValueAsBool(FName("IsBeingShock"), bIsBeingShock);
 	}

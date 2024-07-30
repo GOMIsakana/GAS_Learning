@@ -67,7 +67,10 @@ void AAuraTornado::DealDamageAtSelfLocation()
 {
 	// 每次造成伤害前更新自己的伤害参数
 	DamageEffectParams.DamageOriginLocation = GetActorLocation();
-	UAuraAbilitySystemLibrary::ApplyDamageEffect(DamageEffectParams);
+	if (HasAuthority())
+	{
+		UAuraAbilitySystemLibrary::ApplyDamageEffect(DamageEffectParams);
+	}
 	// 扫描周围敌人的间隔和造成伤害的间隔一致
 	if (bFollowNearestEnemy)
 	{

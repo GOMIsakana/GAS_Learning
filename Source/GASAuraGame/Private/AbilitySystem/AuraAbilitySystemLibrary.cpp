@@ -309,6 +309,15 @@ FVector UAuraAbilitySystemLibrary::GetDamageOriginLocation(const FGameplayEffect
 	return FVector();
 }
 
+bool UAuraAbilitySystemLibrary::IsActivateHitReact(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FAuraGameplayEffectContext* AuraEffectContext = static_cast<const FAuraGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return AuraEffectContext->IsActivateHitReact();
+	}
+	return true;
+}
+
 void UAuraAbilitySystemLibrary::SetIsCriticalHit(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, bool bInIsCriticalHit)
 {
 	if (FAuraGameplayEffectContext* AuraEffectContext = static_cast<FAuraGameplayEffectContext*>(EffectContextHandle.Get()))
@@ -419,6 +428,14 @@ void UAuraAbilitySystemLibrary::SetDamageOriginLocation(UPARAM(ref) FGameplayEff
 	if (FAuraGameplayEffectContext* AuraEffectContext = static_cast<FAuraGameplayEffectContext*>(EffectContextHandle.Get()))
 	{
 		AuraEffectContext->SetDamageOriginLocation(InDamageOriginLocation);
+	}
+}
+
+void UAuraAbilitySystemLibrary::SetActivateHitReact(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, bool bInActivateHitReact)
+{
+	if (FAuraGameplayEffectContext* AuraEffectContext = static_cast<FAuraGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		AuraEffectContext->SetActivateHitReact(bInActivateHitReact);
 	}
 }
 
