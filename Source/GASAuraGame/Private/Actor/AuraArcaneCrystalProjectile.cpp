@@ -7,12 +7,31 @@
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "AuraGameplayTags.h"
 
+void AAuraArcaneCrystalProjectile::StartOverlapCooldown()
+{
+	bCanCauseOverlapDamage = false;
+	GetWorldTimerManager().SetTimer(
+		OverlapCooldownTimer,
+		this,
+		&AAuraArcaneCrystalProjectile::OverlapCooldownTimerFinish,
+		OverlapCooldown,
+		false
+	);
+}
+
 void AAuraArcaneCrystalProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
 	ProjectileMovementComponent->bShouldBounce = true;
 	ProjectileMovementComponent->OnProjectileBounce.AddDynamic(this, &AAuraArcaneCrystalProjectile::OnProjectileBounce);
+}
+
+void AAuraArcaneCrystalProjectile::Destroyed()
+{
+	OnHit();
+
+	Super::Destroyed();
 }
 
 void AAuraArcaneCrystalProjectile::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -22,13 +41,15 @@ void AAuraArcaneCrystalProjectile::OnCapsuleBeginOverlap(UPrimitiveComponent* Ov
 		OnHit();
 		Destroy();
 	}
+
 	AActor* SourceActor = DamageEffectParams.SourceASC->GetAvatarActor();
 	if (SourceActor == nullptr) return;
 	if (SourceActor == OtherActor || UAuraAbilitySystemLibrary::ActorIsFriend(SourceActor, OtherActor)) return;
-	if (!bHit) OnHit();
+	// if (!bHit) OnHit();
 
-	if (HasAuthority())
+	if (HasAuthority() && bCanCauseOverlapDamage)
 	{
+		StartOverlapCooldown();
 		if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
 		{
 			const FVector DeathImpulse = GetActorForwardVector() * DamageEffectParams.DeathImpulseMagnitude;
@@ -62,4 +83,9 @@ void AAuraArcaneCrystalProjectile::OnProjectileBounce(const FHitResult& ImpactRe
 		DamageEffectParams.SourceASC->ExecuteGameplayCue(FAuraGameplayTags::Get().GameplayCue_ArcaneStorm, Params);
 	}
 	DamageEffectParams.BaseDamage *= (1 + OverlapIncreaseDamageMagnitude);
+}
+
+void AAuraArcaneCrystalProjectile::OverlapCooldownTimerFinish()
+{
+	bCanCauseOverlapDamage = true;
 }

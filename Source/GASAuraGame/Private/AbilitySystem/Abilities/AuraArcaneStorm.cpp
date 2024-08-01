@@ -62,10 +62,6 @@ void UAuraArcaneStorm::SpawnProjectileWithSpread(const FVector& TargetLocation, 
 
 	FVector SocketLocation = GetAvatarActorFromActorInfo()->GetActorLocation();
 	SocketLocation.Z += 10.f;
-	if (GetAvatarActorFromActorInfo()->Implements<UCombatInterface>())
-	{
-		SocketLocation = ICombatInterface::Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo(), SocketTag);
-	}
 
 	FRotator Rotation = (TargetLocation - SocketLocation).Rotation();
 	const FVector Forward = Rotation.Vector();
