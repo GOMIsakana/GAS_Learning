@@ -113,7 +113,7 @@ public:
 	/* 玩家数据(来自PlayerState) */
 
 	UPROPERTY()
-	int32 CombatLevel = 0;
+	int32 CombatLevel = 1;
 
 	UPROPERTY()
 	float CombatXP = 0.f;

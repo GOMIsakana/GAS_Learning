@@ -8,6 +8,7 @@
 #include "Interaction/SaveInterface.h"
 #include "Interaction/HighlightInterface.h"
 #include "GASAuraGame/GASAuraGame.h"
+#include "GameplayEffect.h"
 #include "CheckPoint.generated.h"
 
 /**
@@ -41,11 +42,20 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void HandleCheckPointGlowEffect();
 
+	UFUNCTION(BlueprintCallable)
+	void HandleReachedGameplayEffect(AActor* TargetActor);
+
 	UPROPERTY(BlueprintReadWrite, SaveGame)
 	bool bReached = false;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	bool bBindOverlapCallback = true;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	TSubclassOf<UGameplayEffect> ReachedGameplayEffect;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int32 Level = 1;
 
 protected:
 	virtual void BeginPlay() override;

@@ -5,6 +5,8 @@
 #include "Interaction/PlayerInterface.h"
 #include "Game/AuraGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
+#include "AbilitySystem/AuraAbilitySystemComponentBase.h"
+#include "AbilitySystemBlueprintLibrary.h"
 
 ACheckPoint::ACheckPoint(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -64,6 +66,20 @@ void ACheckPoint::HandleCheckPointGlowEffect()
 	CheckPointReached(MaterialInst);
 }
 
+void ACheckPoint::HandleReachedGameplayEffect(AActor* TargetActor)
+{
+	if (ReachedGameplayEffect)
+	{
+		if (UAuraAbilitySystemComponentBase* AuraASC = Cast<UAuraAbilitySystemComponentBase>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor)))
+		{
+			FGameplayEffectContextHandle EffectContextHandle = AuraASC->MakeEffectContext();
+			EffectContextHandle.AddSourceObject(TargetActor);
+			FGameplayEffectSpecHandle EffectSpecHandle = AuraASC->MakeOutgoingSpec(ReachedGameplayEffect, Level, EffectContextHandle);
+			AuraASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data);
+		}
+	}
+}
+
 void ACheckPoint::BeginPlay()
 {
 	Super::BeginPlay();
@@ -88,6 +104,7 @@ void ACheckPoint::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 				WorldAssetName.RemoveFromStart(World->StreamingLevelsPrefix);
 				AuraGameMode->SaveWorldState(World, WorldAssetName);
 			}
+			HandleReachedGameplayEffect(OtherActor);
 			/*
 			* 此处存档的管线是:
 			* 玩家走进检查点范围 -> 检查点调用玩家的存档函数 -> 玩家获取Gamemode中的存档 -> 玩家修改存档中的玩家信息 ->
