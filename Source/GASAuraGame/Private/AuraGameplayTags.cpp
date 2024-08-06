@@ -114,6 +114,10 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.DamageTypeToDebuff.Add(GameplayTags.Damage_Lighting, GameplayTags.Debuff_Type_Stun);
 	GameplayTags.DamageTypeToDebuff.Add(GameplayTags.Damage_Arcane, GameplayTags.Debuff_Type_Arcane);
 
+	GameplayTags.Message_Death1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Message.Death1"), TEXT("死亡消息1"));
+	GameplayTags.Message_Death2 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Message.Death2"), TEXT("死亡消息2"));
+	GameplayTags.Message_GameSaved = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Message.GameSaved"), TEXT("游戏保存消息"));
+
 	GameplayTags.Montage_Attack_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Attack.1"), TEXT("攻击动作标签"));
 	GameplayTags.Montage_Attack_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Attack.2"), TEXT("攻击动作标签"));
 	GameplayTags.Montage_Attack_3 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Attack.3"), TEXT("攻击动作标签"));

@@ -138,6 +138,12 @@ public:
 	UPROPERTY()
 	float Vigor = 0.f;
 
+	UPROPERTY()
+	float Health = 0.f;
+
+	UPROPERTY()
+	float Mana = 0.f;
+
 	/* 技能数据 */
 
 	UPROPERTY()

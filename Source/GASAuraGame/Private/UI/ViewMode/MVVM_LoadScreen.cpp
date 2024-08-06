@@ -39,6 +39,7 @@ void UMVVM_LoadScreen::CreateNewSaveButtonPressed(int32 SlotIndex, const FString
 		LoadSlotMap[SlotIndex]->SlotStatus = ESaveSlotStatus::Taken;
 		LoadSlotMap[SlotIndex]->SetMapName(Gamemode->StartupMapName);
 		LoadSlotMap[SlotIndex]->SetPlayerStartTag(Gamemode->DefaultMapPlayerStartTag);
+		LoadSlotMap[SlotIndex]->SetPlayerLevel(1);
 		LoadSlotMap[SlotIndex]->MapAssetName = Gamemode->DefaultMap.ToSoftObjectPath().GetAssetName();
 
 		Gamemode->SaveSlotData(LoadSlotMap[SlotIndex], SlotIndex);

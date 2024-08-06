@@ -225,6 +225,8 @@ void AAuraCharacter::SaveProgress_Implementation(const FName& PlayerStartTag)
 		GameSave->Intelligence = UAuraAttributeSet::GetIntelligenceAttribute().GetNumericValue(GetAttributeSet());
 		GameSave->Resilience = UAuraAttributeSet::GetResilienceAttribute().GetNumericValue(GetAttributeSet());
 		GameSave->Vigor = UAuraAttributeSet::GetVigorAttribute().GetNumericValue(GetAttributeSet());
+		GameSave->Health = UAuraAttributeSet::GetHealthAttribute().GetNumericValue(GetAttributeSet());
+		GameSave->Mana = UAuraAttributeSet::GetManaAttribute().GetNumericValue(GetAttributeSet());
 
 		GameSave->bFirstTimeLoadIn = false;
 
@@ -253,6 +255,10 @@ void AAuraCharacter::SaveProgress_Implementation(const FName& PlayerStartTag)
 		);
 		AuraASC->ForEachAbility(LoadForEachAbility);
 
+		FGameplayTagContainer GameSavedContainer;
+		GameSavedContainer.AddTag(FAuraGameplayTags::Get().Message_GameSaved);
+		AuraASC->EffectAssetTags.Broadcast(GameSavedContainer);
+
 		AuraGamemode->SaveInGameSaveData(GameSave);
 	}
 }
@@ -271,6 +277,15 @@ void AAuraCharacter::Die(const FVector& DeathImpulse)
 			}
 		}
 	);
+
+	if (UAuraAbilitySystemComponentBase* AuraASC = Cast<UAuraAbilitySystemComponentBase>(AbilitySystemComponent))
+	{
+		FGameplayTagContainer DeathTagContainer;
+		DeathTagContainer.AddTag(FAuraGameplayTags::Get().Message_Death1);
+		DeathTagContainer.AddTag(FAuraGameplayTags::Get().Message_Death2);
+		AuraASC->EffectAssetTags.Broadcast(DeathTagContainer);
+	}
+
 	GetWorldTimerManager().SetTimer(DeathTimer, DeathTimerDelegate, DeathTimerDelay, false);
 	FollowCamera->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 }

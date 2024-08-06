@@ -30,6 +30,9 @@ struct FUIWidgetRow : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UTexture2D* Image = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float RemoveDelay = 2.1f;
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float, NewValue);

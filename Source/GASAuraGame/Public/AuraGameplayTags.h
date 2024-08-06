@@ -117,6 +117,10 @@ public:
 	FGameplayTag CombatSocket_RightHand;
 	FGameplayTag CombatSocket_Tail;
 
+	FGameplayTag Message_Death1;
+	FGameplayTag Message_Death2;
+	FGameplayTag Message_GameSaved;
+
 	FGameplayTag Montage_Attack_1;
 	FGameplayTag Montage_Attack_2;
 	FGameplayTag Montage_Attack_3;

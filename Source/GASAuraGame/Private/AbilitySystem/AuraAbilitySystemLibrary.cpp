@@ -125,6 +125,8 @@ void UAuraAbilitySystemLibrary::InitializeDefaultAttributesFromSaveData(const UO
 			FGameplayEffectContextHandle VitalAttributeContextHandle = ASC->MakeEffectContext();
 			VitalAttributeContextHandle.AddSourceObject(ASC);
 			FGameplayEffectSpecHandle VitalAttributeEffectSpecHandle = ASC->MakeOutgoingSpec(ClassInfo->VitalAttributes_Infinite, 1.f, VitalAttributeContextHandle);
+			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(VitalAttributeEffectSpecHandle, GameplayTags.Attributes_Vital_Health, SaveData->Health);
+			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(VitalAttributeEffectSpecHandle, GameplayTags.Attributes_Vital_Mana, SaveData->Mana);
 			ASC->ApplyGameplayEffectSpecToSelf(*VitalAttributeEffectSpecHandle.Data.Get());
 		}
 	}

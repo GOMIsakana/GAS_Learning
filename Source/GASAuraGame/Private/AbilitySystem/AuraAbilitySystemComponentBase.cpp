@@ -322,7 +322,7 @@ void UAuraAbilitySystemComponentBase::UpdateAbilityStatuses(int32 Level)
 	{
 		if (!Info.AbilityTag.IsValid()) continue;
 		// 从ActibleAbility中检查出未拥有Info中的符合条件的技能时, 赋予该技能
-		if (GetAbilitySpecFromAbilityTag(Info.AbilityTag) == nullptr && Level <= Info.LevelRequirement)
+		if (GetAbilitySpecFromAbilityTag(Info.AbilityTag) == nullptr && Level >= Info.LevelRequirement)
 		{
 			FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(Info.Ability, 1.f);
 			AbilitySpec.DynamicAbilityTags.AddTag(FAuraGameplayTags::Get().Abilities_Status_Eligible);
