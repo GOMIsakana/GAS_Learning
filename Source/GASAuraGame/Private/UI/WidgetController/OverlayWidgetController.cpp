@@ -5,6 +5,8 @@
 #include "AbilitySystem/AuraAttributeSet.h"
 #include "AbilitySystemComponent.h"
 #include "AuraGameplayTags.h"
+#include "Kismet/GameplayStatics.h"
+#include "Game/AuraGameModeBase.h"
 
 void UOverlayWidgetController::BroadcastInitialValues()
 {
@@ -49,6 +51,16 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 			OnMaxManaChanged.Broadcast(Data.NewValue);
 		}
 	);
+	
+	if (AAuraGameModeBase* Gamemode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(this)))
+	{
+		Gamemode->SendMapTitleMessageDelegate.AddLambda(
+			[this](FString Title, FString SubTitle) 
+			{
+				OnReceivedTitleMessageDelegate.Broadcast(Title, SubTitle);
+			}
+		);
+	}
 
 	if (GetAuraAbilitySystemComponent())
 	{
@@ -68,12 +80,29 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 				for (const FGameplayTag Tag : AssetTags)
 				{
 					FGameplayTag MessageTag = FGameplayTag::RequestGameplayTag("Message");
-					if (Tag.MatchesTag(MessageTag))
+					if (Tag.MatchesTag(MessageTag) && !MessageTag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Message.Multi"))))
 					{
 						const FUIWidgetRow* Row = GetDataTableRowByTag<FUIWidgetRow>(MessageWidgetDataTable, Tag);
-						MessageWidgetRowDelegate.Broadcast(*Row);
+						if (Row != nullptr)
+						{
+							MessageWidgetRowDelegate.Broadcast(*Row);
+						}
 					}
 				}
+			}
+		);
+		GetAuraAbilitySystemComponent()->OnReceiveMultiMessageTagDelegate.AddLambda(
+			[this](FGameplayTag MessageTag)
+			{
+				if (MessageTag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Message.Multi"))))
+				{
+					const FMultiUIWidgetRow* Row = GetDataTableRowByTag<FMultiUIWidgetRow>(MultiMessageWidgetDataTable, MessageTag);
+					if (Row != nullptr)
+					{
+						MultiMessageWidgetRowDelegate.Broadcast(*Row);
+					}
+				}
+
 			}
 		);
 	}

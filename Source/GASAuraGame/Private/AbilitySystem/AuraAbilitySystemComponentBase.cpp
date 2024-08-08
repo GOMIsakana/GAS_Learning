@@ -127,6 +127,13 @@ void UAuraAbilitySystemComponentBase::ClientOnEffectApplied_Implementation(UAbil
 	EffectSpec.GetAllAssetTags(TagContainer);
 
 	EffectAssetTags.Broadcast(TagContainer);
+	for (const FGameplayTag& Tag : TagContainer)
+	{
+		if (Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Message.Multi"))))
+		{
+			OnReceiveMultiMessageTagDelegate.Broadcast(Tag);
+		}
+	}
 }
 
 void UAuraAbilitySystemComponentBase::ForEachAbility(const FForEachAbility& Delegate)

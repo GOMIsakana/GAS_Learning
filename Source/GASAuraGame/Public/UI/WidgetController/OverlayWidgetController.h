@@ -35,9 +35,45 @@ struct FUIWidgetRow : public FTableRowBase
 	float RemoveDelay = 2.1f;
 };
 
+USTRUCT(BlueprintType)
+struct FWidgetRowInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FString Message;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UTexture2D* Image;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float RemoveDelay = 2.1f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float DelayToThisMessage = 0.f;
+};
+
+USTRUCT(BlueprintType)
+struct FMultiUIWidgetRow : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FGameplayTag MessageTag;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<UAuraUserWidget> MessageWidget;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TArray<FWidgetRowInfo> Messages;
+};
+
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float, NewValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnPlayerStateChangedSignature, int32, NewValue, bool, bBroadcastNotify);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMessageWidgetRowSignature, FUIWidgetRow, Row);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMultiMessageWidgetRowSignature, FMultiUIWidgetRow, Row);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnReceivedTitleMessageSignature, FString, Title, FString, SubTitle);
 
 /**
  * 
@@ -66,15 +102,24 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "GAS|Messages")
 	FMessageWidgetRowSignature MessageWidgetRowDelegate;
 
+	UPROPERTY(BlueprintAssignable, Category = "GAS|Messages")
+	FMultiMessageWidgetRowSignature MultiMessageWidgetRowDelegate;
+
 	UPROPERTY(BlueprintAssignable, Category = "GAS|XP")
 	FOnAttributeChangedSignature OnXPPercentChangedDelegate;
 
 	UPROPERTY(BlueprintAssignable, Category = "GAS|XP")
 	FOnPlayerStateChangedSignature OnPlayerLevelChangedDelegate;
 
+	UPROPERTY(BlueprintAssignable, Category = "MapMessage")
+	FOnReceivedTitleMessageSignature OnReceivedTitleMessageDelegate;	// 绑定在BP
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget Data")
 	TObjectPtr<UDataTable> MessageWidgetDataTable;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget Data")
+	TObjectPtr<UDataTable> MultiMessageWidgetDataTable;
 
 	template<typename T>
 	T* GetDataTableRowByTag(UDataTable* DataTable, const FGameplayTag& Tag);
@@ -87,5 +132,9 @@ protected:
 template<typename T>
 inline T* UOverlayWidgetController::GetDataTableRowByTag(UDataTable* DataTable, const FGameplayTag& Tag)
 {
-	return DataTable->FindRow<T>(Tag.GetTagName(), TEXT(""));
+	if (DataTable)
+	{
+		return DataTable->FindRow<T>(Tag.GetTagName(), TEXT(""), false);
+	}
+	return nullptr;
 }

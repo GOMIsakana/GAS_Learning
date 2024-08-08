@@ -56,6 +56,7 @@ void AAuraCharacter::PossessedBy(AController* NewController)
 	if (AAuraGameModeBase* AuraGameMode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(this)))
 	{
 		AuraGameMode->LoadWorldState(GetWorld());
+		AuraGameMode->SendMapTitleMessage();
 	}
 }
 
@@ -280,10 +281,7 @@ void AAuraCharacter::Die(const FVector& DeathImpulse)
 
 	if (UAuraAbilitySystemComponentBase* AuraASC = Cast<UAuraAbilitySystemComponentBase>(AbilitySystemComponent))
 	{
-		FGameplayTagContainer DeathTagContainer;
-		DeathTagContainer.AddTag(FAuraGameplayTags::Get().Message_Death1);
-		DeathTagContainer.AddTag(FAuraGameplayTags::Get().Message_Death2);
-		AuraASC->EffectAssetTags.Broadcast(DeathTagContainer);
+		AuraASC->OnReceiveMultiMessageTagDelegate.Broadcast(FAuraGameplayTags::Get().Message_Multi_Death);
 	}
 
 	GetWorldTimerManager().SetTimer(DeathTimer, DeathTimerDelegate, DeathTimerDelay, false);

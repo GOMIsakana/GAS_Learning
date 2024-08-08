@@ -10,6 +10,7 @@
 #include "AuraAbilitySystemComponentBase.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FEffectAssetTags, const FGameplayTagContainer& /* 资产的Tag */);
+DECLARE_MULTICAST_DELEGATE_OneParam(FReceiveMultiMessageTag, FGameplayTag/* MessageTag */);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAbilityGiven);
 DECLARE_DELEGATE_OneParam(FForEachAbility, const FGameplayAbilitySpec&);
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FAbilityStatusChanged, const FGameplayTag& /* 技能Tag */, const FGameplayTag& /* 状态Tag */, int32 /* 技能等级 */);
@@ -29,6 +30,7 @@ public:
 	void AbilityActorInfoSet();
 
 	FEffectAssetTags EffectAssetTags;
+	FReceiveMultiMessageTag OnReceiveMultiMessageTagDelegate;
 	UPROPERTY(BlueprintAssignable, Category = "GAS|Messages")
 	FAbilityGiven AbilityGivenDelegate;
 	FAbilityStatusChanged AbilityStatusChanged;

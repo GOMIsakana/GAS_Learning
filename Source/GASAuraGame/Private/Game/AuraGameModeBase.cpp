@@ -9,6 +9,7 @@
 #include "Interaction/SaveInterface.h"
 #include "Serialization/ObjectAndNameAsStringProxyArchive.h"
 #include "GameFramework/Character.h"
+#include "UI/WidgetController/OverlayWidgetController.h"
 
 void AAuraGameModeBase::SaveSlotData(UMVVM_LoadSlot* LoadSlot, int32 SlotIndex)
 {
@@ -56,7 +57,8 @@ void AAuraGameModeBase::DeleteSlotData(FString SlotName, int32 SlotIndex)
 
 void AAuraGameModeBase::TravelToMap(UMVVM_LoadSlot* LoadSlot)
 {
-	UGameplayStatics::OpenLevelBySoftObjectPtr(LoadSlot, GameMaps[LoadSlot->GetMapName()]);
+	UGameplayStatics::OpenLevelBySoftObjectPtr(LoadSlot, GameMaps[LoadSlot->GetMapName()].MapAsset);
+	// 显示新地图的名称
 }
 
 ULoadScreenSaveGame* AAuraGameModeBase::RetrieveInGameSaveData() const
@@ -191,9 +193,9 @@ void AAuraGameModeBase::LoadWorldState(UWorld* WorldToLoad)
 
 FString AAuraGameModeBase::GetMapNameFromMapAssetName(FString MapAssetName)
 {
-	for (TTuple<FString, TSoftObjectPtr<UWorld>> Map : GameMaps)
+	for (TTuple<FString, FMapInfo> Map : GameMaps)
 	{
-		if (Map.Value.ToSoftObjectPath().GetAssetName() == MapAssetName)
+		if (Map.Value.MapAsset.ToSoftObjectPath().GetAssetName() == MapAssetName)
 		{
 			return Map.Key;
 		}
@@ -236,5 +238,37 @@ void AAuraGameModeBase::PlayerDied(ACharacter* DeadPlayer)
 void AAuraGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
-	GameMaps.Add(StartupMapName, DefaultMap);
+
+	FMapInfo DefaultMapInfo;
+	DefaultMapInfo.MapAsset = DefaultMap;
+	DefaultMapInfo.MapTitleOverride = StartupMapTitleOverride;
+	DefaultMapInfo.MapSubTitle = StartupMapSubTitle;
+	GameMaps.Add(StartupMapName, DefaultMapInfo);
+
+	if (bBroadcastSendTitleMessage)
+	{
+		SendMapTitleMessage();
+	}
+}
+
+void AAuraGameModeBase::SendMapTitleMessage()
+{
+	if (UAuraGameInstance* GameInstance = Cast<UAuraGameInstance>(GetGameInstance()))
+	{
+		if (ULoadScreenSaveGame* GameSave = GetSaveSlotData(GameInstance->LoadSlotName, GameInstance->LoadSlotIndex))
+		{
+			FString MapName = GetMapNameFromMapAssetName(GameSave->MapAssetName);
+			if (GameMaps.Contains(MapName))
+			{
+				FMapInfo MapInfo = GameMaps[MapName];
+				FString Title = MapInfo.MapTitleOverride == FString("") ? MapName : MapInfo.MapTitleOverride;
+				SendMapTitleMessageDelegate.Broadcast(Title, MapInfo.MapSubTitle);
+				bBroadcastSendTitleMessage = false;
+			}
+			else
+			{
+				bBroadcastSendTitleMessage = true;
+			}
+		}
+	}
 }

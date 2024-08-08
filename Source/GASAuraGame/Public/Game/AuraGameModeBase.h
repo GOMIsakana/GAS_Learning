@@ -12,6 +12,24 @@
 
 class UCharacterClassInfo;
 
+USTRUCT(BlueprintType)
+struct FMapInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSoftObjectPtr<UWorld> MapAsset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FString MapTitleOverride;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FString MapSubTitle;
+
+};
+
+DECLARE_MULTICAST_DELEGATE_TwoParams(FSendMapTitleMessageSignature, FString /*Title*/, FString /* Subtitle */);
+
 /**
  * 
  */
@@ -29,6 +47,8 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "LootTiers")
 	TObjectPtr<ULootTiers> LootTiers;
+
+	FSendMapTitleMessageSignature SendMapTitleMessageDelegate;
 
 	void SaveSlotData(UMVVM_LoadSlot* LoadSlot, int32 SlotIndex);
 
@@ -52,19 +72,30 @@ public:
 	FString StartupMapName;
 
 	UPROPERTY(EditDefaultsOnly)
+	FString StartupMapTitleOverride;
+
+	UPROPERTY(EditDefaultsOnly)
+	FString StartupMapSubTitle;
+
+	UPROPERTY(EditDefaultsOnly)
 	TSoftObjectPtr<UWorld> DefaultMap;
 
 	UPROPERTY(EditDefaultsOnly)
 	FName DefaultMapPlayerStartTag;
 
 	UPROPERTY(EditDefaultsOnly)
-	TMap<FString, TSoftObjectPtr<UWorld>> GameMaps;
+	TMap<FString, FMapInfo> GameMaps;
 
 	FString GetMapNameFromMapAssetName(FString MapAssetName);
 
 	AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 
 	void PlayerDied(ACharacter* DeadPlayer);
+
+	UFUNCTION(BlueprintCallable)
+	void SendMapTitleMessage();
 protected:
 	virtual void BeginPlay() override;
+
+	bool bBroadcastSendTitleMessage = false;
 };
