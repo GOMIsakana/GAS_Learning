@@ -8,6 +8,8 @@
 #include "UI/ViewMode/MVVM_LoadScreen.h"
 #include "LoadScreenHUD.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLoadScreenWidgetInitializeFinish);
+
 /**
  * 
  */
@@ -17,6 +19,17 @@ class GASAURAGAME_API ALoadScreenHUD : public AHUD
 	GENERATED_BODY()
 	
 public:
+	UPROPERTY(BlueprintAssignable)
+	FOnLoadScreenWidgetInitializeFinish OnLoadScreenWidgetInitializeFinish;
+
+	UFUNCTION(BlueprintCallable)
+	void AddLoadScreenViewModel();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	ULoadScreenWidget* GetLoadScreenWidget();
+
+	UFUNCTION(BlueprintCallable)
+	void SetLoadScreenWidgetVisibility(ESlateVisibility Visibility);
 
 	UPROPERTY(EditDefaultsOnly, Category = "LoadScreen")
 	TSubclassOf<ULoadScreenWidget> LoadScreenWidgetClass;
