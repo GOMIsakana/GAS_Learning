@@ -125,7 +125,7 @@ void AAuraGameModeBase::SaveWorldState(UWorld* WorldToSave, const FString& Desti
 			FMemoryWriter MemoryWriter(ActorToSave.Bytes);
 
 			FObjectAndNameAsStringProxyArchive Archive(MemoryWriter, true);	// 新建Archive, 该结构的Archive会将Object和FName转化为FString进行储存
-			Archive.ArIsSaveGame = true; // 将该Archive其设置为保存游戏状态
+			Archive.ArIsSaveGame = true;
 
 			Actor->Serialize(Archive);	// 将Actor的序列化信息存入Archive中（需要用MemoryReader创建的Archive才会进行反序列化）
 

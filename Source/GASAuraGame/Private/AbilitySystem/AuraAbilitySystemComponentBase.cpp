@@ -124,16 +124,20 @@ void UAuraAbilitySystemComponentBase::AbilityInputTagReleased(const FGameplayTag
 void UAuraAbilitySystemComponentBase::ClientOnEffectApplied_Implementation(UAbilitySystemComponent* TargetASC, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle)
 {
 	FGameplayTagContainer TagContainer;
+	FGameplayTagContainer TagsToRemove;
 	EffectSpec.GetAllAssetTags(TagContainer);
 
-	EffectAssetTags.Broadcast(TagContainer);
 	for (const FGameplayTag& Tag : TagContainer)
 	{
 		if (Tag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Message.Multi"))))
 		{
 			OnReceiveMultiMessageTagDelegate.Broadcast(Tag);
+			TagsToRemove.AddTag(Tag);
 		}
 	}
+	// 移除掉message.multi的Tag, 避免重复播报
+	TagContainer.RemoveTags(TagsToRemove);
+	EffectAssetTags.Broadcast(TagContainer);
 }
 
 void UAuraAbilitySystemComponentBase::ForEachAbility(const FForEachAbility& Delegate)

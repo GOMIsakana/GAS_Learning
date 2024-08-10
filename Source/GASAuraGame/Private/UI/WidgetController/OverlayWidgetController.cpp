@@ -80,7 +80,7 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 				for (const FGameplayTag Tag : AssetTags)
 				{
 					FGameplayTag MessageTag = FGameplayTag::RequestGameplayTag("Message");
-					if (Tag.MatchesTag(MessageTag) && !MessageTag.MatchesTag(FGameplayTag::RequestGameplayTag(FName("Message.Multi"))))
+					if (Tag.MatchesTag(MessageTag))
 					{
 						const FUIWidgetRow* Row = GetDataTableRowByTag<FUIWidgetRow>(MessageWidgetDataTable, Tag);
 						if (Row != nullptr)
