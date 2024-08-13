@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "Engine/DecalActor.h"
 #include "EnemyInterface.generated.h"
 
 // This class does not need to be modified.
@@ -28,4 +29,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	AActor* GetCombatTarget() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void ShowEnemyArrow(UMaterialInterface* ArrowMaterialOverride);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void HideEnemyArrow();
 };
