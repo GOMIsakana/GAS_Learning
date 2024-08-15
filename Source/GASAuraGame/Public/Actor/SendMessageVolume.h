@@ -31,9 +31,9 @@ public:
 	int32 ApplicationTimes = 1;
 
 protected:
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSubclassOf<UGameplayEffect> MessageEffectClass;
 
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Send Message Volume")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Send Message Volume")
 	FGameplayTagContainer MessageTagContainer;
 };

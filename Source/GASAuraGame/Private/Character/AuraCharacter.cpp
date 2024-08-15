@@ -264,9 +264,9 @@ void AAuraCharacter::SaveProgress_Implementation(const FName& PlayerStartTag)
 	}
 }
 
-void AAuraCharacter::Die(const FVector& DeathImpulse)
+void AAuraCharacter::Die_Implementation(const FVector& DeathImpulse)
 {
-	Super::Die(DeathImpulse);
+	Super::Die_Implementation(DeathImpulse);
 
 	FTimerDelegate DeathTimerDelegate;
 	DeathTimerDelegate.BindLambda(

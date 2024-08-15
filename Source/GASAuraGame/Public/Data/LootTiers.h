@@ -41,6 +41,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	TArray<FLootItem> GetLootItems();
 
+	UFUNCTION(BlueprintCallable)
+	TArray<FLootItem> GetBreakableActorLootItems();
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "LootTiers|Spawning")
 	TArray<FLootItem> LootItemArray;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "LootTiers|Spawning")
+	TArray<FLootItem> BreakableActorLootItemArray;
 };

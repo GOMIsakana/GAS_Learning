@@ -14,12 +14,18 @@ function M:ReceiveBeginPlay()
 end
 
 function M:ShowEnemyArrow(ArrowMaterialOverride)
+    self.Overridden.ShowEnemyArrow(self, ArrowMaterialOverride)
     Parent.ShowEnemyArrow(self, ArrowMaterialOverride)
 end
 
 function M:SetCombatTarget(InCombatTarget)
     self.Overridden.SetCombatTarget(self, InCombatTarget)
-    self.ShowEnemyArrow(self, nil)
+    Parent.SetCombatTarget(self, InCombatTarget)
+end
+
+function M:Die(DeathImpluse)
+    Parent.Die(self, DeathImpluse)
+    self.Overridden.Die(self, DeathImpluse)
 end
 
 return M

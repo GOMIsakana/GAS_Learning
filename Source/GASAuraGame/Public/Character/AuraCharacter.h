@@ -40,7 +40,7 @@ public:
 	/* 玩家接口结束 */
 
 	/* 战斗接口 */
-	virtual void Die(const FVector& DeathImpulse) override;
+	virtual void Die_Implementation(const FVector& DeathImpulse) override;
 	virtual int32 GetCombatLevel_Implementation() override;
 	/* 战斗接口结束 */
 

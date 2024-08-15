@@ -34,7 +34,7 @@ public:
 	/* 战斗 接口开始 */
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
 	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation() override;
-	virtual void Die(const FVector& DeathImpluse) override;
+	virtual void Die_Implementation(const FVector& DeathImpluse) override;
 	virtual FVector GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag) override;
 	virtual USkeletalMeshComponent* GetWeapon_Implementation() override;
 	virtual bool IsDead_Implementation() const override;

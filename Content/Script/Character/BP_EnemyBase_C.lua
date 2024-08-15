@@ -9,11 +9,15 @@ end
 function M:ShowEnemyArrow(ArrowMaterialOverride)
     self.Overridden.ShowEnemyArrow(self, ArrowMaterialOverride)
     local Target = self.GetCombatTarget(self)
-    if (Target ~= nil and self.EnemyArrow == nil) then
+    if (Target ~= nil) then
+        if (self.EnemyArrow ~= nil) then
+            self.EnemyArrow:K2_DestroyActor()
+            self.EnemyArrow = nil
+        end
         local World = self:GetWorld()
         local TargetTransform = Target:GetTransform()  -- 生成的transform和目标对齐
         local AlwaysSpawn = UE.ESpawnActorCollisionHandlingMethod.AlwaysSpawn
-        self.EnemyArrow = World:SpawnActor(self.EnemyArrowClass, AlwaysSpawn, self, self, "Actor.EnemyArrow.BP_EnemyArrow_C")
+        self.EnemyArrow = World:SpawnActor(self.EnemyArrowClass, TargetTransform, AlwaysSpawn, self, self, "Actor.EnemyArrow.BP_EnemyArrow_C")
         if (ArrowMaterialOverride ~= nil) then  -- 覆写材质
             self.EnemyArrow:GetDecal():SetDecalMaterial(ArrowMaterialOverride)
         end
@@ -26,7 +30,12 @@ end
 
 function M:SetCombatTarget(InCombatTarget)
     self.Overridden.SetCombatTarget(self, InCombatTarget)
-    self.ShowEnemyArrow(self, nil)
+end
+
+function M:Die(DeathImpluse)
+    self.EnemyArrow:K2_DestroyActor()
+    self.EnemyArrow = nil
+    self.Overridden.Die(self, DeathImpluse)
 end
 
 return M
