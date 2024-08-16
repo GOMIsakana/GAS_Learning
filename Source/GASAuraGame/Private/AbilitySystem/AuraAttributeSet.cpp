@@ -92,7 +92,9 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	FEffectProperties Props;
 	SetEffectProperties(Data, Props);
 
-	if (Props.TargetCharacter->Implements<UCombatInterface>() && ICombatInterface::Execute_IsDead(Props.TargetCharacter)) return;
+	bool bTargetCharacterValid = Props.TargetCharacter && Props.TargetCharacter->Implements<UCombatInterface>() && !ICombatInterface::Execute_IsDead(Props.TargetCharacter);
+	bool bTargetAvatarActorValid = Props.TargetAvatarActor && Props.TargetAvatarActor->Implements<UCombatInterface>() && !ICombatInterface::Execute_IsDead(Props.TargetAvatarActor);
+	if (!(bTargetCharacterValid || bTargetAvatarActorValid)) return;
 
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
@@ -172,7 +174,7 @@ void UAuraAttributeSet::ShowFloatingText(const FEffectProperties& Props, float D
 void UAuraAttributeSet::SendXPEvent(FEffectProperties& Props)
 {
 	
-	if (Props.TargetCharacter->Implements<UCombatInterface>())
+	if (Props.TargetCharacter && Props.TargetCharacter->Implements<UCombatInterface>())
 	{
 		const float XPReward = UAuraAbilitySystemLibrary::GetXPRewardForClassAndLevel(this, ICombatInterface::Execute_GetCharacterClass(Props.TargetCharacter), ICombatInterface::Execute_GetCombatLevel(Props.TargetCharacter));
 		FAuraGameplayTags GameplayTags = FAuraGameplayTags::Get();
@@ -196,7 +198,7 @@ void UAuraAttributeSet::HandleDamage(FEffectProperties Props)
 		if (bFatal)
 		{
 			FVector DeathImpulse = UAuraAbilitySystemLibrary::GetDeathImpulse(Props.EffectContextHandle);
-			if (Props.TargetAvatarActor->Implements<UCombatInterface>())
+			if (Props.TargetAvatarActor && Props.TargetAvatarActor->Implements<UCombatInterface>())
 			{
 				ICombatInterface::Execute_Die(Props.TargetAvatarActor, DeathImpulse);
 			}
@@ -209,7 +211,7 @@ void UAuraAttributeSet::HandleDamage(FEffectProperties Props)
 			FGameplayTagContainer Tags;
 			Tags.AddTag(FAuraGameplayTags::Get().Abilities_HitReact);
 			bool bActivateHitReact = UAuraAbilitySystemLibrary::IsActivateHitReact(Props.EffectContextHandle);
-			if (bActivateHitReact && Props.TargetCharacter->Implements<UCombatInterface>() && !ICombatInterface::Execute_IsBeingShock(Props.TargetCharacter))
+			if (bActivateHitReact && Props.TargetCharacter && Props.TargetCharacter->Implements<UCombatInterface>() && !ICombatInterface::Execute_IsBeingShock(Props.TargetCharacter))
 			{
 				Props.TargetASC->TryActivateAbilitiesByTag(Tags);
 			}
@@ -221,7 +223,7 @@ void UAuraAttributeSet::HandleDamage(FEffectProperties Props)
 
 			// 击退
 			FVector KnockbackImpulse = UAuraAbilitySystemLibrary::GetKnockbackImpulse(Props.EffectContextHandle);
-			if (!KnockbackImpulse.IsNearlyZero(1.f))
+			if (Props.TargetCharacter && !KnockbackImpulse.IsNearlyZero(1.f))
 			{
 				Props.TargetCharacter->LaunchCharacter(KnockbackImpulse, true, false);
 			}

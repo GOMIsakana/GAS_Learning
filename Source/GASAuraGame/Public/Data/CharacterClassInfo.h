@@ -12,7 +12,8 @@ enum class ECharacterClass : uint8
 {
 	Elementalist,
 	Warrior,
-	Ranger
+	Ranger,
+	BreakableActor
 };
 
 USTRUCT(BlueprintType)
