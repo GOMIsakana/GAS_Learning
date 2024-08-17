@@ -6,6 +6,7 @@ local UNiagaraFunctionLibrary = UE.UNiagaraFunctionLibrary
 local ENCPoolMethod = UE.ENCPoolMethod
 local UKismetSystemLibrary = UE.UKismetSystemLibrary
 local UAbilitySystemBlueprintLibrary = UE.UAbilitySystemBlueprintLibrary
+local UGameplayStatics = UE.UGameplayStatics
 
 -- 需要做的: 伪装成罐子, 并完善被打破时候执行的逻辑
 
@@ -14,12 +15,14 @@ local function SpawnActorTimer(Self, LootArray)
     local AlwaysSpawn = ESpawnActorCollisionHandlingMethod.AlwaysSpawn
     for LootIndex = 1, LootArray:Length() do
         local Loot = LootArray:Get(LootIndex)
-        local SpawnedActor = World:SpawnActor(Loot.ItemClass, Self:GetTransform(), AlwaysSpawn, Self, Self, "Actor.BP_AuraEffectActorBase_C")    -- 生成Actor
+        local SpawnedActor = World:SpawnActor(Loot.ItemClass, Self.DropLocation:K2_GetComponentToWorld(), AlwaysSpawn, Self, Self, "Actor.BP_AuraEffectActorBase_C")    -- 生成Actor
         if (SpawnedActor ~= nil and Loot.bLootItemLevelOverride) then           -- 覆写等级
             SpawnedActor.ActorLevel = Self.ActorLevel
         end
-        -- 生成特效
-        UNiagaraFunctionLibrary.SpawnSystemAtLocation(Self, Loot.SpawnSystem, Self:K2_GetActorLocation(), Self:K2_GetActorRotation(), Self:GetActorScale3D(), true, true, ENCPoolMethod.None, true)
+        -- 生成掉落物特效
+        if (Loot.SpawnSystem ~= nil) then
+            UNiagaraFunctionLibrary.SpawnSystemAtLocation(Self, Loot.SpawnSystem, Self.DropLocation:K2_GetComponentLocation(), Self.DropLocation:K2_GetComponentRotation(), Self.DropLocation:K2_GetComponentScale(), true, true, ENCPoolMethod.None, true)
+        end
         UKismetSystemLibrary.Delay(Self, Self.LootSpawnDelay)
     end
 end
@@ -44,14 +47,23 @@ function M:Die(DeathImpulse)
     self.Overridden.Die(self, DeathImpulse)
 
     self.bDead = true
-    self:SetLifeSpan(3)
     self:MulticastDied()
+    self:K2_DestroyActor()
 end
 
 function M:MulticastDied_RPC()
     if (self.HasTrigged == false) then
         self.HasTrigged = true
         self:SpawnLoots()
+
+        -- 生成破坏音效
+        if (self.BreakSound ~= nil) then
+            UGameplayStatics.PlaySoundAtLocation(self, self.BreakSound, self.DropLocation:K2_GetComponentLocation(), self.DropLocation:K2_GetComponentRotation())
+        end
+        -- 生成破坏特效
+        if (self.BreakSystem ~= nil) then
+            UNiagaraFunctionLibrary.SpawnSystemAtLocation(self, self.BreakSystem, self.DropLocation:K2_GetComponentLocation(), self.DropLocation:K2_GetComponentRotation(), self.DropLocation:K2_GetComponentScale(), true, true, ENCPoolMethod.None, true)
+        end
     end
 end
 

@@ -157,9 +157,13 @@ void UAuraAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData
 
 void UAuraAttributeSet::ShowFloatingText(const FEffectProperties& Props, float DamageAmount, bool bCriticalHit, bool bDamageValid)
 {
-
+	bool bShowTextSuccess = false;
 	if (Props.SourceCharacter != Props.TargetCharacter)
 	{
+		if (Props.TargetCharacter)
+		{
+			bShowTextSuccess = true;
+		}
 		if (AAuraPlayerController* PC = Cast<AAuraPlayerController>(Props.SourceController))
 		{
 			PC->ClientShowDamageNumber(DamageAmount, Props.TargetCharacter, bCriticalHit, bDamageValid);
@@ -167,6 +171,20 @@ void UAuraAttributeSet::ShowFloatingText(const FEffectProperties& Props, float D
 		if (AAuraPlayerController* PC = Cast<AAuraPlayerController>(Props.TargetController))
 		{
 			PC->ClientShowDamageNumber(DamageAmount, Props.TargetCharacter, bCriticalHit, bDamageValid);
+		}
+	}
+	// 因为可破坏Actor这类物品不是Character, 所以需要把AvatarActor作为额外判定依据, 以避免不跳字的情况
+	// bShowTextSuccess用于防止二次跳字
+	if (bShowTextSuccess) return;
+	if (Props.SourceAvatarActor != Props.TargetAvatarActor)
+	{
+		if (AAuraPlayerController* PC = Cast<AAuraPlayerController>(Props.SourceController))
+		{
+			PC->ClientShowDamageNumber(DamageAmount, Props.TargetAvatarActor, bCriticalHit, bDamageValid);
+		}
+		if (AAuraPlayerController* PC = Cast<AAuraPlayerController>(Props.TargetController))
+		{
+			PC->ClientShowDamageNumber(DamageAmount, Props.TargetAvatarActor, bCriticalHit, bDamageValid);
 		}
 	}
 }
