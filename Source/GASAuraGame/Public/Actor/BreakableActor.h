@@ -8,15 +8,28 @@
 #include "AbilitySystem/AuraAttributeSet.h"
 #include "AbilitySystemInterface.h"
 #include "Interaction/CombatInterface.h"
+#include "Interaction/SaveInterface.h"
+#include "Interaction/HighLightInterface.h"
 #include "BreakableActor.generated.h"
 
 UCLASS()
-class GASAURAGAME_API ABreakableActor : public AActor, public IAbilitySystemInterface, public ICombatInterface
+class GASAURAGAME_API ABreakableActor : public AActor, public IAbilitySystemInterface, public ICombatInterface, public IHighlightInterface, public ISaveInterface
 {
 	GENERATED_BODY()
 	
 public:	
 	ABreakableActor();
+
+	/* 保存接口开始 */
+	FORCEINLINE virtual bool bShouldLoadTransform_Implementation() override { return false; };
+	virtual void LoadActor_Implementation() override;
+	/* 保存接口结束 */
+
+	/* 高亮接口开始 */
+	virtual void HighlightActor_Implementation() override;
+	virtual void UnhighlightActor_Implementation() override;
+	virtual void SetMoveToDestination_Implementation(FVector& OutDestination) override;
+	/* 高亮接口结束 */
 
 	/* 能力接口开始 */
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
@@ -52,7 +65,7 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, SaveGame)
 	bool bDead = false;
 
 };

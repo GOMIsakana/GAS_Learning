@@ -14,6 +14,10 @@ function M:MulticastDied_RPC()
     Parent.MulticastDied_RPC(self)
 end
 
+function M:LoadActor()
+    Parent.LoadActor(self)
+end
+
 function M:ReceiveBeginPlay()
     self.Overridden.ReceiveBeginPlay(self)
     Parent.ReceiveBeginPlay(self)

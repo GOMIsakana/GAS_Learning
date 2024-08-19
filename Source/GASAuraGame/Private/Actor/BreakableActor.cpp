@@ -14,6 +14,27 @@ ABreakableActor::ABreakableActor()
 	AttributeSet = CreateDefaultSubobject<UAuraAttributeSet>("AttributeSet");
 }
 
+void ABreakableActor::LoadActor_Implementation()
+{
+	if (bDead)
+	{
+		SetActorHiddenInGame(true);
+	}
+}
+
+void ABreakableActor::HighlightActor_Implementation()
+{
+}
+
+void ABreakableActor::UnhighlightActor_Implementation()
+{
+}
+
+void ABreakableActor::SetMoveToDestination_Implementation(FVector& OutDestination)
+{
+	
+}
+
 UAbilitySystemComponent* ABreakableActor::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;

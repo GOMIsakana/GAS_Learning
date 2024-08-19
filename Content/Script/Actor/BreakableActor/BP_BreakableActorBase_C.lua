@@ -7,6 +7,7 @@ local ENCPoolMethod = UE.ENCPoolMethod
 local UKismetSystemLibrary = UE.UKismetSystemLibrary
 local UAbilitySystemBlueprintLibrary = UE.UAbilitySystemBlueprintLibrary
 local UGameplayStatics = UE.UGameplayStatics
+local ECollisionResponse = UE.ECollisionResponse
 
 -- 需要做的: 伪装成罐子, 并完善被打破时候执行的逻辑
 
@@ -46,9 +47,10 @@ end
 function M:Die(DeathImpulse)
     self.Overridden.Die(self, DeathImpulse)
 
+    self.StaticMesh:SetCollisionResponseToAllChannels(ECollisionResponse.ECR_Ignore)
     self.bDead = true
     self:MulticastDied()
-    self:K2_DestroyActor()
+    self:SetActorHiddenInGame(true)
 end
 
 function M:MulticastDied_RPC()
@@ -64,6 +66,13 @@ function M:MulticastDied_RPC()
         if (self.BreakSystem ~= nil) then
             UNiagaraFunctionLibrary.SpawnSystemAtLocation(self, self.BreakSystem, self.DropLocation:K2_GetComponentLocation(), self.DropLocation:K2_GetComponentRotation(), self.DropLocation:K2_GetComponentScale(), true, true, ENCPoolMethod.None, true)
         end
+    end
+end
+
+function M:LoadActor()
+    self.Overridden.LoadActor(self)
+    if (self.bDead) then
+        self.StaticMesh:SetCollisionResponseToAllChannels(ECollisionResponse.ECR_Ignore)
     end
 end
 
