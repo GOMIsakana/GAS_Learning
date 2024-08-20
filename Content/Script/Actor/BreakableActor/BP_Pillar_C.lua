@@ -23,4 +23,8 @@ function M:ReceiveBeginPlay()
     Parent.ReceiveBeginPlay(self)
 end
 
+function M:GetAvatarActor()
+    return Parent.GetAvatarActor(self)
+end
+
 return M

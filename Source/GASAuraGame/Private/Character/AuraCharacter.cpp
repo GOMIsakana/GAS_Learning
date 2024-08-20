@@ -264,6 +264,14 @@ void AAuraCharacter::SaveProgress_Implementation(const FName& PlayerStartTag)
 	}
 }
 
+void AAuraCharacter::SendEffectMessage_Implementation(FGameplayTagContainer TagContainerToSend)
+{
+	if (UAuraAbilitySystemComponentBase* AuraASC = Cast<UAuraAbilitySystemComponentBase>(AbilitySystemComponent))
+	{
+		AuraASC->EffectAssetTags.Broadcast(TagContainerToSend);
+	}
+}
+
 void AAuraCharacter::Die_Implementation(const FVector& DeathImpulse)
 {
 	Super::Die_Implementation(DeathImpulse);

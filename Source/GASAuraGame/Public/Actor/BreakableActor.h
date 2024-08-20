@@ -42,6 +42,7 @@ public:
 	virtual FOnASCRegistered& GetOnASCRegisteredDelegate() override;
 	virtual FOnDeath& GetOnDeathDelegate() override;
 	virtual FOnDamageSignature& GetOnDamageDelegate() override;
+	virtual AActor* GetAvatarActor_Implementation() override;
 
 	FOnASCRegistered OnASCRegistered;
 	FOnDeath OnDeath;

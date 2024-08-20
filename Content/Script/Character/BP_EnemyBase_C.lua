@@ -1,6 +1,9 @@
 local M = UnLua.Class()
 
 local EAttachmentRule = UE.EAttachmentRule
+local UKismetSystemLibrary = UE.UKismetSystemLibrary
+local UPlayerInterface = UE.UPlayerInterface
+local IPlayerInterface = UE.IPlayerInterface
 
 function M:ReceiveBeginPlay()
     self.Overridden.ReceiveBeginPlay(self)
@@ -29,12 +32,25 @@ function M:ShowEnemyArrow(ArrowMaterialOverride)
 end
 
 function M:SetCombatTarget(InCombatTarget)
+    if (self:GetCombatTarget() ~= InCombatTarget) then
+        if (self:GetCombatTarget() ~= nil) then
+            self:GetCombatTarget():AddEnemyTargetedAmount(-1)
+        end
+        if (InCombatTarget ~= nil) then
+            InCombatTarget:AddEnemyTargetedAmount(1)
+        end
+    end
     self.Overridden.SetCombatTarget(self, InCombatTarget)
 end
 
 function M:Die(DeathImpluse)
-    self.EnemyArrow:K2_DestroyActor()
-    self.EnemyArrow = nil
+    if (self.EnemyArrow ~= nil) then
+        self.EnemyArrow:K2_DestroyActor()
+        self.EnemyArrow = nil
+    end
+    if (self:GetCombatTarget() ~= nil) then
+        self:GetCombatTarget():AddEnemyTargetedAmount(-1)
+    end
     self.Overridden.Die(self, DeathImpluse)
 end
 

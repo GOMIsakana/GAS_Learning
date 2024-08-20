@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "GameplayTagContainer.h"
 #include "PlayerInterface.generated.h"
 
 // This class does not need to be modified.
@@ -56,4 +57,12 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void SaveProgress(const FName& PlayerStartTag);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void AddEnemyTargetedAmount(int32 AmountToAdd);
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	int32 GetEnemyTargetedAmount();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SendEffectMessage(FGameplayTagContainer TagContainerToSend);
 };

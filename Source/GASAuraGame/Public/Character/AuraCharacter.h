@@ -37,6 +37,7 @@ public:
 	virtual void ShowMagicCircle_Implementation(UMaterialInterface* InMagicCircleMaterial) override;
 	virtual void HideMagicCircle_Implementation() override;
 	virtual void SaveProgress_Implementation(const FName& PlayerStartTag) override;
+	void SendEffectMessage_Implementation(FGameplayTagContainer TagContainerToSend);
 	/* 玩家接口结束 */
 
 	/* 战斗接口 */

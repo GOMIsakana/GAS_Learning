@@ -54,9 +54,9 @@ void AAuraPlayerController::SetMagicCircleMaterial(UMaterialInterface* InMateria
 
 void AAuraPlayerController::ClientShowDamageNumber_Implementation(float DamageAmount, AActor* Target, bool bCriticalHit, bool bDamageValid)
 {
-	if (IsValid(Target) && DamageTextComponentClass)
+	if (GetPawn() && IsValid(Target) && DamageTextComponentClass)
 	{
-		UDamageTextWidgetComponent* DamageText = NewObject<UDamageTextWidgetComponent>(Target, DamageTextComponentClass);
+		UDamageTextWidgetComponent* DamageText = NewObject<UDamageTextWidgetComponent>(GetPawn(), DamageTextComponentClass);
 		DamageText->RegisterComponent();
 		DamageText->AttachToComponent(Target->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 		DamageText->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
@@ -66,9 +66,9 @@ void AAuraPlayerController::ClientShowDamageNumber_Implementation(float DamageAm
 
 void AAuraPlayerController::ClientShowFloatingTextNumber_Implementation(float Number, AActor* Target, const FString& TextPrefix, const FString& TextSuffix, FSlateColor ColorOverride)
 {
-	if (IsValid(Target) && FloatingTextComponentClass)
+	if (GetPawn() && IsValid(Target) && FloatingTextComponentClass)
 	{
-		UFloatingTextWidgetComponent* FloatingText = NewObject<UFloatingTextWidgetComponent>(Target, FloatingTextComponentClass);
+		UFloatingTextWidgetComponent* FloatingText = NewObject<UFloatingTextWidgetComponent>(GetPawn(), FloatingTextComponentClass);
 		FloatingText->RegisterComponent();
 		FloatingText->AttachToComponent(Target->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 		FloatingText->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);

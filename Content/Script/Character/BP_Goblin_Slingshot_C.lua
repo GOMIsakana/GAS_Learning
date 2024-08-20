@@ -19,7 +19,6 @@ function M:ShowEnemyArrow(ArrowMaterialOverride)
 end
 
 function M:SetCombatTarget(InCombatTarget)
-    self.Overridden.SetCombatTarget(self, InCombatTarget)
     Parent.SetCombatTarget(self, InCombatTarget)
 end
 

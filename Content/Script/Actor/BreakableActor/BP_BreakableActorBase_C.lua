@@ -84,6 +84,12 @@ function M:ReceiveBeginPlay()
     local EffectContextHandle = ASC:MakeEffectContext()
     local EffectSpecHandle = ASC:MakeOutgoingSpec(self.BreakableActorInitializeEffectClass, 1.0, EffectContextHandle)
     ASC:BP_ApplyGameplayEffectSpecToSelf(EffectSpecHandle)
+
+    self.StaticMesh:SetCustomDepthStencilValue(251)     -- 设置高亮颜色为蓝色, 提示在GASAuraGame.h里, 实际上的颜色处理在PP_highlight, 改变高光材质的选项在PostProcessVolume里
+end
+
+function M:GetAvatarActor()
+    return self
 end
 
 return M

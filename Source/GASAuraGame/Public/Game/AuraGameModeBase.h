@@ -8,6 +8,7 @@
 #include "Data/LootTiers.h"
 #include "UI/ViewMode/MVVM_LoadSlot.h"
 #include "LoadScreenSaveGame.h"
+#include "MediaSource.h"
 #include "AuraGameModeBase.generated.h"
 
 class UCharacterClassInfo;
@@ -26,6 +27,8 @@ struct FMapInfo
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FString MapSubTitle;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UMediaSource> MapBackgroundMusicOverride;
 };
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FSendMapTitleMessageSignature, FString /*Title*/, FString /* Subtitle */);
@@ -84,6 +87,9 @@ public:
 	FName DefaultMapPlayerStartTag;
 
 	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UMediaSource> DefaultMapBackgroundMusicOverride;
+
+	UPROPERTY(EditDefaultsOnly)
 	TMap<FString, FMapInfo> GameMaps;
 
 	FString GetMapNameFromMapAssetName(FString MapAssetName);
@@ -94,6 +100,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SendMapTitleMessage();
+
+	UFUNCTION(BlueprintCallable, meta = (DefaultToSelf = "WorldContextObject"))
+	UMediaSource* GetMapBackgroundMusic(UObject* WorldContextObject);
 protected:
 	virtual void BeginPlay() override;
 

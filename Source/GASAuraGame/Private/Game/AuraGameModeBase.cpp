@@ -243,6 +243,7 @@ void AAuraGameModeBase::BeginPlay()
 	DefaultMapInfo.MapAsset = DefaultMap;
 	DefaultMapInfo.MapTitleOverride = StartupMapTitleOverride;
 	DefaultMapInfo.MapSubTitle = StartupMapSubTitle;
+	DefaultMapInfo.MapBackgroundMusicOverride = DefaultMapBackgroundMusicOverride;
 	GameMaps.Add(StartupMapName, DefaultMapInfo);
 
 	if (bBroadcastSendTitleMessage)
@@ -271,4 +272,19 @@ void AAuraGameModeBase::SendMapTitleMessage()
 			}
 		}
 	}
+}
+
+UMediaSource* AAuraGameModeBase::GetMapBackgroundMusic(UObject* WorldContextObject)
+{
+	UWorld* World = WorldContextObject->GetWorld();
+	for (const TTuple<FString, FMapInfo>& Maps : GameMaps)
+	{
+		FString MapAssetName = World->GetMapName();
+		MapAssetName.RemoveFromStart(World->StreamingLevelsPrefix);
+		if (Maps.Value.MapAsset.ToSoftObjectPath().GetAssetName() == MapAssetName)
+		{
+			return Maps.Value.MapBackgroundMusicOverride;
+		}
+	}
+	return nullptr;
 }

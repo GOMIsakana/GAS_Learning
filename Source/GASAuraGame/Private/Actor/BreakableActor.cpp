@@ -43,7 +43,7 @@ UAbilitySystemComponent* ABreakableActor::GetAbilitySystemComponent() const
 void ABreakableActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	GetAbilitySystemComponent()->InitAbilityActorInfo(this, this);
 }
 
 float ABreakableActor::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -62,7 +62,7 @@ void ABreakableActor::Die_Implementation(const FVector& DeathImpluse)
 
 bool ABreakableActor::IsDead_Implementation() const
 {
-	return false;
+	return bDead;
 }
 
 ECharacterClass ABreakableActor::GetCharacterClass_Implementation()
@@ -83,4 +83,9 @@ FOnDeath& ABreakableActor::GetOnDeathDelegate()
 FOnDamageSignature& ABreakableActor::GetOnDamageDelegate()
 {
 	return OnDamageDelegate;
+}
+
+AActor* ABreakableActor::GetAvatarActor_Implementation()
+{
+	return nullptr;
 }

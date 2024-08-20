@@ -38,4 +38,10 @@ function M:ReceiveBeginPlay()
     PlayerController.bShowMouseCursor = true
 end
 
+function M:ReceiveDestroyed()
+    self.MainMenuWidget.PlayButton.Button.OnClicked:Remove(self, self.OnPlayButtonClicked)
+    self.BP_LoadScreenHUD.OnLoadScreenWidgetInitializeFinish:Remove(self, self.OnLoadScreenWidgetInitializeFinish)
+    self.Overridden.ReceiveDestroyed(self)
+end
+
 return M
