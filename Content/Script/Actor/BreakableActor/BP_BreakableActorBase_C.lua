@@ -48,7 +48,6 @@ function M:Die(DeathImpulse)
     self.Overridden.Die(self, DeathImpulse)
 
     self.StaticMesh:SetCollisionResponseToAllChannels(ECollisionResponse.ECR_Ignore)
-    self.bDead = true
     self:MulticastDied()
     self:SetActorHiddenInGame(true)
 end
@@ -57,6 +56,7 @@ function M:MulticastDied_RPC()
     if (self.HasTrigged == false) then
         self.HasTrigged = true
         self:SpawnLoots()
+        -- self.bDead = true
 
         -- 生成破坏音效
         if (self.BreakSound ~= nil) then

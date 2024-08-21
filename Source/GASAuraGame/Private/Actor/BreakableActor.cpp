@@ -55,9 +55,15 @@ float ABreakableActor::TakeDamage(float Damage, FDamageEvent const& DamageEvent,
 	return DamageTaken;
 }
 
+void ABreakableActor::MulticastHandleDeath_Implementation(const FVector& DeathImpluse)
+{
+	bDead = true;
+	OnDeath.Broadcast(this);
+}
+
 void ABreakableActor::Die_Implementation(const FVector& DeathImpluse)
 {
-	OnDeath.Broadcast(this);
+	MulticastHandleDeath(DeathImpluse);
 }
 
 bool ABreakableActor::IsDead_Implementation() const
