@@ -18,6 +18,10 @@ function M:ShowEnemyArrow(ArrowMaterialOverride)
     Parent.ShowEnemyArrow(self, ArrowMaterialOverride)
 end
 
+function M:HideEnemyArrow()
+    Parent.HideEnemyArrow(self)
+end
+
 function M:SetCombatTarget(InCombatTarget)
     Parent.SetCombatTarget(self, InCombatTarget)
 end

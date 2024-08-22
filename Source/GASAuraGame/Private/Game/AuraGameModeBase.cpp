@@ -243,7 +243,8 @@ void AAuraGameModeBase::BeginPlay()
 	DefaultMapInfo.MapAsset = DefaultMap;
 	DefaultMapInfo.MapTitleOverride = StartupMapTitleOverride;
 	DefaultMapInfo.MapSubTitle = StartupMapSubTitle;
-	DefaultMapInfo.MapBackgroundMusicOverride = DefaultMapBackgroundMusicOverride;
+	DefaultMapInfo.MapNormalBackgroundMusic = DefaultMapNormalBackgroundMusic;
+	DefaultMapInfo.MapCombatBackgroundMusic = DefaultMapCombatBackgroundMusic;
 	GameMaps.Add(StartupMapName, DefaultMapInfo);
 
 	if (bBroadcastSendTitleMessage)
@@ -274,7 +275,7 @@ void AAuraGameModeBase::SendMapTitleMessage()
 	}
 }
 
-UMediaSource* AAuraGameModeBase::GetMapBackgroundMusic(UObject* WorldContextObject)
+UMediaSource* AAuraGameModeBase::GetMapNormalBackgroundMusic(UObject* WorldContextObject)
 {
 	UWorld* World = WorldContextObject->GetWorld();
 	for (const TTuple<FString, FMapInfo>& Maps : GameMaps)
@@ -283,7 +284,22 @@ UMediaSource* AAuraGameModeBase::GetMapBackgroundMusic(UObject* WorldContextObje
 		MapAssetName.RemoveFromStart(World->StreamingLevelsPrefix);
 		if (Maps.Value.MapAsset.ToSoftObjectPath().GetAssetName() == MapAssetName)
 		{
-			return Maps.Value.MapBackgroundMusicOverride;
+			return Maps.Value.MapNormalBackgroundMusic;
+		}
+	}
+	return nullptr;
+}
+
+UMediaSource* AAuraGameModeBase::GetMapCombatBackgroundMusic(UObject* WorldContextObject)
+{
+	UWorld* World = WorldContextObject->GetWorld();
+	for (const TTuple<FString, FMapInfo>& Maps : GameMaps)
+	{
+		FString MapAssetName = World->GetMapName();
+		MapAssetName.RemoveFromStart(World->StreamingLevelsPrefix);
+		if (Maps.Value.MapAsset.ToSoftObjectPath().GetAssetName() == MapAssetName)
+		{
+			return Maps.Value.MapCombatBackgroundMusic;
 		}
 	}
 	return nullptr;

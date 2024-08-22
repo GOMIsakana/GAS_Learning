@@ -13,10 +13,7 @@ function M:ShowEnemyArrow(ArrowMaterialOverride)
     self.Overridden.ShowEnemyArrow(self, ArrowMaterialOverride)
     local Target = self.GetCombatTarget(self)
     if (Target ~= nil) then
-        if (self.EnemyArrow ~= nil) then
-            self.EnemyArrow:K2_DestroyActor()
-            self.EnemyArrow = nil
-        end
+        self.HideEnemyArrow(self)
         local World = self:GetWorld()
         local TargetTransform = Target:GetTransform()  -- 生成的transform和目标对齐
         local AlwaysSpawn = UE.ESpawnActorCollisionHandlingMethod.AlwaysSpawn
@@ -28,6 +25,15 @@ function M:ShowEnemyArrow(ArrowMaterialOverride)
         self.EnemyArrow:K2_AttachToComponent(Target.RootComponent, "", EAttachmentRule.SnapToTarget, EAttachmentRule.SnapToTarget, EAttachmentRule.SnapToTarget, true)
         -- 设置主人为自己
         self.EnemyArrow:SetOwner(self)
+    end
+end
+
+function M:HideEnemyArrow()
+    self.Overridden.HideEnemyArrow(self)
+
+    if (self.EnemyArrow ~= nil) then
+        self.EnemyArrow:K2_DestroyActor()
+        self.EnemyArrow = nil
     end
 end
 
@@ -44,10 +50,7 @@ function M:SetCombatTarget(InCombatTarget)
 end
 
 function M:Die(DeathImpluse)
-    if (self.EnemyArrow ~= nil) then
-        self.EnemyArrow:K2_DestroyActor()
-        self.EnemyArrow = nil
-    end
+    self.HideEnemyArrow(self)
     if (self:GetCombatTarget() ~= nil) then
         self:GetCombatTarget():AddEnemyTargetedAmount(-1)
     end

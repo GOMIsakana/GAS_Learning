@@ -28,7 +28,10 @@ struct FMapInfo
 	FString MapSubTitle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TObjectPtr<UMediaSource> MapBackgroundMusicOverride;
+	TObjectPtr<UMediaSource> MapNormalBackgroundMusic;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UMediaSource> MapCombatBackgroundMusic;
 };
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FSendMapTitleMessageSignature, FString /*Title*/, FString /* Subtitle */);
@@ -87,7 +90,10 @@ public:
 	FName DefaultMapPlayerStartTag;
 
 	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UMediaSource> DefaultMapBackgroundMusicOverride;
+	TObjectPtr<UMediaSource> DefaultMapNormalBackgroundMusic;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UMediaSource> DefaultMapCombatBackgroundMusic;
 
 	UPROPERTY(EditDefaultsOnly)
 	TMap<FString, FMapInfo> GameMaps;
@@ -102,7 +108,10 @@ public:
 	void SendMapTitleMessage();
 
 	UFUNCTION(BlueprintCallable, meta = (DefaultToSelf = "WorldContextObject"))
-	UMediaSource* GetMapBackgroundMusic(UObject* WorldContextObject);
+	UMediaSource* GetMapNormalBackgroundMusic(UObject* WorldContextObject);
+
+	UFUNCTION(BlueprintCallable, meta = (DefaultToSelf = "WorldContextObject"))
+	UMediaSource* GetMapCombatBackgroundMusic(UObject* WorldContextObject);
 protected:
 	virtual void BeginPlay() override;
 
