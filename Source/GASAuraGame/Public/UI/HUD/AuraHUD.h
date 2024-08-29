@@ -7,6 +7,7 @@
 #include "UI/WidgetController/OverlayWidgetController.h"
 #include "UI/WidgetController/AttributeMenuWidgetController.h"
 #include "UI/WidgetController/SpellMenuWidgetController.h"
+#include "UI/WidgetController/BackpackWidgetController.h"
 #include "AuraHUD.generated.h"
 
 class UAuraUserWidget;
@@ -25,6 +26,7 @@ public:
 	UOverlayWidgetController* GetOverlayWidgetController(const FWidgetControllerParams& WCParams);
 	UAttributeMenuWidgetController* GetAttributeMenuWidgetController(const FWidgetControllerParams& WCParams);
 	USpellMenuWidgetController* GetSpellMenuWidgetController(const FWidgetControllerParams& WCParams);
+	UBackpackWidgetController* GetBackpackWidgetController(const FWidgetControllerParams& WCParams);
 
 	void InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS);
 
@@ -52,4 +54,9 @@ private:
 	TObjectPtr<USpellMenuWidgetController> SpellMenuWidgetController;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<USpellMenuWidgetController> SpellMenuWidgetControllerClass;
+
+	UPROPERTY()
+	TObjectPtr<UBackpackWidgetController> BackpackWidgetController;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UBackpackWidgetController> BackpackWidgetControllerClass;
 };

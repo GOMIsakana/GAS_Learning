@@ -14,6 +14,7 @@
 #include "Actor/MagicCircle.h"
 #include "Interaction/HighlightInterface.h"
 #include "UI/Widgets/FloatingTextWidgetComponent.h"
+#include "Interaction/BackpackInterface.h"
 #include "AuraPlayerController.generated.h"
 
 class UInputMappingContext;
@@ -31,7 +32,7 @@ enum class ETargetingStatus : uint8
  * 
  */
 UCLASS()
-class GASAURAGAME_API AAuraPlayerController : public APlayerController
+class GASAURAGAME_API AAuraPlayerController : public APlayerController, public IBackpackInterface
 {
 	GENERATED_BODY()
 	
@@ -53,9 +54,31 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetMagicCircleMaterial(UMaterialInterface* InMaterial);
 
+	virtual void SortBackpackItems_Implementation(bool bAscending = true) override;
+	virtual void ExchangeItem_Implementation(int32 SourceItemSlot, int32 TargetItemSlot) override;
+	virtual void GetItemAtBackpackSlot_Implementation(FBackpackItem& OutItem, int32 BackpackSlot) override;
+	virtual void SetItemAtBackpackSlot_Implementation(FBackpackItem& InItem, int32 BackpackSlot) override;
+	virtual void GetItemAtEquipSlot_Implementation(FBackpackItem& OutItem, int32 EquipSlot) override;
+	virtual void EquipItemToSlot_Implementation(int32 ToEquipItemBackpackSlot, int32 EquipSlot) override;
+	virtual bool PickupItem_Implementation(FBackpackItem& InItem) override;
+	FORCEINLINE virtual int32 GetBackpackSize_Implementation() override { return BackpackSize; }
+
+	FORCEINLINE virtual FBackpackItemMovedSignature& GetBackpackItemMovedDelegate() override { return BackpackItemMovedDelegate; };
+
+	FBackpackItemMovedSignature BackpackItemMovedDelegate;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TObjectPtr<UDropItems> DropItemAsset;
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FBackpackItem> BackpackItems;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 BackpackSize = 36;
 
 private:
 	FHitResult CursorHit;

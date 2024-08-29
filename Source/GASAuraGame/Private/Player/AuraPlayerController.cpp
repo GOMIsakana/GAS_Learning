@@ -12,6 +12,7 @@
 #include "Components/WidgetComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "GASAuraGame/GASAuraGame.h"
+#include "Data/DropItems.h"
 
 AAuraPlayerController::AAuraPlayerController()
 {
@@ -50,6 +51,135 @@ void AAuraPlayerController::SetMagicCircleMaterial(UMaterialInterface* InMateria
 	{
 		MagicCircle->SetMaterial(InMaterial);
 	}
+}
+
+void AAuraPlayerController::SortBackpackItems_Implementation(bool bAscending)
+{
+	struct FSortBackpackByBackpackSlot
+	{
+		FSortBackpackByBackpackSlot(bool bInbAscending) : bAscending(bInbAscending) {};
+
+		bool bAscending = true;
+
+		FORCEINLINE bool operator()(const FBackpackItem& ItemA, const FBackpackItem& ItemB) const
+		{
+			return bAscending ? ItemA.BackpackSlot < ItemB.BackpackSlot : ItemA.BackpackSlot > ItemB.BackpackSlot;
+		}
+	};
+	BackpackItems.Sort(FSortBackpackByBackpackSlot(bAscending));
+}
+
+void AAuraPlayerController::ExchangeItem_Implementation(int32 SourceItemSlot, int32 TargetItemSlot)
+{
+	FBackpackItem SourceItem;
+	FBackpackItem TargetItem;
+	GetItemAtBackpackSlot(SourceItem, SourceItemSlot);
+	GetItemAtBackpackSlot(TargetItem, TargetItemSlot);
+	/**
+	* 
+	* 拿起物品时, 将原来的物品转化成一个新物品附着到鼠标上, 原来位置清空或者数量减半(左键拿整组, 右键取一半)
+	* 如果鼠标落点位置为无效落点, 则弹回物品到原本的物品堆上
+	* 不会对空位置做出反应
+	* 
+	* 下面所说的"交换", 本质上都是从原本的物品堆中取其物品信息创建一个新的widget部件, 将原本鼠标上的物品信息覆盖到物品堆上, 再将新创建的widget绑定到鼠标上
+	* 如果物品类型一样, 检查物品的最大堆叠数, 如果未达到堆叠上限, 则合并两个物品, 并将溢出的物品堆叠更新到鼠标上的物品
+	* 如果物品类型不一样, 则进行位置交换(目标位置上的物品和鼠标上的物品进行交换)
+	* 如果目标没有物品, 则直接放置在目标位置
+	* 
+	*/
+
+	// 如果物品类型一样, 检查物品的最大堆叠数
+	if (SourceItem.ItemTag.MatchesTagExact(TargetItem.ItemTag))
+	{
+		FItemInfo SourceItemInfo = DropItemAsset->FindItemInfoByItemTag(SourceItem.ItemTag);
+		FItemInfo TargetItemInfo = DropItemAsset->FindItemInfoByItemTag(TargetItem.ItemTag);
+	}
+}
+
+void AAuraPlayerController::GetItemAtBackpackSlot_Implementation(FBackpackItem& OutItem, int32 BackpackSlot)
+{
+	for (const FBackpackItem& Item : BackpackItems)
+	{
+		if (Item.BackpackSlot == BackpackSlot)
+		{
+			OutItem = Item;
+		}
+	}
+}
+
+void AAuraPlayerController::SetItemAtBackpackSlot_Implementation(FBackpackItem& InItem, int32 BackpackSlot)
+{
+}
+
+void AAuraPlayerController::GetItemAtEquipSlot_Implementation(FBackpackItem& OutItem, int32 EquipSlot)
+{
+	for (const FBackpackItem& Item : BackpackItems)
+	{
+		if (Item.EquipSlot == EquipSlot)
+		{
+			OutItem = Item;
+		}
+	}
+}
+
+void AAuraPlayerController::EquipItemToSlot_Implementation(int32 ToEquipItemBackpackSlot, int32 EquipSlot)
+{
+	// 移除该位置上原有的物品
+	for (FBackpackItem& Item : BackpackItems)
+	{
+		if (Item.EquipSlot == EquipSlot)
+		{
+			/*
+			Item.Value.EquipSlot = -1;
+			// 将应用特效时的effect存到pc中
+			AuraAbilitySystemComponent->ApplyGameplayEffectSpecToSelf;
+				AuraAbilitySystemComponent->GetActiveGameplayEffect();
+			// 需要更改时, 获取当前的SetByCaller值, 减去需要移除的值，并更新到里面
+			FGameplayEffectSpecHandle SpecHandle;
+			SpecHandle.Data.Get()->GetSetByCallerMagnitude();
+			AuraAbilitySystemComponent->UpdateActiveGameplayEffectSetByCallerMagnitude
+			// 修改原本的被动effect的值
+			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude();
+			*/
+			break;
+			
+		}
+	}
+
+	// 将需要装备的物品装备到槽位上
+	for (FBackpackItem& Item : BackpackItems)
+	{
+		if (Item.BackpackSlot == ToEquipItemBackpackSlot)
+		{
+			Item.EquipSlot = EquipSlot;
+			break;
+		}
+	}
+}
+
+bool AAuraPlayerController::PickupItem_Implementation(FBackpackItem& InItem)
+{
+	// 先进行排序, 保证物品栏顺序正确
+	// 这里的排序是排序的数组, 跟读取的没有关系
+	SortBackpackItems(true);
+	// 检测第一个检测到的空位
+	int32 FirstEmptySlot = 0;
+	for (const FBackpackItem& Item : BackpackItems)
+	{
+		// 如果0号位置不是空位就一直检查到有空位为止
+		if (Item.BackpackSlot == FirstEmptySlot)
+		{
+			FirstEmptySlot++;
+		}
+	}
+	// 如果溢出了, 那就不拾取了
+	if (FirstEmptySlot == GetBackpackSize()) return false;
+	InItem.BackpackSlot = FirstEmptySlot;
+	// 如果位置没有抵达上限, 则放置在找到的第一个空位
+	BackpackItems.Add(InItem);
+	// 发送背包更新的提示
+	BackpackItemMovedDelegate.Broadcast(-1, FirstEmptySlot);
+	return true;
 }
 
 void AAuraPlayerController::ClientShowDamageNumber_Implementation(float DamageAmount, AActor* Target, bool bCriticalHit, bool bDamageValid)

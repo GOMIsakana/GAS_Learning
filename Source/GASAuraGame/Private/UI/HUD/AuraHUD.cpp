@@ -40,6 +40,17 @@ USpellMenuWidgetController* AAuraHUD::GetSpellMenuWidgetController(const FWidget
 	return SpellMenuWidgetController;
 }
 
+UBackpackWidgetController* AAuraHUD::GetBackpackWidgetController(const FWidgetControllerParams& WCParams)
+{
+	if (BackpackWidgetController == nullptr)
+	{
+		BackpackWidgetController = NewObject<UBackpackWidgetController>(this, BackpackWidgetControllerClass);
+		BackpackWidgetController->SetWidgetControllerParams(WCParams);
+		BackpackWidgetController->BindCallbacksToDependencies();
+	}
+	return BackpackWidgetController;
+}
+
 void AAuraHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS)
 {
 	checkf(OverlayWidgetClass, TEXT("Overlay Widget Class 未初始化, 请在BP_AuraHUD中设置"));
