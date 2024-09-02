@@ -11,7 +11,7 @@ void UBackpackWidgetController::SetItemToTargetSlot(FBackpackItem InItem, int32 
 	{
 		if (AuraPC->Implements<UBackpackInterface>())
 		{
-			IBackpackInterface::Execute_SetItemAtBackpackSlot(AuraPC, InItem, TargetSlot);
+			IBackpackInterface::Execute_SetItemAtBackpackSlot(AuraPC, InItem, TargetSlot, true);
 		}
 	}
 }
@@ -22,10 +22,10 @@ void UBackpackWidgetController::BindCallbacksToDependencies()
 	{
 		if (IBackpackInterface* BackpackInterface = Cast<IBackpackInterface>(AuraPC))
 		{
-			BackpackInterface->GetBackpackItemMovedDelegate().AddLambda(
-				[this](int32 SourceItemSlot, int32 TargetItemSlot)
+			BackpackInterface->GetBackpackItemUpdateDelegate().AddLambda(
+				[this](FBackpackItem InItem)
 				{
-					OnBackpackItemMovedDelegate.Broadcast(SourceItemSlot, TargetItemSlot);
+					OnBackpackItemUpdateDelegate.Broadcast(InItem);
 				}
 			);
 		}

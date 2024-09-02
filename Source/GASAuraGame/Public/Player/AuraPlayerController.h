@@ -56,16 +56,16 @@ public:
 
 	virtual void SortBackpackItems_Implementation(bool bAscending = true) override;
 	virtual void ExchangeItem_Implementation(int32 SourceItemSlot, int32 TargetItemSlot) override;
-	virtual void GetItemAtBackpackSlot_Implementation(FBackpackItem& OutItem, int32 BackpackSlot) override;
-	virtual void SetItemAtBackpackSlot_Implementation(FBackpackItem& InItem, int32 BackpackSlot) override;
-	virtual void GetItemAtEquipSlot_Implementation(FBackpackItem& OutItem, int32 EquipSlot) override;
-	virtual void EquipItemToSlot_Implementation(int32 ToEquipItemBackpackSlot, int32 EquipSlot) override;
+	virtual void GetItemAtBackpackSlot_Implementation(FBackpackItem& OutItem, int32 InBackpackSlot) override;
+	virtual void SetItemAtBackpackSlot_Implementation(FBackpackItem InItem, int32 InBackpackSlot, bool bRemoveInItemSourceSlotItem = true) override;
+	virtual void GetItemAtEquipSlot_Implementation(FBackpackItem& OutItem, int32 InEquipSlot) override;
+	virtual void EquipItemToSlot_Implementation(int32 ToEquipItemBackpackSlot, int32 InEquipSlot) override;
 	virtual bool PickupItem_Implementation(FBackpackItem& InItem) override;
 	FORCEINLINE virtual int32 GetBackpackSize_Implementation() override { return BackpackSize; }
 
-	FORCEINLINE virtual FBackpackItemMovedSignature& GetBackpackItemMovedDelegate() override { return BackpackItemMovedDelegate; };
+	FORCEINLINE virtual FBackpackItemUpdateSignature& GetBackpackItemUpdateDelegate() override { return BackpackItemUpdateDelegate; };
 
-	FBackpackItemMovedSignature BackpackItemMovedDelegate;
+	FBackpackItemUpdateSignature BackpackItemUpdateDelegate;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TObjectPtr<UDropItems> DropItemAsset;

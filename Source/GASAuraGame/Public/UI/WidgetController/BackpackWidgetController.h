@@ -7,7 +7,7 @@
 #include "Data/DropItems.h"
 #include "BackpackWidgetController.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnBackpackItemMovedSigenature, int32, SourceItemSlot, int32, TargetItemSlot);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBackpackItemUpdateSigenature, FBackpackItem, ItemToUpdate);
 
 /**
  * 
@@ -31,5 +31,5 @@ public:
 	TObjectPtr<UDropItems> DropItemAsset;
 
 	UPROPERTY(BlueprintAssignable)
-	FOnBackpackItemMovedSigenature OnBackpackItemMovedDelegate;
+	FOnBackpackItemUpdateSigenature OnBackpackItemUpdateDelegate;
 };

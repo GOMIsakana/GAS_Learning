@@ -93,6 +93,8 @@ void AAuraPlayerController::ExchangeItem_Implementation(int32 SourceItemSlot, in
 	{
 		FItemInfo SourceItemInfo = DropItemAsset->FindItemInfoByItemTag(SourceItem.ItemTag);
 		FItemInfo TargetItemInfo = DropItemAsset->FindItemInfoByItemTag(TargetItem.ItemTag);
+		BackpackItemUpdateDelegate.Broadcast(SourceItem);
+		BackpackItemUpdateDelegate.Broadcast(TargetItem);
 	}
 }
 
@@ -103,31 +105,80 @@ void AAuraPlayerController::GetItemAtBackpackSlot_Implementation(FBackpackItem& 
 		if (Item.BackpackSlot == BackpackSlot)
 		{
 			OutItem = Item;
+			return;
 		}
+	}
+	OutItem = FBackpackItem();
+}
+
+void AAuraPlayerController::SetItemAtBackpackSlot_Implementation(FBackpackItem InItem, int32 InBackpackSlot, bool bRemoveInItemSourceSlotItem)
+{
+	if (InItem.BackpackSlot == -1) return;	// 背包位置为-1代表不存在, 不做任何处理
+	int32 ToRemoveItemIndex = -1;
+	int32 InItemArrayIndex = -1;
+	int32 InItemOriginBackpackSlot = InItem.BackpackSlot;
+	InItem.BackpackSlot = InBackpackSlot;
+	// 遍历所有物品
+	for (int32 i = 0; i < BackpackItems.Num(); i++)
+	{
+		FBackpackItem& Item = BackpackItems[i];	// 获取物品
+		if (bRemoveInItemSourceSlotItem && Item.BackpackSlot == InItemOriginBackpackSlot)	// 如果有物品位于输入物品的原来位置, 则将其记录下来
+		{
+			ToRemoveItemIndex = i;
+		}
+		if (Item.BackpackSlot == InBackpackSlot)	// 如果找到需要覆盖的位置, 则将其覆盖
+		{
+			Item = InItem;
+			BackpackItemUpdateDelegate.Broadcast(InItem);
+			InItemArrayIndex = i;
+		}
+	}
+	// 只有当原本位置和目标位置不是同一个物品的时候才会移除掉原本位置的物品
+	if (bRemoveInItemSourceSlotItem && ToRemoveItemIndex != -1 && InItemOriginBackpackSlot != InBackpackSlot)
+	{
+		FBackpackItem ToRemoveItem;
+		ToRemoveItem.BackpackSlot = InItemOriginBackpackSlot;
+		BackpackItemUpdateDelegate.Broadcast(ToRemoveItem);
+		BackpackItems.RemoveAt(ToRemoveItemIndex);
+	}
+	// 如果已经塞入背包, 则再次不塞入背包
+	if (InItemArrayIndex != -1)
+	{
+		// 如果物品数量为零, 则移除该物品
+		if (InItem.ItemAmount <= 0)
+		{
+			FBackpackItem ToRemoveItem;
+			ToRemoveItem.BackpackSlot = BackpackItems[InItemArrayIndex].BackpackSlot;
+			BackpackItemUpdateDelegate.Broadcast(ToRemoveItem);
+			BackpackItems.RemoveAt(InItemArrayIndex);
+		}
+		return;
+	}
+	// 如果没有在对应位置上的物品、且数量大于0, 则直接放入背包, 当新开了一个格子
+	if (InItem.ItemAmount > 0)
+	{
+		BackpackItems.Add(InItem);
+		BackpackItemUpdateDelegate.Broadcast(InItem);
 	}
 }
 
-void AAuraPlayerController::SetItemAtBackpackSlot_Implementation(FBackpackItem& InItem, int32 BackpackSlot)
-{
-}
-
-void AAuraPlayerController::GetItemAtEquipSlot_Implementation(FBackpackItem& OutItem, int32 EquipSlot)
+void AAuraPlayerController::GetItemAtEquipSlot_Implementation(FBackpackItem& OutItem, int32 InEquipSlot)
 {
 	for (const FBackpackItem& Item : BackpackItems)
 	{
-		if (Item.EquipSlot == EquipSlot)
+		if (Item.EquipSlot == InEquipSlot)
 		{
 			OutItem = Item;
 		}
 	}
 }
 
-void AAuraPlayerController::EquipItemToSlot_Implementation(int32 ToEquipItemBackpackSlot, int32 EquipSlot)
+void AAuraPlayerController::EquipItemToSlot_Implementation(int32 ToEquipItemBackpackSlot, int32 InEquipSlot)
 {
 	// 移除该位置上原有的物品
 	for (FBackpackItem& Item : BackpackItems)
 	{
-		if (Item.EquipSlot == EquipSlot)
+		if (Item.EquipSlot == InEquipSlot)
 		{
 			/*
 			Item.Value.EquipSlot = -1;
@@ -151,7 +202,7 @@ void AAuraPlayerController::EquipItemToSlot_Implementation(int32 ToEquipItemBack
 	{
 		if (Item.BackpackSlot == ToEquipItemBackpackSlot)
 		{
-			Item.EquipSlot = EquipSlot;
+			Item.EquipSlot = InEquipSlot;
 			break;
 		}
 	}
@@ -178,7 +229,7 @@ bool AAuraPlayerController::PickupItem_Implementation(FBackpackItem& InItem)
 	// 如果位置没有抵达上限, 则放置在找到的第一个空位
 	BackpackItems.Add(InItem);
 	// 发送背包更新的提示
-	BackpackItemMovedDelegate.Broadcast(-1, FirstEmptySlot);
+	BackpackItemUpdateDelegate.Broadcast(InItem);
 	return true;
 }
 

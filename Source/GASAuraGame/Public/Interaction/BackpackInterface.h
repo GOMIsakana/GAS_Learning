@@ -21,7 +21,7 @@ struct FBackpackItem
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	int32 BackpackSlot;
+	int32 BackpackSlot = -1; // -1表示不存在于背包中, 默认为0的话会导致0编号上的物品被删除
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FGameplayTag ItemTag;
@@ -45,7 +45,7 @@ struct FBackpackItem
 	int32 ItemAmount = 0;
 };
 
-DECLARE_MULTICAST_DELEGATE_TwoParams(FBackpackItemMovedSignature, int32 /* 起点位置 */, int32 /* 终点位置 */);
+DECLARE_MULTICAST_DELEGATE_OneParam(FBackpackItemUpdateSignature, FBackpackItem /* 需要更新的物品, 位置信息已包含在里面 */);
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
@@ -63,28 +63,28 @@ class GASAURAGAME_API IBackpackInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	UFUNCTION(BlueprintNativeEvent)
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void ExchangeItem(int32 SourceItemSlot, int32 TargetItemSlot);
 	// 这里的排序是排序的数组, 跟读取的没有关系
-	UFUNCTION(BlueprintNativeEvent)
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void SortBackpackItems(bool bAscending = true);
 
-	UFUNCTION(BlueprintNativeEvent)
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	int32 GetBackpackSize();
 
-	UFUNCTION(BlueprintNativeEvent)
-	void GetItemAtBackpackSlot(FBackpackItem& OutItem, int32 BackpackSlot);
-	UFUNCTION(BlueprintNativeEvent)
-	void SetItemAtBackpackSlot(FBackpackItem& InItem, int32 BackpackSlot);
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void GetItemAtBackpackSlot(FBackpackItem& OutItem, int32 InBackpackSlot);
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, meta = ())
+	void SetItemAtBackpackSlot(FBackpackItem InItem, int32 InBackpackSlot, bool bRemoveInItemSourceSlotItem = true);
 
-	UFUNCTION(BlueprintNativeEvent)
-	void GetItemAtEquipSlot(FBackpackItem& OutItem, int32 EquipSlot);
-	UFUNCTION(BlueprintNativeEvent)
-	void EquipItemToSlot(int32 ToEquipItemBackpackSlot, int32 EquipSlot);
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void GetItemAtEquipSlot(FBackpackItem& OutItem, int32 InEquipSlot);
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void EquipItemToSlot(int32 ToEquipItemBackpackSlot, int32 InEquipSlot);
 
-	UFUNCTION(BlueprintNativeEvent)
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	// 如果拾取成功, 返回true, 拾取失败返回false
 	bool PickupItem(FBackpackItem& InItem);
 
-	virtual FBackpackItemMovedSignature& GetBackpackItemMovedDelegate() = 0;
+	virtual FBackpackItemUpdateSignature& GetBackpackItemUpdateDelegate() = 0;
 };
