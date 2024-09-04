@@ -43,6 +43,36 @@ struct FBackpackItem
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int32 ItemAmount = 0;
+
+	bool operator==(FBackpackItem OtherItem)
+	{
+		bool bSameBaseAttributes = true;
+		if (BaseAttributes.Num() == OtherItem.BaseAttributes.Num())
+		{
+			TArray<FGameplayTag> AttributeTags;
+			BaseAttributes.GetKeys(AttributeTags);
+			for (int32 i = 0; i < AttributeTags.Num(); i++)
+			{
+				FGameplayTag Tag = AttributeTags[i];
+				if (!(OtherItem.BaseAttributes.Contains(Tag) && BaseAttributes[Tag] == OtherItem.BaseAttributes[Tag]))
+				{
+					bSameBaseAttributes = false;
+					break;
+				}
+			}
+		}
+		else
+		{
+			bSameBaseAttributes = false;
+		}
+		// 物品tag、等级限制且属性表一致才认为是同一个物品
+		return ItemTag.MatchesTagExact(OtherItem.ItemTag) && LevelLimit == OtherItem.LevelLimit && bSameBaseAttributes;
+	}
+
+	bool StructEquals(const FBackpackItem& A, const FBackpackItem& B)
+	{
+		return FBackpackItem::StaticStruct()->CompareScriptStruct(&A, &B, 0);
+	}
 };
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FBackpackItemUpdateSignature, FBackpackItem /* 需要更新的物品, 位置信息已包含在里面 */);

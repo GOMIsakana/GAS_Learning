@@ -1,0 +1,16 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UnrealEditor-LuaRapidjson-0001-Win64-DebugGame.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"D:\UnrealEngineProject\GASAuraGame\Intermediate\Build\Win64\x64\GASAuraGameEditor\DebugGame\Engine\SharedPCH.Engine.NonOptimized.ShadowErrors.NoUndef.InclOrderUnreal5_1.h.obj"
+"D:\UnrealEngineProject\GASAuraGame\Plugins\UnLuaExtensions\LuaRapidjson\Intermediate\Build\Win64\x64\UnrealEditor\DebugGame\LuaRapidjson\LuaRapidjsonModule.cpp.obj"
+"D:\UnrealEngineProject\GASAuraGame\Plugins\UnLuaExtensions\LuaRapidjson\Intermediate\Build\Win64\x64\UnrealEditor\DebugGame\LuaRapidjson\Document.cpp.obj"
+"D:\UnrealEngineProject\GASAuraGame\Plugins\UnLuaExtensions\LuaRapidjson\Intermediate\Build\Win64\x64\UnrealEditor\DebugGame\LuaRapidjson\rapidjson.cpp.obj"
+"D:\UnrealEngineProject\GASAuraGame\Plugins\UnLuaExtensions\LuaRapidjson\Intermediate\Build\Win64\x64\UnrealEditor\DebugGame\LuaRapidjson\Schema.cpp.obj"
+"D:\UnrealEngineProject\GASAuraGame\Plugins\UnLuaExtensions\LuaRapidjson\Intermediate\Build\Win64\x64\UnrealEditor\DebugGame\LuaRapidjson\values.cpp.obj"
+"D:\UnrealEngineProject\GASAuraGame\Plugins\UnLuaExtensions\LuaRapidjson\Intermediate\Build\Win64\x64\UnrealEditor\DebugGame\LuaRapidjson\Default.rc2.res"
+/OUT:"D:\UnrealEngineProject\GASAuraGame\Plugins\UnLuaExtensions\LuaRapidjson\Intermediate\Build\Win64\x64\UnrealEditor\DebugGame\LuaRapidjson\UnrealEditor-LuaRapidjson-0001-Win64-DebugGame.lib"

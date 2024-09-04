@@ -1,0 +1,13 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UnrealEditor-LuaProtobuf-0001-Win64-DebugGame.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"D:\UnrealEngineProject\GASAuraGame\Intermediate\Build\Win64\x64\GASAuraGameEditor\DebugGame\Engine\SharedPCH.Engine.NonOptimized.ShadowErrors.NoUndef.InclOrderUnreal5_1.h.obj"
+"D:\UnrealEngineProject\GASAuraGame\Plugins\UnLuaExtensions\LuaProtobuf\Intermediate\Build\Win64\x64\UnrealEditor\DebugGame\LuaProtobuf\LuaProtobufModule.cpp.obj"
+"D:\UnrealEngineProject\GASAuraGame\Plugins\UnLuaExtensions\LuaProtobuf\Intermediate\Build\Win64\x64\UnrealEditor\DebugGame\LuaProtobuf\pb.cpp.obj"
+"D:\UnrealEngineProject\GASAuraGame\Plugins\UnLuaExtensions\LuaProtobuf\Intermediate\Build\Win64\x64\UnrealEditor\DebugGame\LuaProtobuf\Default.rc2.res"
+/OUT:"D:\UnrealEngineProject\GASAuraGame\Plugins\UnLuaExtensions\LuaProtobuf\Intermediate\Build\Win64\x64\UnrealEditor\DebugGame\LuaProtobuf\UnrealEditor-LuaProtobuf-0001-Win64-DebugGame.lib"

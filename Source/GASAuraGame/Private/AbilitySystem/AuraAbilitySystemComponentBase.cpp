@@ -367,7 +367,9 @@ void UAuraAbilitySystemComponentBase::ServerEquipAbility_Implementation(const FG
 						ClientEquipAbility(AbilityTag, GameplayTags.Abilities_Status_Equipped, Slot, PreviousSlot);
 						return;
 					}
-					
+
+					AbilitySpecFromSlot->DynamicAbilityTags.RemoveTag(GetStatusTagFromSpec(*AbilitySpecFromSlot));
+					AbilitySpecFromSlot->DynamicAbilityTags.AddTag(FAuraGameplayTags::Get().Abilities_Status_Unlocked);
 					if (IsPassiveAbility(*AbilitySpecFromSlot)) // 如果原来槽位上的是被动技能, 则禁用它（因为被动技能的生效取决于是否装备）
 					{
 						DeactivatePassiveAbilityDelegate.Broadcast(GetAbilityTagFromSpec(*AbilitySpecFromSlot));
