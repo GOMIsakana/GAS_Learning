@@ -7,13 +7,15 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Interaction/PlayerInterface.h"
+#include "Player/AuraPlayerController.h"
+#include "Interaction/BackpackInterface.h"
 #include "AuraCharacter.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class GASAURAGAME_API AAuraCharacter : public AAuraCharacterBase, public IPlayerInterface
+class GASAURAGAME_API AAuraCharacter : public AAuraCharacterBase, public IPlayerInterface, public IBackpackInterface
 {
 	GENERATED_BODY()
 	
@@ -45,6 +47,22 @@ public:
 	virtual int32 GetCombatLevel_Implementation() override;
 	/* 战斗接口结束 */
 
+	/* 背包接口开始 */
+	virtual void SortBackpackItems_Implementation(bool bAscending = true) override;
+	virtual void ExchangeItem_Implementation(int32 SourceItemSlot, int32 TargetItemSlot) override;
+	virtual void GetItemAtBackpackSlot_Implementation(FBackpackItem& OutItem, int32 InBackpackSlot) override;
+	virtual void SetItemAtBackpackSlot_Implementation(FBackpackItem InItem, int32 InBackpackSlot, bool bRemoveInItemSourceSlotItem = true) override;
+	virtual void GetItemAtEquipSlot_Implementation(FBackpackItem& OutItem, int32 InEquipSlot) override;
+	virtual void EquipItemToSlot_Implementation(int32 ToEquipItemBackpackSlot, int32 InEquipSlot) override;
+	virtual bool PickupItem_Implementation(UPARAM(Ref) FBackpackItem& InItem) override;
+	virtual int32 GetBackpackSize_Implementation() override;
+
+	virtual FBackpackItemUpdateSignature& GetBackpackItemUpdateDelegate() override;
+	FBackpackItemUpdateSignature BackpackItemUpdateDelegate;
+	/* 背包接口结束 */
+
+	AAuraPlayerController* GetAuraPlayerController();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UNiagaraComponent> LevelUpNiagaraComponent;
 protected:
@@ -73,4 +91,7 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USoundBase> LevelUpSoundCue;
+
+	UPROPERTY()
+	TObjectPtr<AAuraPlayerController> AuraPlayerController;
 };

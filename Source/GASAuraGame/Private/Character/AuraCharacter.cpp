@@ -4,7 +4,6 @@
 #include "Character/AuraCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Player/AuraPlayerState.h"
-#include "Player/AuraPlayerController.h"
 #include "UI/HUD/AuraHUD.h"
 #include "AbilitySystem/AuraAbilitySystemComponentBase.h"
 #include "NiagaraComponent.h"
@@ -187,23 +186,21 @@ void AAuraCharacter::LevelUp_Implementation()
 
 void AAuraCharacter::ShowMagicCircle_Implementation(UMaterialInterface* InMagicCircleMaterial)
 {
-	AAuraPlayerController* AuraPC = Cast<AAuraPlayerController>(GetController());
-	if (AuraPC)
+	if (GetAuraPlayerController())
 	{
-		AuraPC->ShowMagicCircle();
+		GetAuraPlayerController()->ShowMagicCircle();
 		if (InMagicCircleMaterial)
 		{
-			AuraPC->SetMagicCircleMaterial(InMagicCircleMaterial);
+			GetAuraPlayerController()->SetMagicCircleMaterial(InMagicCircleMaterial);
 		}
 	}
 }
 
 void AAuraCharacter::HideMagicCircle_Implementation()
 {
-	AAuraPlayerController* AuraPC = Cast<AAuraPlayerController>(GetController());
-	if (AuraPC)
+	if (GetAuraPlayerController())
 	{
-		AuraPC->HideMagicCircle();
+		GetAuraPlayerController()->HideMagicCircle();
 	}
 }
 
@@ -306,6 +303,90 @@ int32 AAuraCharacter::GetCombatLevel_Implementation()
 	return 0;
 }
 
+void AAuraCharacter::SortBackpackItems_Implementation(bool bAscending)
+{
+	if (GetAuraPlayerController() && GetAuraPlayerController()->Implements<UBackpackInterface>())
+	{
+		IBackpackInterface::Execute_SortBackpackItems(GetAuraPlayerController(), bAscending);
+	}
+}
+
+void AAuraCharacter::ExchangeItem_Implementation(int32 SourceItemSlot, int32 TargetItemSlot)
+{
+	if (GetAuraPlayerController() && GetAuraPlayerController()->Implements<UBackpackInterface>())
+	{
+		IBackpackInterface::Execute_ExchangeItem(GetAuraPlayerController(), SourceItemSlot, TargetItemSlot);
+	}
+}
+
+void AAuraCharacter::GetItemAtBackpackSlot_Implementation(FBackpackItem& OutItem, int32 InBackpackSlot)
+{
+	if (GetAuraPlayerController() && GetAuraPlayerController()->Implements<UBackpackInterface>())
+	{
+		IBackpackInterface::Execute_GetItemAtBackpackSlot(GetAuraPlayerController(), OutItem, InBackpackSlot);
+	}
+}
+
+void AAuraCharacter::SetItemAtBackpackSlot_Implementation(FBackpackItem InItem, int32 InBackpackSlot, bool bRemoveInItemSourceSlotItem)
+{
+	if (GetAuraPlayerController() && GetAuraPlayerController()->Implements<UBackpackInterface>())
+	{
+		IBackpackInterface::Execute_SetItemAtBackpackSlot(GetAuraPlayerController(), InItem, InBackpackSlot, bRemoveInItemSourceSlotItem);
+	}
+}
+
+void AAuraCharacter::GetItemAtEquipSlot_Implementation(FBackpackItem& OutItem, int32 InEquipSlot)
+{
+	if (GetAuraPlayerController() && GetAuraPlayerController()->Implements<UBackpackInterface>())
+	{
+		IBackpackInterface::Execute_GetItemAtEquipSlot(GetAuraPlayerController(), OutItem, InEquipSlot);
+	}
+}
+
+void AAuraCharacter::EquipItemToSlot_Implementation(int32 ToEquipItemBackpackSlot, int32 InEquipSlot)
+{
+	if (GetAuraPlayerController() && GetAuraPlayerController()->Implements<UBackpackInterface>())
+	{
+		IBackpackInterface::Execute_EquipItemToSlot(GetAuraPlayerController(), ToEquipItemBackpackSlot, InEquipSlot);
+	}
+}
+
+bool AAuraCharacter::PickupItem_Implementation(UPARAM(Ref) FBackpackItem& InItem)
+{
+	if (GetAuraPlayerController() && GetAuraPlayerController()->Implements<UBackpackInterface>())
+	{
+		return IBackpackInterface::Execute_PickupItem(GetAuraPlayerController(), InItem);
+	}
+	return false;
+}
+
+int32 AAuraCharacter::GetBackpackSize_Implementation()
+{
+	if (GetAuraPlayerController() && GetAuraPlayerController()->Implements<UBackpackInterface>())
+	{
+		return IBackpackInterface::Execute_GetBackpackSize(GetAuraPlayerController());
+	}
+	return 0;
+}
+
+FBackpackItemUpdateSignature& AAuraCharacter::GetBackpackItemUpdateDelegate()
+{
+	if (IBackpackInterface* BackpackInterface = Cast<IBackpackInterface>(GetAuraPlayerController()))
+	{
+		BackpackItemUpdateDelegate = BackpackInterface->GetBackpackItemUpdateDelegate();
+	}
+	return BackpackItemUpdateDelegate;
+}
+
+AAuraPlayerController* AAuraCharacter::GetAuraPlayerController()
+{
+	if (AuraPlayerController == nullptr)
+	{
+		AuraPlayerController = Cast<AAuraPlayerController>(GetController());
+	}
+	return AuraPlayerController;
+}
+
 void AAuraCharacter::OnStunTagChanged(FGameplayTag ReceivedTag, int32 NewCount)
 {
 	bIsStunned = NewCount > 0;
@@ -384,9 +465,9 @@ void AAuraCharacter::InitAbilityActorInfo()
 
 	AbilitySystemComponent->RegisterGameplayTagEvent(FAuraGameplayTags::Get().Debuff_Type_Stun).AddUObject(this, &AAuraCharacter::OnStunTagChanged);
 
-	if (AAuraPlayerController* AuraPlayerController = Cast<AAuraPlayerController>(GetController()))
+	if (GetAuraPlayerController())
 	{
-		if (AAuraHUD* AuraHUD = Cast<AAuraHUD>(AuraPlayerController->GetHUD()))
+		if (AAuraHUD* AuraHUD = Cast<AAuraHUD>(GetAuraPlayerController()->GetHUD()))
 		{
 			AuraHUD->InitOverlay(AuraPlayerController, AuraPlayerState, AbilitySystemComponent, AttributeSet);
 		}

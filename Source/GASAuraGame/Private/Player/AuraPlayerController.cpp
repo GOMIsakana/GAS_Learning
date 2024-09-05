@@ -71,10 +71,16 @@ void AAuraPlayerController::SortBackpackItems_Implementation(bool bAscending)
 
 void AAuraPlayerController::ExchangeItem_Implementation(int32 SourceItemSlot, int32 TargetItemSlot)
 {
+
+	// 实现在蓝图 //
+
+	/*
 	FBackpackItem SourceItem;
 	FBackpackItem TargetItem;
-	GetItemAtBackpackSlot(SourceItem, SourceItemSlot);
-	GetItemAtBackpackSlot(TargetItem, TargetItemSlot);
+	IBackpackInterface::Execute_GetItemAtBackpackSlot(this, SourceItem, SourceItemSlot);
+	IBackpackInterface::Execute_GetItemAtBackpackSlot(this, TargetItem, TargetItemSlot);
+	*/
+
 	/**
 	* 
 	* 拿起物品时, 将原来的物品转化成一个新物品附着到鼠标上, 原来位置清空或者数量减半(左键拿整组, 右键取一半)
@@ -88,6 +94,7 @@ void AAuraPlayerController::ExchangeItem_Implementation(int32 SourceItemSlot, in
 	* 
 	*/
 
+	/*
 	// 如果物品类型一样, 检查物品的最大堆叠数
 	if (SourceItem.ItemTag.MatchesTagExact(TargetItem.ItemTag))
 	{
@@ -96,6 +103,7 @@ void AAuraPlayerController::ExchangeItem_Implementation(int32 SourceItemSlot, in
 		BackpackItemUpdateDelegate.Broadcast(SourceItem);
 		BackpackItemUpdateDelegate.Broadcast(TargetItem);
 	}
+	*/
 }
 
 void AAuraPlayerController::GetItemAtBackpackSlot_Implementation(FBackpackItem& OutItem, int32 BackpackSlot)
@@ -208,28 +216,57 @@ void AAuraPlayerController::EquipItemToSlot_Implementation(int32 ToEquipItemBack
 	}
 }
 
-bool AAuraPlayerController::PickupItem_Implementation(FBackpackItem& InItem)
+bool AAuraPlayerController::PickupItem_Implementation(UPARAM(Ref) FBackpackItem& InItem)
 {
 	// 先进行排序, 保证物品栏顺序正确
 	// 这里的排序是排序的数组, 跟读取的没有关系
-	SortBackpackItems(true);
-	// 检测第一个检测到的空位
-	int32 FirstEmptySlot = 0;
-	for (const FBackpackItem& Item : BackpackItems)
+	IBackpackInterface::Execute_SortBackpackItems(this, true);
+	// 检测所有位置
+	TArray<int32> HasItemSlots;
+	FItemInfo InItemInfo = DropItemAsset->FindItemInfoByItemTag(InItem.ItemTag);
+	for (FBackpackItem& Item : BackpackItems)
 	{
-		// 如果0号位置不是空位就一直检查到有空位为止
-		if (Item.BackpackSlot == FirstEmptySlot)
+		// 如果有相同的物品, 则优先堆叠到相同物品
+		if (Item == InItem)
 		{
-			FirstEmptySlot++;
+			int32 ToChangeAmount = FMath::Min(InItemInfo.MaxStackAmount - Item.ItemAmount, InItem.ItemAmount);
+			Item.ItemAmount += ToChangeAmount;
+			InItem.ItemAmount -= ToChangeAmount;
+			BackpackItemUpdateDelegate.Broadcast(Item);
+		}
+		// 检查有物品的位置
+		HasItemSlots.AddUnique(Item.BackpackSlot);
+	}
+	// 如果溢出了, 那就不拾取剩下的部分了
+	if (BackpackItems.Num() == IBackpackInterface::Execute_GetBackpackSize(this)) return false;
+	// 如果堆叠到目标位置还有多的, 那就分堆
+	if (InItem.ItemAmount > 0)
+	{
+		int32 EmptySlot = 0;
+		int32 ArrayIndex = 0;
+		while (InItem.ItemAmount > 0 && BackpackItems.Num() < IBackpackInterface::Execute_GetBackpackSize(this))
+		{
+			// 循环找到下一个空槽
+			while (ArrayIndex < HasItemSlots.Num() && EmptySlot == HasItemSlots[ArrayIndex])
+			{
+				EmptySlot = HasItemSlots[ArrayIndex] + 1;
+				ArrayIndex++;
+			}
+			FBackpackItem NewItem = InItem;
+			NewItem.ItemAmount = FMath::Min(InItemInfo.MaxStackAmount, InItem.ItemAmount);	// 根据数量分堆
+			InItem.ItemAmount -= NewItem.ItemAmount;	// 减少原物品堆的物品
+			NewItem.BackpackSlot = EmptySlot;
+			// 如果位置没有抵达上限, 则放置在找到的第一个空位
+			BackpackItems.Add(NewItem);
+			// 发送背包更新的提示
+			BackpackItemUpdateDelegate.Broadcast(NewItem);
+			// 空槽位下标+1
+			EmptySlot++;
+
+			// 每次循环结束后检查背包是否已满, 满了就放弃拾取
+			if (BackpackItems.Num() == IBackpackInterface::Execute_GetBackpackSize(this)) return false;
 		}
 	}
-	// 如果溢出了, 那就不拾取了
-	if (FirstEmptySlot == GetBackpackSize()) return false;
-	InItem.BackpackSlot = FirstEmptySlot;
-	// 如果位置没有抵达上限, 则放置在找到的第一个空位
-	BackpackItems.Add(InItem);
-	// 发送背包更新的提示
-	BackpackItemUpdateDelegate.Broadcast(InItem);
 	return true;
 }
 

@@ -114,7 +114,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	// 如果拾取成功, 返回true, 拾取失败返回false
-	bool PickupItem(FBackpackItem& InItem);
+	bool PickupItem(UPARAM(Ref) FBackpackItem& InItem);
 
 	virtual FBackpackItemUpdateSignature& GetBackpackItemUpdateDelegate() = 0;
 };

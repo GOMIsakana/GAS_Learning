@@ -54,18 +54,20 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetMagicCircleMaterial(UMaterialInterface* InMaterial);
 
+	/* 背包接口开始 */
 	virtual void SortBackpackItems_Implementation(bool bAscending = true) override;
 	virtual void ExchangeItem_Implementation(int32 SourceItemSlot, int32 TargetItemSlot) override;
 	virtual void GetItemAtBackpackSlot_Implementation(FBackpackItem& OutItem, int32 InBackpackSlot) override;
 	virtual void SetItemAtBackpackSlot_Implementation(FBackpackItem InItem, int32 InBackpackSlot, bool bRemoveInItemSourceSlotItem = true) override;
 	virtual void GetItemAtEquipSlot_Implementation(FBackpackItem& OutItem, int32 InEquipSlot) override;
 	virtual void EquipItemToSlot_Implementation(int32 ToEquipItemBackpackSlot, int32 InEquipSlot) override;
-	virtual bool PickupItem_Implementation(FBackpackItem& InItem) override;
+	virtual bool PickupItem_Implementation(UPARAM(Ref) FBackpackItem& InItem) override;
 	FORCEINLINE virtual int32 GetBackpackSize_Implementation() override { return BackpackSize; }
 
 	FORCEINLINE virtual FBackpackItemUpdateSignature& GetBackpackItemUpdateDelegate() override { return BackpackItemUpdateDelegate; };
 
 	FBackpackItemUpdateSignature BackpackItemUpdateDelegate;
+	/* 背包接口结束 */
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TObjectPtr<UDropItems> DropItemAsset;
